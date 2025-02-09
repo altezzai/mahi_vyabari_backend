@@ -1,0 +1,27 @@
+{
+  "shopImage": "https://example.com/images/shop1.jpg",
+  "shopIconImage": "https://example.com/images/shop1-icon.jpg",
+  "shopName": "Tech Haven",
+  "category": "Electronics",
+  "phone": "+1234567890",
+  "whatsapp": "+1234567890",
+  "website": "https://techhaven.com",
+  "location": "37.7749,-122.4194",
+  "description": "A one-stop shop for all your tech needs. From smartphones to laptops, we have it all.",
+  "address": "123 Tech Street, San Francisco, CA 94103",
+  "openingTime": "09:00 AM",
+  "closingTime": "09:00 PM",
+  "workingDays": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+  "priority": "A",
+  "areas": ["Downtown", "Mission District", "SoMa"]
+}
+
+
+
+{
+  "shopId":"67a40ea7a1a0053a51588eac",
+  "productName":"sample",
+  "originalPrice":200,
+  "offerPrice":150,
+  "description":"Good"
+}
