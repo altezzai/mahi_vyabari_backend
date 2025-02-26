@@ -7,7 +7,7 @@ const sequelize = new Sequelize(
   {
     host: "localhost",
     dialect: "mysql",
-    logging: console.log,
+    logging:false,
   }
 );
 
@@ -18,6 +18,6 @@ try {
   console.error("Unable to connect to the database:", error);
 }
 
-sequelize.sync();
+sequelize.sync({force:false});
 
 module.exports = sequelize;

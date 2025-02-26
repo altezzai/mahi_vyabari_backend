@@ -3,6 +3,10 @@ const sequelize = require("../config/database");
 const Category = sequelize.define(
   "Category",
   {
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
     category: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -10,9 +14,9 @@ const Category = sequelize.define(
         notEmpty: true,
       },
     },
-    categoryIcon:{
-        type:DataTypes.STRING,
-        allowNull:false
+    categoryIcon: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     subcategories: {
       type: DataTypes.JSON,

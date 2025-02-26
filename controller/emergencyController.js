@@ -2,9 +2,9 @@ require("../config/database");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
-const Category = require("../models/Category");
+const Emergency = require("../models/Emergency");
 
-const uploadPath = path.join(__dirname, "../public/uploads/categoryImages");
+const uploadPath = path.join(__dirname, "../public/uploads/emergency");
 if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath, { recursive: true });
 }
@@ -23,25 +23,26 @@ const upload = multer({ storage });
 
 module.exports = {
   upload,
-  addCategory: async (req, res) => {
+  addEmergency: async (req, res) => {
+    console.log(req.body);
     try {
       if (!req.file) {
         return res.status(400).json({ message: "category icon is required" });
       }
 
-      const categoryIcon = req.file ? req.file.filename : null;
-      req.body.categoryIcon = categoryIcon;
+      const icon = req.file ? req.file.filename : null;
+      req.body.icon = icon;
 
-      const savedCategory = await Category.create(req.body);
-      if (!savedCategory) {
+      const savedEmergency = await Emergency.create(req.body);
+      if (!savedEmergency) {
         res.status(404).json({
           status: "FAILED",
-          message: "Can't upload Category Data",
+          message: "Can't upload Emergency Data",
         });
       }
       res.status(200).json({
         status: "SUCCESS",
-        data: savedCategory,
+        data: savedEmergency,
       });
     } catch (error) {
       console.log(error);

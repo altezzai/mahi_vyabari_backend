@@ -2,12 +2,10 @@ require("../config/database");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
-const Product = require("../models/Product");
-const Shop = require("../models/Shop");
-const ShopCategory = require("../models/ShopCategory");
-const { json } = require("body-parser");
+const Worker = require("../models/Worker");
+const WorkerCategory = require("../models/WorkerCategory");
 
-const uploadPath = path.join(__dirname, "../public/uploads/shopImages");
+const uploadPath = path.join(__dirname, "../public/uploads/workers");
 if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath, { recursive: true });
 }
@@ -26,7 +24,7 @@ const upload = multer({ storage });
 
 module.exports = {
   upload,
-  addshop: async (req, res) => {
+  addWorkerProfile: async (req, res) => {
     try {
       if (!req.files.image || !req.files.icon) {
         return res
@@ -40,44 +38,25 @@ module.exports = {
       req.body.image = image;
       req.body.icon = icon;
 
-      const savedShop = await Shop.create(req.body);
-
-      if (savedShop.categories && savedShop.categories.length > 0) {
-        await ShopCategory.bulkCreate(
-          JSON.parse(savedShop.categories).map((category) => ({
-            shopId: savedShop.id,
+      const savedWorker = await Worker.create(req.body);
+      
+      if (savedWorker.categories && savedWorker.categories.length > 0) {
+        await WorkerCategory.bulkCreate(
+          JSON.parse(savedWorker.categories).map((category) => ({
+            workerId: savedWorker.id,
             categoryId: category,
           }))
         );
       }
-
       res.status(201).json({
         status: "success",
-        savedShop: savedShop,
+        result: savedWorker,
       });
     } catch (error) {
       console.log(error);
       res.status(401).json({
         status: "FAILED",
-        message: "An error occured while uploading new shop data",
-      });
-    }
-  },
-  addproduct: async (req, res) => {
-    try {
-      const savedProduct = await Product.create(req.body);
-      if (!savedProduct) {
-        res.status(404).json(error.message);
-      }
-      res.status(200).json({
-        success: "SUCCESS",
-        result: savedProduct,
-      });
-    } catch (error) {
-      console.log(error);
-      res.status(401).json({
-        status: "FAILED",
-        message: "An error occured while adding the product",
+        message: "An error occured while uploading new Worker Profile data",
       });
     }
   },

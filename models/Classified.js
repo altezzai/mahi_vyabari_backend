@@ -1,69 +1,68 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 
-const Shop = sequelize.define(
-  "Shop",
+const ItemListing = sequelize.define(
+  "ItemListing",
   {
     userId: {
       type: DataTypes.INTEGER,
       allowNull: true,
     },
-    image: {
+    category: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    icon: {
+    itemName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      field: "item_name",
+      validate: {
+        notEmpty: true,
+      },
+    },
+    price: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
+    homeTown: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      field: "home_town",
+    },
+    area: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    shopName: {
-      type: DataTypes.STRING,
+    address: {
+      type: DataTypes.TEXT,
       allowNull: false,
     },
-    categories: {
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    priority: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull:false
     },
     phone: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
     },
     whatsapp: {
       type: DataTypes.STRING,
+      allowNull: true,
     },
-    website: {
-      type: DataTypes.STRING,
+    image: {
+      type: DataTypes.STRING, // Stores the image URL/path
+      allowNull: true,
     },
-    location: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    description: {
-      type: DataTypes.STRING(500),
-    },
-    address: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    openingTime: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    closingTime: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    workingDays: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    priority: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    areas: {
-      type: DataTypes.STRING,
-      allowNull: false,
+    icon: {
+      type: DataTypes.STRING, // Stores the icon URL/path
+      allowNull: true,
     },
     trash: {
       type: DataTypes.BOOLEAN,
@@ -71,9 +70,8 @@ const Shop = sequelize.define(
     },
   },
   {
-    tableName: "shops",
-    timestamps: false,
+    timestamps: true,
   }
 );
 
-module.exports = Shop;
+module.exports = ItemListing;

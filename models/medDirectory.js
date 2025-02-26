@@ -1,16 +1,26 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');  
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/database");
 
-  const HealthcareProvider = sequelize.define('HealthcareProvider', {
-    userId:{
-       type:DataTypes.INTEGER,
-       allowNull:true,
+const HealthcareProvider = sequelize.define(
+  "HealthcareProvider",
+  {
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    image: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    icon: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     searchCategory: {
-      type: DataTypes.ENUM('doctor', 'hospital'),
+      type: DataTypes.ENUM("doctor", "hospital"),
       allowNull: false,
       validate: {
-        isIn: [['doctor', 'hospital']],
+        isIn: [["doctor", "hospital"]],
       },
     },
     name: {
@@ -25,14 +35,6 @@ const sequelize = require('../config/database');
       },
     },
     searchSubcategory: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    image: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    icon: {
       type: DataTypes.STRING,
       allowNull: true,
     },
@@ -74,19 +76,23 @@ const sequelize = require('../config/database');
     priority: {
       type: DataTypes.CHAR(1),
       allowNull: false,
-      validate:{
-        isIn:[['A','B','C']]
-      }
+      validate: {
+        isIn: [["A", "B", "C"]],
+      },
     },
     area: {
       type: DataTypes.STRING,
       allowNull: false,
-    }
-  }, {
+    },
+    trash: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+  },
+  {
     timestamps: true,
-    tableName:"HealthcareProvider"
-  });
+    tableName: "HealthcareProvider",
+  }
+);
 
-  module.exports = HealthcareProvider;
-
-
+module.exports = HealthcareProvider;
