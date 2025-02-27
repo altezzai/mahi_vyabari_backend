@@ -38,6 +38,7 @@ const VehicleSchedule = sequelize.define(
     },
   },
   {
+    tableName: "vehicleschedules",
     timestamps: true,
   }
 );

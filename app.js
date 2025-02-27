@@ -10,6 +10,7 @@ const passport = require("passport");
 const PORT = process.env.PORT || 3000;
 
 const shopRouter = require("./routes/shopRoute");
+const productRouter = require("./routes/productRoute");
 const categoryRouter = require("./routes/categoryRoute");
 const classifiedRouter = require("./routes/classifiedRoute")
 const emergenctRouter = require("./routes/emergencyRoute")
@@ -17,6 +18,7 @@ const medDirectoryRouter = require("./routes/medDirecotoryRoute");
 const vehicleRouter = require("./routes/vehicleRoute");
 const workersRouter = require('./routes/workersRoute');
 const userRouter = require("./routes/userRoute");
+const publicRouter = require("./routes/publicRoute");
 
 app.use(session({
     resave:false,
@@ -33,6 +35,7 @@ app.use(express.urlencoded({extended:true}))
 app.use(cors());
 
 app.use("/api/shop",shopRouter);
+app.use("/api/product",productRouter);
 app.use("/api/category",categoryRouter);
 app.use("/api/classified",classifiedRouter);
 app.use("/api/emergency",emergenctRouter);
@@ -40,6 +43,7 @@ app.use("/api/medDirectory",medDirectoryRouter);
 app.use("/api/vehicle",vehicleRouter);
 app.use("/api/workers",workersRouter);
 app.use("/api/user",userRouter);
+app.use("/api/public",publicRouter)
 
 
 app.listen(PORT,()=>{

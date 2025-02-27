@@ -91,7 +91,7 @@ const HealthcareProvider = sequelize.define(
   },
   {
     timestamps: true,
-    tableName: "HealthcareProvider",
+    tableName: "HealthcareProviders",
   }
 );
 

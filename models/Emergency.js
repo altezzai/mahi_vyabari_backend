@@ -24,11 +24,12 @@ const Emergency = sequelize.define(
       allowNull: true,
     },
     icon: {
-      type: DataTypes.STRING, 
+      type: DataTypes.STRING,
       allowNull: true,
     },
   },
   {
+    tableName: "emergencies",
     timestamps: true,
   }
 );

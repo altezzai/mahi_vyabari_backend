@@ -51,6 +51,7 @@ const WorkerProfile = sequelize.define(
     },
   },
   {
+    tableName: "serviceprofiles",
     timestamps: false,
   }
 );

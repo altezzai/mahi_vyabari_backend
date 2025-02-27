@@ -8,7 +8,14 @@ router.put("/edit-user/:id",userController.upload.single("image"),userController
 router.post("/user-login", userController.userLogin);
 router.get("/auth/google",passport.authenticate("google", { scope: ["profile", "email"] }));
 router.get("/auth/google/callback",passport.authenticate("google", { successRedirect: "/api/user/dashboard", failureRedirect: "/login" }));
-router.get("/logout",userController.Logout)
-router.get("/dashboard",async (req,res)=>{res.json({message:"successfully logined..!" + req.user})})
+router.get("/dashboard",userController.geDashboard);
+router.post("/feedback",userController.feedback);
+router.post("/create-complaints",userController.complaints);
+router.get("/get-complaints",userController.getAllComplaints);
+router.get("/get-complaints/:userId",userController.getComplaintsById);
+router.patch("/update-complaints/:id",userController.updateComplaints);
+router.get("/delete-complaints/:id",userController.deleteComplaints)
+router.get("/logout",userController.Logout);
+
 
 module.exports = router;

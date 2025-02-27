@@ -72,7 +72,7 @@ const Shop = sequelize.define(
   },
   {
     tableName: "shops",
-    timestamps: false,
+    timestamps: true,
   }
 );
 

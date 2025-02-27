@@ -2,10 +2,14 @@ require("../config/database");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
-const User = require("../models/User");
 const { deletefile, deletefilewithfoldername } = require("../utils/util");
 const createToken = require("../utils/createToken");
 const { hashPassword } = require("../utils/hashData");
+
+const User = require("../models/User");
+const Feedback = require("../models/Feedback");
+const Complaint = require("../models/Complaint");
+
 const uploadPath = path.join(__dirname, "../public/uploads/userImages");
 
 if (!fs.existsSync(uploadPath)) {
@@ -149,6 +153,122 @@ module.exports = {
       status: "success",
       result: user,
     });
+  },
+  geDashboard: async (req, res) => {
+    console.log(req.body);
+    res.status(200).json({
+      status: "success",
+      message: "successfully registered...!",
+    });
+  },
+  feedback: async (req, res) => {
+    try {
+      const { userId, shopId, rating } = req.body;
+
+      // Validate input
+      if (!userId || !shopId || !rating) {
+        return res
+          .status(400)
+          .json({ error: "User ID, Event ID, and Rating are required!" });
+      }
+
+      if (rating < 1 || rating > 5) {
+        return res
+          .status(400)
+          .json({ error: "Rating must be between 1 and 5" });
+      }
+
+      // Create feedback entry
+      const feedback = await Feedback.create({
+        userId,
+        shopId,
+        rating,
+      });
+
+      res
+        .status(201)
+        .json({ message: "Feedback added successfully!", feedback });
+    } catch (error) {
+      console.error("Error adding feedback:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  },
+  complaints: async (req, res) => {
+    try {
+      const { userId, shopId, title, description } = req.body;
+
+      if (!userId || !shopId || !title || !description) {
+        return res.status(400).json({ error: "All fields are required!" });
+      }
+
+      const complaint = await Complaint.create({
+        userId,
+        shopId,
+        title,
+        description,
+      });
+
+      res
+        .status(201)
+        .json({ message: "Complaint filed successfully!", complaint });
+    } catch (error) {
+      console.error("Error filing complaint:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  },
+  getAllComplaints: async (req, res) => {
+    try {
+      const complaints = await Complaint.findAll();
+      res.status(200).json(complaints);
+    } catch (error) {
+      console.error("Error fetching complaints:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  },
+  getComplaintsById: async (req, res) => {
+    try {
+      const complaints = await Complaint.findAll({
+        where: { userId: req.params.userId },
+      });
+      res.status(200).json(complaints);
+    } catch (error) {
+      console.error("Error fetching user complaints:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  },
+  updateComplaints: async (req, res) => {
+    try {
+      const { status, resolution } = req.body;
+      const complaint = await Complaint.findByPk(req.params.id);
+
+      if (!complaint) {
+        return res.status(404).json({ error: "Complaint not found" });
+      }
+
+      await complaint.update({ status, resolution });
+
+      res
+        .status(200)
+        .json({ message: "Complaint updated successfully!", complaint });
+    } catch (error) {
+      console.error("Error updating complaint:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  },
+  deleteComplaints: async (req, res) => {
+    try {
+      const complaint = await Complaint.findByPk(req.params.id);
+
+      if (!complaint) {
+        return res.status(404).json({ error: "Complaint not found" });
+      }
+
+      await complaint.update({ trash:true });
+      res.status(200).json({ message: "Complaint deleted successfully!", complaint });
+    } catch (error) {
+      console.error("Error deleting complaint:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
   },
   Logout: async (req, res) => {
     req.logout(() => {

@@ -1,4 +1,3 @@
-
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const Shop = require("./Shop");
@@ -19,7 +18,7 @@ const ShopCategory = sequelize.define(
         key: "id",
       },
       allowNull: false,
-      onDelete:"CASCADE"
+      onDelete: "CASCADE",
     },
     categoryId: {
       type: DataTypes.INTEGER,
@@ -28,12 +27,19 @@ const ShopCategory = sequelize.define(
         key: "id",
       },
       allowNull: false,
-      onDelete:"CASCADE"
+      onDelete: "CASCADE",
     },
   },
   {
+    tableName: "shopcategories",
     timestamps: false,
   }
 );
+
+Shop.belongsToMany(Category, { through: ShopCategory, foreignKey: "shopId" });
+Category.belongsToMany(Shop, {
+  through: ShopCategory,
+  foreignKey: "categoryId",
+});
 
 module.exports = ShopCategory;

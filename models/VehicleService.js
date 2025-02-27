@@ -44,15 +44,16 @@ const VehicleService = sequelize.define(
       allowNull: false,
     },
     image: {
-      type: DataTypes.STRING, 
+      type: DataTypes.STRING,
       allowNull: true,
     },
     icon: {
-      type: DataTypes.STRING, 
+      type: DataTypes.STRING,
       allowNull: true,
     },
   },
   {
+    tableName: "vehicleservice",
     timestamps: true,
     underscored: true,
   }

@@ -43,7 +43,7 @@ const ItemListing = sequelize.define(
     },
     priority: {
       type: DataTypes.STRING,
-      allowNull:false
+      allowNull: false,
     },
     phone: {
       type: DataTypes.STRING,

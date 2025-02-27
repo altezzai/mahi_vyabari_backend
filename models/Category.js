@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
+const Type = require("./Type");
 const Category = sequelize.define(
   "Category",
   {
@@ -7,9 +8,13 @@ const Category = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: true,
     },
-    category: {
+    typeId: {
       type: DataTypes.STRING,
       allowNull: false,
+      references: {
+        model: Type,
+        key: "id",
+      },
       validate: {
         notEmpty: true,
       },
@@ -18,7 +23,7 @@ const Category = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    subcategories: {
+    categories: {
       type: DataTypes.JSON,
       allowNull: true,
       defaultValue: [],
@@ -34,7 +39,7 @@ const Category = sequelize.define(
   },
   {
     tableName: "categories",
-    timestamps: false,
+    timestamps: true,
   }
 );
 
