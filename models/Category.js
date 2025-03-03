@@ -9,7 +9,7 @@ const Category = sequelize.define(
       allowNull: true,
     },
     typeId: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: Type,
@@ -23,10 +23,9 @@ const Category = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    categories: {
-      type: DataTypes.JSON,
+    category: {
+      type: DataTypes.STRING,
       allowNull: true,
-      defaultValue: [],
     },
     description: {
       type: DataTypes.TEXT,

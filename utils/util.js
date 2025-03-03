@@ -22,10 +22,10 @@ const deletefile = async (files) => {
     console.error("Error cleaning up files:", err);
   }
 };
-const deletefilewithfoldername = async (uploadPath, file) => {
+const deletefilewithfoldername = async (uploadPath, filename) => {
   try {
     if (file) {
-      const filePath = path.join(uploadPath, file.filename);
+      const filePath = path.join(uploadPath, filename);
       if (fs.existsSync(filePath)) {
         await fs.promises.unlink(filePath);
       }

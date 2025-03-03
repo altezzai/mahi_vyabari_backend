@@ -2,6 +2,7 @@ require("../config/database");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
+const bcrypt = require('bcrypt');
 const { deletefile, deletefilewithfoldername } = require("../utils/util");
 const createToken = require("../utils/createToken");
 const { hashPassword } = require("../utils/hashData");
@@ -32,7 +33,7 @@ module.exports = {
     try {
       const { email, password, phone } = req.body;
       if (!email || !password || !phone) {
-        await deletefilewithfoldername(uploadPath, req.file);
+        await deletefilewithfoldername(uploadPath, req.file.filename);
         res.status(400).json({
           status: "failed",
           message: "data is missing for user uploading",
@@ -42,7 +43,7 @@ module.exports = {
         where: { email },
       });
       if (existingUser) {
-        await deletefilewithfoldername(uploadPath, req.file);
+        await deletefilewithfoldername(uploadPath, req.file.filename);
         res.status(409).json({
           status: "failed",
           message: "User is already existing",
@@ -50,7 +51,11 @@ module.exports = {
       }
       req.body.password = await hashPassword(password);
       req.body.image = req.file ? req.file.filename : null;
-      const savedUser = await User.create(req.body);
+      const userData = {
+        ...req.body,
+        image:req.file?req.file.filename:null
+      }
+      const savedUser = await User.create(userData);
       res.json({
         status: "success",
         result: savedUser,
@@ -65,22 +70,20 @@ module.exports = {
   },
   editUser: async (req, res) => {
     const { email, password, phone } = req.body;
-    if (!req.file) {
-      return res.status(400).json({ message: "category icon is required" });
-    }
     if (!email || !password || !phone) {
-      await deletefilewithfoldername(uploadPath, req.file);
+      await deletefilewithfoldername(uploadPath, req.file.filename);
       res.status(400).json({
         status: "failed",
         message: "data is missing for user uploading",
       });
     }
+    
     const user = await User.findByPk(req.params.id);
     const oldImage = user.image;
     console.log(oldImage);
     try {
       if (!user) {
-        await deletefilewithfoldername(uploadPath, req.file);
+        await deletefilewithfoldername(uploadPath, req.file.filename);
         res.status(409).json({
           status: "failed",
           message: "collage not found",
@@ -88,14 +91,17 @@ module.exports = {
       }
       const updatedUserData = {
         ...req.body,
-        image: req.file ? req.file.filename : null,
+        password : await hashPassword(req.body.password),
+        image: req.file ? req.file.filename : oldImage,
       };
       await user.update(updatedUserData);
       try {
-        if (oldImage) {
-          const coverPath = path.join(uploadPath, oldImage);
-          if (fs.existsSync(coverPath)) {
-            fs.unlinkSync(coverPath);
+        if(req.file?.filename){
+          if (oldImage) {
+            const coverPath = path.join(uploadPath, oldImage);
+            if (fs.existsSync(coverPath)) {
+              fs.unlinkSync(coverPath);
+            }
           }
         }
       } catch (error) {
@@ -106,6 +112,7 @@ module.exports = {
         result: user,
       });
     } catch (error) {
+      await deletefilewithfoldername(uploadPath, req.file.filename);
       console.log(error);
       res.status(500).json({
         status: "failed",
@@ -115,7 +122,6 @@ module.exports = {
   },
   userLogin: async (req, res) => {
     const { email, password } = req.body;
-    console.log("email: " + email, "password :" + password);
     if (!email || !password) {
       res.status(409).json({
         status: "failed",
@@ -131,13 +137,14 @@ module.exports = {
         message: "invalid email or email is not registered..!",
       });
     }
-    if (password !== user.password) {
+    const isMatch = await bcrypt.compare(password,user.password);
+    if (!isMatch) {
       res.status(401).json({
         status: "failed",
         message: "invalid password..!",
       });
     }
-    const tokenData = { userId: user._id, email };
+    const tokenData = { userId: user._id, email:user.email };
     const token = await createToken(tokenData);
     if (!token) {
       res.status(401).json({
