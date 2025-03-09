@@ -11,12 +11,10 @@ const Type = sequelize.define(
     },
     name: {
       type: DataTypes.STRING,
-      allowNull: false,
       unique: true,
     },
     description: {
       type: DataTypes.STRING,
-      allowNull: true,
     },
     trash: {
       type: DataTypes.BOOLEAN,

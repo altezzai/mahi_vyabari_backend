@@ -6,7 +6,6 @@ const Category = sequelize.define(
   {
     userId: {
       type: DataTypes.INTEGER,
-      allowNull: true,
     },
     typeId: {
       type: DataTypes.INTEGER,
@@ -19,17 +18,14 @@ const Category = sequelize.define(
         notEmpty: true,
       },
     },
-    categoryIcon: {
+    icon: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
-    category: {
+    name: {
       type: DataTypes.STRING,
-      allowNull: true,
     },
     description: {
       type: DataTypes.TEXT,
-      allowNull: true,
     },
     trash: {
       type: DataTypes.BOOLEAN,

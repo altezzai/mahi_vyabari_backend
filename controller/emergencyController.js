@@ -2,7 +2,7 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const Emergency = require("../models/Emergency");
-const {deletefilewithfoldername} = require("../utils/util")
+const { deletefilewithfoldername } = require("../utils/util");
 
 const uploadPath = path.join(__dirname, "../public/uploads/emergency");
 if (!fs.existsSync(uploadPath)) {
@@ -24,22 +24,22 @@ const upload = multer({ storage });
 module.exports = {
   upload,
   addEmergency: async (req, res) => {
-    console.log(req.body);
-    const { itemName, phone, description } = req.body; 
     try {
-      if(!itemName||!phone||!description){
-        return res.status(400).json({ message: "Please fill in all fields" });
-      }
-      if (!req.file) {
-        return res.status(400).json({ message: "category icon is required" });
-      }
+      // if(!itemName||!phone||!description){
+      //   return res.status(400).json({ message: "Please fill in all fields" });
+      // }
+      // if (!req.file) {
+      //   return res.status(400).json({ message: "category icon is required" });
+      // }
 
-      const icon = req.file ? req.file.filename : null;
-      req.body.icon = icon;
+      const emergencyData = {
+        ...req.body,
+        icon: req.file ? req.file.filename : null,
+      };
 
-      const savedEmergency = await Emergency.create(req.body);
+      const savedEmergency = await Emergency.create(emergencyData);
       if (!savedEmergency) {
-        await deletefilewithfoldername(uploadPath,req.file.filename);
+        // await deletefilewithfoldername(uploadPath,req.file.filename);
         res.status(404).json({
           status: "FAILED",
           message: "Can't upload Emergency Data",
@@ -75,11 +75,13 @@ module.exports = {
       let newFile = req.file ? req.file.filename : emergency.icon;
 
       if (req.file) {
-        const oldFilePath = path.join(uploadPath, emergency.icon);
+        if (emergency.icon) {
+          const oldFilePath = path.join(uploadPath, emergency.icon);
 
-        // Check if the old file exists and delete it
-        if (fs.existsSync(oldFilePath)) {
-          fs.unlinkSync(oldFilePath);
+          // Check if the old file exists and delete it
+          if (fs.existsSync(oldFilePath)) {
+            fs.unlinkSync(oldFilePath);
+          }
         }
       }
 
@@ -97,7 +99,7 @@ module.exports = {
         data: emergency,
       });
     } catch (error) {
-      await deletefilewithfoldername(uploadPath,req.file.filename);
+      // await deletefilewithfoldername(uploadPath, req.file.filename);
       console.error("Error updating emergency details:", error);
       return res.status(500).json({
         success: false,
@@ -121,21 +123,18 @@ module.exports = {
       // Perform soft delete by updating the trash field to true
       await emergency.update({ trash: true });
 
-      return res
-        .status(200)
-        .json({
-          success: true,
-          message: "Emergency record moved to trash successfully",
-        });
+      return res.status(200).json({
+        success: true,
+        message: "Emergency record moved to trash successfully",
+        emergency
+      });
     } catch (error) {
       console.error("Error soft deleting emergency:", error);
-      return res
-        .status(500)
-        .json({
-          success: false,
-          message: "Error soft deleting emergency",
-          error,
-        });
+      return res.status(500).json({
+        success: false,
+        message: "Error soft deleting emergency",
+        error,
+      });
     }
   },
   restoreEmergency: async (req, res) => {
@@ -153,21 +152,18 @@ module.exports = {
       // Perform soft delete by updating the trash field to true
       await emergency.update({ trash: false });
 
-      return res
-        .status(200)
-        .json({
-          success: true,
-          message: "Emergency record moved to trash successfully",
-        });
+      return res.status(200).json({
+        success: true,
+        message: "Emergency record moved to trash successfully",
+        emergency
+      });
     } catch (error) {
       console.error("Error soft deleting emergency:", error);
-      return res
-        .status(500)
-        .json({
-          success: false,
-          message: "Error soft deleting emergency",
-          error,
-        });
+      return res.status(500).json({
+        success: false,
+        message: "Error soft deleting emergency",
+        error,
+      });
     }
   },
   getEmergency: async (req, res) => {

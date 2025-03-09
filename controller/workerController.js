@@ -27,19 +27,18 @@ module.exports = {
   upload,
   addWorkerProfile: async (req, res) => {
     try {
-      if (!req.files.image || !req.files.icon) {
-        return res
-          .status(400)
-          .json({ message: "Both shopImage and shopIconImage are required" });
+      // if (!req.files.image || !req.files.icon) {
+      //   return res
+      //     .status(400)
+      //     .json({ message: "Both shopImage and shopIconImage are required" });
+      // }
+
+      const workerData = {
+        ...req.body,
+        image:req.files?.image?.[0]?.filename||null,
+        icon:req.files?.icon?.[0]?.filename||null
       }
-
-      const image = req.files ? req.files.image[0].filename : null;
-      const icon = req.files ? req.files.icon[0].filename : null;
-
-      req.body.image = image;
-      req.body.icon = icon;
-
-      const savedWorker = await Worker.create(req.body);
+      const savedWorker = await Worker.create(workerData);
       
       if (savedWorker.categories && savedWorker.categories.length > 0) {
         await WorkerCategory.bulkCreate(
@@ -54,8 +53,8 @@ module.exports = {
         result: savedWorker,
       });
     } catch (error) {
-      await deletefilewithfoldername(uploadPath,req.files.image[0].filename)
-      await deletefilewithfoldername(uploadPath,req.files.icon[0].filename)
+      // await deletefilewithfoldername(uploadPath,req.files.image[0].filename)
+      // await deletefilewithfoldername(uploadPath,req.files.icon[0].filename)
       console.log(error);
       res.status(401).json({
         status: "FAILED",
@@ -69,10 +68,10 @@ module.exports = {
       const { categories, name, minWage, priority, area, phone, whatsapp, description } = req.body;
   
       // Find the existing worker profile
-      const worker = await WorkerProfile.findByPk(id);
+      const worker = await Worker.findByPk(id);
       if (!worker) {
-        await deletefilewithfoldername(uploadPath,req.files.image[0].filename)
-        await deletefilewithfoldername(uploadPath,req.files.icon[0].filename)
+        // await deletefilewithfoldername(uploadPath,req.files.image[0].filename)
+        // await deletefilewithfoldername(uploadPath,req.files.icon[0].filename)
         return res.status(404).json({ success: false, message: "Worker profile not found" });
       }
   
@@ -118,8 +117,8 @@ module.exports = {
       return res.status(200).json({ success: true, message: "Worker profile updated successfully", data: worker });
   
     } catch (error) {
-      await deletefilewithfoldername(uploadPath,req.files.image[0].filename)
-      await deletefilewithfoldername(uploadPath,req.files.icon[0].filename)
+      // await deletefilewithfoldername(uploadPath,req.files.image[0].filename)
+      // await deletefilewithfoldername(uploadPath,req.files.icon[0].filename)
       console.error("Error updating worker profile:", error);
       return res.status(500).json({ success: false, message: "Error updating worker profile", error });
     }
@@ -129,7 +128,7 @@ module.exports = {
       const { id } = req.params;
   
       // Find the existing worker profile
-      const worker = await WorkerProfile.findByPk(id);
+      const worker = await Worker.findByPk(id);
       if (!worker) {
         return res.status(404).json({ success: false, message: "Worker profile not found" });
       }
@@ -137,7 +136,7 @@ module.exports = {
       // Soft delete by setting trash to true
       await worker.update({ trash: true });
   
-      return res.status(200).json({ success: true, message: "Worker profile deleted successfully" });
+      return res.status(200).json({ success: true, message: "Worker profile deleted successfully",worker});
   
     } catch (error) {
       console.error("Error deleting worker profile:", error);
@@ -150,7 +149,7 @@ module.exports = {
       const { id } = req.params;
   
       // Find the existing worker profile
-      const worker = await WorkerProfile.findByPk(id);
+      const worker = await Worker.findByPk(id);
       if (!worker) {
         return res.status(404).json({ success: false, message: "Worker profile not found" });
       }
@@ -158,18 +157,18 @@ module.exports = {
       // Soft delete by setting trash to true
       await worker.update({ trash: false });
   
-      return res.status(200).json({ success: true, message: "Worker profile deleted successfully" });
+      return res.status(200).json({ success: true, message: "Worker profile restored successfully",worker});
   
     } catch (error) {
-      console.error("Error deleting worker profile:", error);
-      return res.status(500).json({ success: false, message: "Error deleting worker profile", error });
+      console.error("Error restoring worker profile:", error);
+      return res.status(500).json({ success: false, message: "Error restoring worker profile", error });
     }
   
   },
   getWorkerProfiles:async(req,res)=>{
     try {
       // Fetch all worker profiles
-      const workers = await WorkerProfile.findAll();
+      const workers = await Worker.findAll();
       if (!workers.length) {
         return res.status(404).json({ success: false, message: "Worker profile not found" });
       }
@@ -184,7 +183,7 @@ module.exports = {
       const { id } = req.params;
   
       // Find worker profile by ID
-      const worker = await WorkerProfile.findByPk(id);
+      const worker = await Worker.findByPk(id);
       
       if (!worker) {
         return res.status(404).json({ success: false, message: "Worker profile not found" });

@@ -7,7 +7,6 @@ const Product = sequelize.define(
   {
     userId: {
       type: DataTypes.INTEGER,
-      allowNull: true,
     },
     shopId: {
       type: DataTypes.INTEGER,
@@ -24,11 +23,9 @@ const Product = sequelize.define(
     },
     image:{
       type:DataTypes.STRING,
-      allowNull:false
     },
     originalPrice: {
       type: DataTypes.FLOAT,
-      allowNull: false,
       validate: {
         min: 0,
       },

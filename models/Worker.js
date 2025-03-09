@@ -1,58 +1,53 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const WorkerProfile = sequelize.define(
-  "ServiceProfile",
+  "Worker",
   {
     categories: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
     name: {
       type: DataTypes.STRING,
-      allowNull: false,
       validate: {
         notEmpty: true,
       },
     },
     minWage: {
       type: DataTypes.DECIMAL(10, 2),
-      allowNull: false,
     },
     priority: {
       type: DataTypes.INTEGER,
-      defaultValue: 0,
     },
     area: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
     phone: {
       type: DataTypes.STRING,
-      allowNull: false,
       validate: {
         notEmpty: true,
       },
+      allowNull:false
     },
     whatsapp: {
       type: DataTypes.STRING,
-      allowNull: true,
     },
     image: {
       type: DataTypes.STRING,
-      allowNull: true,
     },
     icon: {
       type: DataTypes.STRING,
-      allowNull: true,
     },
     description: {
       type: DataTypes.TEXT,
-      allowNull: true,
     },
+    trash:{
+      type:DataTypes.BOOLEAN,
+      defaultValue:false
+    }
   },
   {
-    tableName: "serviceprofiles",
-    timestamps: false,
+    tableName: "Workers",
+    timestamps: true,
   }
 );
 

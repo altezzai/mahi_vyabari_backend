@@ -35,7 +35,6 @@ const Complaint = sequelize.define(
     },
     description: {
       type: DataTypes.TEXT,
-      allowNull: false,
     },
     status: {
       type: DataTypes.ENUM("pending", "resolved", "rejected"),
@@ -43,7 +42,6 @@ const Complaint = sequelize.define(
     },
     resolution: {
       type: DataTypes.TEXT,
-      allowNull: true,
     },
     trash: {
       type: DataTypes.BOOLEAN,
@@ -52,7 +50,7 @@ const Complaint = sequelize.define(
   },
   {
     timestamps: true,
-    underscored: true,
+    tableName:"complaints"
   }
 );
 

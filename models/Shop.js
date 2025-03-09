@@ -6,15 +6,12 @@ const Shop = sequelize.define(
   {
     userId: {
       type: DataTypes.INTEGER,
-      allowNull: true,
     },
     image: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
     icon: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
     shopName: {
       type: DataTypes.STRING,
@@ -22,7 +19,13 @@ const Shop = sequelize.define(
     },
     categories: {
       type: DataTypes.STRING,
-      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING,
+      validate: {
+        isEmail: true,
+        notEmpty: true,
+      },
     },
     phone: {
       type: DataTypes.STRING,
@@ -36,34 +39,27 @@ const Shop = sequelize.define(
     },
     location: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
     description: {
       type: DataTypes.STRING(500),
     },
     address: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
     openingTime: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
     closingTime: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
     workingDays: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
     priority: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
     areas: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
     trash: {
       type: DataTypes.BOOLEAN,

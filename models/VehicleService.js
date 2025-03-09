@@ -6,19 +6,16 @@ const VehicleService = sequelize.define(
   {
     selectCategory: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
     minFee: {
       type: DataTypes.DECIMAL(10, 2),
-      allowNull: false,
     },
     vehicleNumber: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull:false
     },
     priority: {
       type: DataTypes.INTEGER,
-      defaultValue: 0,
     },
     phone: {
       type: DataTypes.STRING,
@@ -29,27 +26,21 @@ const VehicleService = sequelize.define(
     },
     whatsapp: {
       type: DataTypes.STRING,
-      allowNull: true,
     },
     description: {
       type: DataTypes.TEXT,
-      allowNull: true,
     },
     area: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
     address: {
       type: DataTypes.TEXT,
-      allowNull: false,
     },
     image: {
       type: DataTypes.STRING,
-      allowNull: true,
     },
     icon: {
       type: DataTypes.STRING,
-      allowNull: true,
     },
     trash:{
       type:DataTypes.BOOLEAN,
@@ -59,7 +50,6 @@ const VehicleService = sequelize.define(
   {
     tableName: "vehicleservice",
     timestamps: true,
-    underscored: true,
   }
 );
 

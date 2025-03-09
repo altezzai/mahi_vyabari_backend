@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 
 const publicController = require("../controller/publicController");
-const { route } = require("./medDirecotoryRoute");
 
 router.get("/",publicController.homePage);
 router.get("/shops",publicController.getShops);

@@ -2,7 +2,7 @@ require("../config/database");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 const { deletefile, deletefilewithfoldername } = require("../utils/util");
 const createToken = require("../utils/createToken");
 const { hashPassword } = require("../utils/hashData");
@@ -33,7 +33,7 @@ module.exports = {
     try {
       const { email, password, phone } = req.body;
       if (!email || !password || !phone) {
-        await deletefilewithfoldername(uploadPath, req.file.filename);
+        // await deletefilewithfoldername(uploadPath, req.file.filename);
         res.status(400).json({
           status: "failed",
           message: "data is missing for user uploading",
@@ -43,23 +43,23 @@ module.exports = {
         where: { email },
       });
       if (existingUser) {
-        await deletefilewithfoldername(uploadPath, req.file.filename);
+        // await deletefilewithfoldername(uploadPath, req.file.filename);
         res.status(409).json({
           status: "failed",
           message: "User is already existing",
         });
+      } else {
+        const userData = {
+          ...req.body,
+          image: req.file ? req.file.filename : null,
+          password: await hashPassword(password),
+        };
+        const savedUser = await User.create(userData);
+        res.json({
+          status: "success",
+          result: savedUser,
+        });
       }
-      req.body.password = await hashPassword(password);
-      req.body.image = req.file ? req.file.filename : null;
-      const userData = {
-        ...req.body,
-        image:req.file?req.file.filename:null
-      }
-      const savedUser = await User.create(userData);
-      res.json({
-        status: "success",
-        result: savedUser,
-      });
     } catch (error) {
       console.log(error);
       res.status(500).json({
@@ -69,21 +69,21 @@ module.exports = {
     }
   },
   editUser: async (req, res) => {
-    const { email, password, phone } = req.body;
-    if (!email || !password || !phone) {
-      await deletefilewithfoldername(uploadPath, req.file.filename);
-      res.status(400).json({
-        status: "failed",
-        message: "data is missing for user uploading",
-      });
-    }
-    
+    // const { email, password, phone } = req.body;
+    // if (!email || !password || !phone) {
+    //   await deletefilewithfoldername(uploadPath, req.file.filename);
+    //   res.status(400).json({
+    //     status: "failed",
+    //     message: "data is missing for user uploading",
+    //   });
+    // }
+
     const user = await User.findByPk(req.params.id);
     const oldImage = user.image;
     console.log(oldImage);
     try {
       if (!user) {
-        await deletefilewithfoldername(uploadPath, req.file.filename);
+        // await deletefilewithfoldername(uploadPath, req.file.filename);
         res.status(409).json({
           status: "failed",
           message: "collage not found",
@@ -91,12 +91,12 @@ module.exports = {
       }
       const updatedUserData = {
         ...req.body,
-        password : await hashPassword(req.body.password),
+        password: await hashPassword(req.body.password),
         image: req.file ? req.file.filename : oldImage,
       };
       await user.update(updatedUserData);
       try {
-        if(req.file?.filename){
+        if (req.file?.filename) {
           if (oldImage) {
             const coverPath = path.join(uploadPath, oldImage);
             if (fs.existsSync(coverPath)) {
@@ -112,7 +112,7 @@ module.exports = {
         result: user,
       });
     } catch (error) {
-      await deletefilewithfoldername(uploadPath, req.file.filename);
+      // await deletefilewithfoldername(uploadPath, req.file.filename);
       console.log(error);
       res.status(500).json({
         status: "failed",
@@ -137,14 +137,14 @@ module.exports = {
         message: "invalid email or email is not registered..!",
       });
     }
-    const isMatch = await bcrypt.compare(password,user.password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       res.status(401).json({
         status: "failed",
         message: "invalid password..!",
       });
     }
-    const tokenData = { userId: user._id, email:user.email };
+    const tokenData = { userId: user._id, email: user.email };
     const token = await createToken(tokenData);
     if (!token) {
       res.status(401).json({
@@ -204,9 +204,9 @@ module.exports = {
     try {
       const { userId, shopId, title, description } = req.body;
 
-      if (!userId || !shopId || !title || !description) {
-        return res.status(400).json({ error: "All fields are required!" });
-      }
+      // if (!userId || !shopId || !title || !description) {
+      //   return res.status(400).json({ error: "All fields are required!" });
+      // }
 
       const complaint = await Complaint.create({
         userId,
@@ -270,8 +270,10 @@ module.exports = {
         return res.status(404).json({ error: "Complaint not found" });
       }
 
-      await complaint.update({ trash:true });
-      res.status(200).json({ message: "Complaint deleted successfully!", complaint });
+      await complaint.update({ trash: true });
+      res
+        .status(200)
+        .json({ message: "Complaint deleted successfully!", complaint });
     } catch (error) {
       console.error("Error deleting complaint:", error);
       res.status(500).json({ error: "Internal server error" });

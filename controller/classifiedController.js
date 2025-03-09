@@ -26,55 +26,54 @@ const upload = multer({ storage });
 module.exports = {
   upload,
   addClassfied: async (req, res) => {
-    const {
-      category,
-      itemName,
-      price,
-      homeTown,
-      area,
-      address,
-      description,
-      priority,
-      phone,
-      whatsapp,
-    } = req.body;
-    if (
-      !category ||
-      !itemName ||
-      !price ||
-      !homeTown ||
-      !area ||
-      !address ||
-      !description ||
-      !priority ||
-      !phone ||
-      !whatsapp
-    ) {
-      await deletefilewithfoldername(uploadPath,req.files.image[0].filename)
-      await deletefilewithfoldername(uploadPath,req.files.icon[0].filename)
-      return res.status(400).json({ message: "Please fill all the fields" });
-    }
+    // const {
+    //   category,
+    //   itemName,
+    //   price,
+    //   homeTown,
+    //   area,
+    //   address,
+    //   description,
+    //   priority,
+    //   phone,
+    //   whatsapp,
+    // } = req.body;
+    // if (
+    //   !category ||
+    //   !itemName ||
+    //   !price ||
+    //   !homeTown ||
+    //   !area ||
+    //   !address ||
+    //   !description ||
+    //   !priority ||
+    //   !phone ||
+    //   !whatsapp
+    // ) {
+    //   await deletefilewithfoldername(uploadPath,req.files.image[0].filename)
+    //   await deletefilewithfoldername(uploadPath,req.files.icon[0].filename)
+    //   return res.status(400).json({ message: "Please fill all the fields" });
+    // }
     try {
-      if (!req.files.image || !req.files.icon) {
-        return res
-          .status(400)
-          .json({ message: "Both shopImage and shopIconImage are required" });
-      }
+      //   if (!req.files.image || !req.files.icon) {
+      //     return res
+      //       .status(400)
+      //       .json({ message: "Both shopImage and shopIconImage are required" });
+      //   }
 
-      const image = req.files ? req.files.image[0].filename : null;
-      const icon = req.files ? req.files.icon[0].filename : null;
-
-      req.body.image = image;
-      req.body.icon = icon;
-
-      const savedClassified = await Classified.create(req.body);
+      const classifiedData = {
+        ...req.body,
+        image: req.files?.image?.[0]?.filename || null,
+        icon: req.files?.icon?.[0]?.filename || null,
+      };
+      const savedClassified = await Classified.create(classifiedData);
       res.status(201).json({
         status: "success",
         savedShop: savedClassified,
       });
     } catch (error) {
-      await deletefilewithfoldername(uploadPath,req.files.image[0].filename)
-      await deletefilewithfoldername(uploadPath,req.files.icon[0].filename)
+      // await deletefilewithfoldername(uploadPath, req.files.image[0].filename);
+      // await deletefilewithfoldername(uploadPath, req.files.icon[0].filename);
       console.log(error);
       res.status(401).json({
         status: "FAILED",
@@ -101,8 +100,8 @@ module.exports = {
       const item = await Classified.findByPk(id);
 
       if (!item) {
-        await deletefilewithfoldername(uploadPath,req.files.image[0].filename)
-        await deletefilewithfoldername(uploadPath,req.files.icon[0].filename)
+        // await deletefilewithfoldername(uploadPath, req.files.image[0].filename);
+        // await deletefilewithfoldername(uploadPath, req.files.icon[0].filename);
         return res.status(404).json({ message: "Item not found" });
       }
 
@@ -111,18 +110,24 @@ module.exports = {
       let newIcon = item.icon;
 
       if (req.files?.image) {
-        const oldImagePath = path.join(uploadPath, item.image);
-        if (fs.existsSync(oldImagePath)) {
-          fs.unlinkSync(oldImagePath); // Delete old image
+        if (item.image) {
+          const oldImagePath = path.join(uploadPath, item.image);
+          if (fs.existsSync(oldImagePath)) {
+            fs.unlinkSync(oldImagePath); // Delete old image
+          }
         }
+
         newImage = req.files.image[0].filename; // Assign new image
       }
 
       if (req.files?.icon) {
-        const oldIconPath = path.join(uploadPath, item.icon);
-        if (fs.existsSync(oldIconPath)) {
-          fs.unlinkSync(oldIconPath); // Delete old icon
+        if (item.icon) {
+          const oldIconPath = path.join(uploadPath, item.icon);
+          if (fs.existsSync(oldIconPath)) {
+            fs.unlinkSync(oldIconPath); // Delete old icon
+          }
         }
+
         newIcon = req.files.icon[0].filename; // Assign new icon
       }
 
@@ -146,8 +151,8 @@ module.exports = {
         .status(200)
         .json({ message: "Item updated successfully", item });
     } catch (error) {
-      await deletefilewithfoldername(uploadPath,req.files.image[0].filename)
-      await deletefilewithfoldername(uploadPath,req.files.icon[0].filename)
+      // await deletefilewithfoldername(uploadPath, req.files.image[0].filename);
+      // await deletefilewithfoldername(uploadPath, req.files.icon[0].filename);
       return res.status(500).json({ message: "Error updating item", error });
     }
   },

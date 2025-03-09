@@ -7,7 +7,6 @@ const Emergency = sequelize.define(
     itemName: {
       type: DataTypes.STRING,
       allowNull: false,
-      field: "item_name",
       validate: {
         notEmpty: true,
       },
@@ -21,11 +20,9 @@ const Emergency = sequelize.define(
     },
     description: {
       type: DataTypes.TEXT,
-      allowNull: true,
     },
     icon: {
       type: DataTypes.STRING,
-      allowNull: true,
     },
     trash:{
       type:DataTypes.BOOLEAN,

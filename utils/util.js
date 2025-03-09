@@ -31,7 +31,7 @@ const deletefilewithfoldername = async (uploadPath, filename) => {
       }
     }
   } catch (err) {
-    console.error("Error cleaning up" + file.filename + " files:", err);
+    console.error("Error cleaning up" + filename + " files:", err);
   }
 };
 module.exports = { deletefile, deletefilewithfoldername };

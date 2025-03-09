@@ -25,33 +25,36 @@ module.exports = {
   upload,
   addProduct: async (req, res) => {
     try {
-      const {
-        shopId,
-        productName,
-        originalPrice,
-        offerPrice,
-        offerPercentage,
-        description,
-      } = req.body;
-      if (!req.file) {
-        return res.status(400).json({ message: "product image is required" });
+      // const {
+      //   shopId,
+      //   productName,
+      //   originalPrice,
+      //   offerPrice,
+      //   offerPercentage,
+      //   description,
+      // } = req.body;
+      // if (!req.file) {
+      //   return res.status(400).json({ message: "product image is required" });
+      // }
+      // if (
+      //   !shopId ||
+      //   !productName ||
+      //   !originalPrice ||
+      //   !offerPrice ||
+      //   !offerPercentage ||
+      //   !description
+      // ) {
+      //   await deletefilewithfoldername(uploadPath, req.file);
+      //   res.status(400).json({
+      //     status: "failed",
+      //     message: "data is missing while uploading the product details...!",
+      //   });
+      // }
+      const productData = {
+        ...req.body,
+        image:req.file ? req.file.filename : null
       }
-      if (
-        !shopId ||
-        !productName ||
-        !originalPrice ||
-        !offerPrice ||
-        !offerPercentage ||
-        !description
-      ) {
-        await deletefilewithfoldername(uploadPath, req.file);
-        res.status(400).json({
-          status: "failed",
-          message: "data is missing while uploading the product details...!",
-        });
-      }
-      req.body.image = req.file ? req.file.filename : null;
-      const savedProduct = await Product.create(req.body);
+      const savedProduct = await Product.create(productData);
       if (!savedProduct) {
         res.status(404).json(error.message);
       }
@@ -60,7 +63,7 @@ module.exports = {
         result: savedProduct,
       });
     } catch (error) {
-      await deletefilewithfoldername(uploadPath, req.file);
+      // await deletefilewithfoldername(uploadPath, req.file);
       console.log(error);
       res.status(401).json({
         status: "FAILED",
@@ -87,26 +90,27 @@ module.exports = {
           return res.status(404).json({ message: "Product not found" });
         }
     
-        // Validate required fields
-        if (!productName || !originalPrice || !shopId) {
-          return res.status(400).json({
-            message: "Missing required fields: productName, originalPrice, or shopId",
-          });
-        }
+        // // Validate required fields
+        // if (!productName || !originalPrice || !shopId) {
+        //   return res.status(400).json({
+        //     message: "Missing required fields: productName, originalPrice, or shopId",
+        //   });
+        // }
     
         // Ensure prices are valid numbers
-        if (isNaN(originalPrice) || (offerPrice && isNaN(offerPrice))) {
-          return res.status(400).json({ message: "Invalid price values" });
-        }
+        // if (isNaN(originalPrice) || (offerPrice && isNaN(offerPrice))) {
+        //   return res.status(400).json({ message: "Invalid price values" });
+        // }
     
         // Ensure offerPercentage is within valid range
-        if (offerPercentage && (offerPercentage < 0 || offerPercentage > 100)) {
-          return res
-            .status(400)
-            .json({ message: "offerPercentage must be between 0 and 100" });
-        }
+        // if (offerPercentage && (offerPercentage < 0 || offerPercentage > 100)) {
+        //   return res
+        //     .status(400)
+        //     .json({ message: "offerPercentage must be between 0 and 100" });
+        // }
     
         // Handle Image Upload
+
         let newImage = product.image; // Keep old image by default
         if (req.file) {
         // Delete old image if exists
@@ -123,7 +127,6 @@ module.exports = {
     
         // Update product data
         await product.update({
-          userId: userId || product.userId,
           shopId,
           productName,
           originalPrice,

@@ -29,57 +29,57 @@ module.exports = {
   upload,
   addshop: async (req, res) => {
     try {
-      const {
-        shopName,
-        categories,
-        phone,
-        whatsapp,
-        website,
-        location,
-        description,
-        address,
-        openingTime,
-        closingTime,
-        workingDays,
-        priority,
-        areas,
-      } = req.body;
+      // const {
+      //   shopName,
+      //   categories,
+      //   phone,
+      //   whatsapp,
+      //   website,
+      //   location,
+      //   description,
+      //   address,
+      //   openingTime,
+      //   closingTime,
+      //   workingDays,
+      //   priority,
+      //   areas,
+      // } = req.body;
 
-      if (
-        !shopName ||
-        !categories ||
-        !phone ||
-        !whatsapp ||
-        !website ||
-        !location ||
-        !description ||
-        !address ||
-        !openingTime ||
-        !closingTime ||
-        !workingDays ||
-        !priority ||
-        !areas
-      ) {
-        await deletefilewithfoldername(uploadPath, req.files.image[0].filename);
-        await deletefilewithfoldername(uploadPath, req.files.icon[0].filename);
-        return res.status(400).json({
-          success: false,
-          message: "data is missing..!!,please fill all the field...!",
-        });
-      }
-      if (!req.files.image || !req.files.icon) {
-        return res
-          .status(400)
-          .json({ message: "Both shopImage and shopIconImage are required" });
-      }
+      // if (
+      //   !shopName ||
+      //   !categories ||
+      //   !phone ||
+      //   !whatsapp ||
+      //   !website ||
+      //   !location ||
+      //   !description ||
+      //   !address ||
+      //   !openingTime ||
+      //   !closingTime ||
+      //   !workingDays ||
+      //   !priority ||
+      //   !areas
+      // ) {
+      //   await deletefilewithfoldername(uploadPath, req.files.image[0].filename);
+      //   await deletefilewithfoldername(uploadPath, req.files.icon[0].filename);
+      //   return res.status(400).json({
+      //     success: false,
+      //     message: "data is missing..!!,please fill all the field...!",
+      //   });
+      // }
+      // if (!req.files.image || !req.files.icon) {
+      //   return res
+      //     .status(400)
+      //     .json({ message: "Both shopImage and shopIconImage are required" });
+      // }
 
-      const image = req.files ? req.files.image[0].filename : null;
-      const icon = req.files ? req.files.icon[0].filename : null;
+      const shopData = {
+        ...req.body,
+        image: req.files?.image?.[0]?.filename || null,
+        icon: req.files?.icon?.[0]?.filename || null,
+      };
 
-      req.body.image = image;
-      req.body.icon = icon;
-
-      const savedShop = await Shop.create(req.body);
+      const savedShop = await Shop.create(shopData);
 
       if (savedShop.categories && savedShop.categories.length > 0) {
         await ShopCategory.bulkCreate(
@@ -96,8 +96,8 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      await deletefilewithfoldername(uploadPath, req.files.image[0].filename);
-      await deletefilewithfoldername(uploadPath, req.files.icon[0].filename);
+      // await deletefilewithfoldername(uploadPath, req.files.image[0].filename);
+      // await deletefilewithfoldername(uploadPath, req.files.icon[0].filename);
       res.status(401).json({
         status: "FAILED",
         message: "An error occured while uploading new shop data",
@@ -231,6 +231,7 @@ module.exports = {
       res.status(200).json({
         success: true,
         message: "Shop deleted successfully (soft delete)",
+        shop,
       });
     } catch (error) {
       console.error("Error soft deleting shop:", error);
@@ -263,7 +264,7 @@ module.exports = {
 
       res
         .status(200)
-        .json({ success: true, message: "Shop restored successfully" });
+        .json({ success: true, message: "Shop restored successfully", shop });
     } catch (error) {
       console.error("Error restoring shop:", error);
       res

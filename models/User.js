@@ -5,13 +5,10 @@ const User = sequelize.define(
   {
     googleId: {
       type: DataTypes.STRING,
-      allowNull: true,
       unique: true,
     },
     email: {
       type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
       validate: {
         isEmail: true,
         notEmpty: true,
@@ -19,7 +16,6 @@ const User = sequelize.define(
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: true,
       validate: {
         notEmpty: function (value) {
           if (!this.googleId && !value) {
@@ -31,22 +27,18 @@ const User = sequelize.define(
     },
     phone: {
       type: DataTypes.STRING,
-      allowNull: true,
       validate: {
         is: /^\+?[\d\s-]+$/,
       },
     },
     image: {
       type: DataTypes.STRING,
-      allowNull: true,
     },
     area: {
       type: DataTypes.STRING,
-      allowNull: true,
     },
     coupenCount: {
       type: DataTypes.INTEGER,
-      allowNull: false,
       defaultValue: 0,
     },
     status: {
@@ -61,7 +53,6 @@ const User = sequelize.define(
   {
     tableName: "users",
     timestamps: true,
-    underscored: true,
   }
 );
 

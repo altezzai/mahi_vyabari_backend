@@ -25,62 +25,62 @@ const upload = multer({ storage });
 module.exports = {
   upload,
   addMedicalDirectory: async (req, res) => {
-    const {
-      searchCategory,
-      name,
-      phone,
-      searchSubcategory,
-      whatsapp,
-      website,
-      location,
-      description,
-      address,
-      openingTime,
-      closingTime,
-      workingDays,
-      priority,
-      area,
-    } = req.body;
-    console.log(req.body);
+    // const {
+    //   searchCategory,
+    //   name,
+    //   phone,
+    //   searchSubcategory,
+    //   whatsapp,
+    //   website,
+    //   location,
+    //   description,
+    //   address,
+    //   openingTime,
+    //   closingTime,
+    //   workingDays,
+    //   priority,
+    //   area,
+    // } = req.body;
+    // console.log(req.body);
     try {
-      if (
-        !searchCategory ||
-        !name ||
-        !phone ||
-        !searchSubcategory ||
-        !whatsapp ||
-        !website ||
-        !location ||
-        !description ||
-        !address ||
-        !openingTime ||
-        !closingTime ||
-        !workingDays ||
-        !priority ||
-        !area
-      ) {
-        return res.status(400).json({ message: "Please fill all the fields" });
+    //   if (
+    //     !searchCategory ||
+    //     !name ||
+    //     !phone ||
+    //     !searchSubcategory ||
+    //     !whatsapp ||
+    //     !website ||
+    //     !location ||
+    //     !description ||
+    //     !address ||
+    //     !openingTime ||
+    //     !closingTime ||
+    //     !workingDays ||
+    //     !priority ||
+    //     !area
+    //   ) {
+    //     return res.status(400).json({ message: "Please fill all the fields" });
+    //   }
+    //   if (!req.files.image || !req.files.icon) {
+    //     return res
+    //       .status(400)
+    //       .json({ message: "Both Image and Icon are required" });
+    //   }
+
+      const medDirectoryData = {
+        ...req.body,
+        image:req.files?.image?.[0]?.filename || null,
+        icon:req.files?.icon?.[0]?.filename || null
       }
-      if (!req.files.image || !req.files.icon) {
-        return res
-          .status(400)
-          .json({ message: "Both Image and Icon are required" });
-      }
 
-      const image = req.files ? req.files.image[0].filename : null;
-      const icon = req.files ? req.files.icon[0].filename : null;
-
-      req.body.image = image;
-      req.body.icon = icon;
-
-      const savedMedicalDirectory = await Medical.create(req.body);
+      const savedMedicalDirectory = await Medical.create(medDirectoryData);
       res.status(201).json({
         status: "success",
         result: savedMedicalDirectory,
       });
     } catch (error) {
-      await deletefilewithfoldername(uploadPath,req.files.image[0].filename);
-      await deletefilewithfoldername(uploadPath,req.files.icon[0].filename);
+      // await deletefilewithfoldername(uploadPath,req.files.image[0].filename);
+      // await deletefilewithfoldername(uploadPath,req.files.icon[0].filename);
       console.log(error);
       res.status(401).json({
         status: "FAILED",
@@ -121,7 +121,7 @@ module.exports = {
       let newImage = healthcareProvider.image;
       let newIcon = healthcareProvider.icon;
 
-      if (req.files?.image[0]) {
+      if (req.files?.image?.[0]) {
         if (healthcareProvider.image) {
           const oldImagePath = path.join(uploadPath, healthcareProvider.image);
           if (fs.existsSync(oldImagePath)) {
@@ -131,7 +131,7 @@ module.exports = {
         newImage = req.files.image[0].filename;
       }
 
-      if (req.files?.icon[0]) {
+      if (req.files?.icon?.[0]) {
         if (healthcareProvider.icon) {
           const oldIconPath = path.join(uploadPath, healthcareProvider.icon);
           if (fs.existsSync(oldIconPath)) {
@@ -167,8 +167,8 @@ module.exports = {
         data: healthcareProvider,
       });
     } catch (error) {
-      await deletefilewithfoldername(uploadPath,req.files.image[0].filename);
-      await deletefilewithfoldername(uploadPath,req.files.icon[0].filename);
+      // await deletefilewithfoldername(uploadPath,req.files.image[0].filename);
+      // await deletefilewithfoldername(uploadPath,req.files.icon[0].filename);
       console.error("Error updating healthcare provider:", error);
       return res.status(500).json({
         success: false,
@@ -194,6 +194,7 @@ module.exports = {
       return res.status(200).json({
         success: true,
         message: "Healthcare Provider deleted successfully",
+        healthcareProvider
       });
     } catch (error) {
       console.error("Error deleting healthcare provider:", error);
@@ -220,13 +221,14 @@ module.exports = {
 
       return res.status(200).json({
         success: true,
-        message: "Healthcare Provider deleted successfully",
+        message: "Healthcare Provider restored successfully",
+        healthcareProvider
       });
     } catch (error) {
-      console.error("Error deleting healthcare provider:", error);
+      console.error("Error restoring healthcare provider:", error);
       return res.status(500).json({
         success: false,
-        message: "Error deleting healthcare provider",
+        message: "Error restoring healthcare provider",
         error,
       });
     }
