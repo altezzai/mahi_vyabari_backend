@@ -11,7 +11,7 @@ const Product = sequelize.define(
     shopId: {
       type: DataTypes.INTEGER,
       references: {
-        model: "shops",
+        model: Shop,
         key: "id",
       },
       allowNull: false,
@@ -60,3 +60,7 @@ const Product = sequelize.define(
 );
 
 module.exports = Product;
+
+
+Shop.hasMany(Product,{foreignKey:"shopId",as:"products"});
+Product.belongsTo(Shop,{foreignKey:"shopId",as:"shop"});

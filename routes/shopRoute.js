@@ -5,6 +5,7 @@ const shopController = require("../controller/shopController");
 
 router.post("/add-shop",shopController.upload.fields([{ name: "image" },{ name: "icon" }]),shopController.addshop);
 router.get("/get-shops",shopController.getShops);
+router.get("/get-shop-search",shopController.getShopSearch)
 router.get("/get-shop/:shopId",shopController.getShopById);
 router.put("/update-shop/:shopId",shopController.upload.fields([{ name: "image" },{ name: "icon" }]),shopController.updateShopById);
 router.patch("/delete-shop/:shopId",shopController.deleteShop);

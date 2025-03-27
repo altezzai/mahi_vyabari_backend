@@ -3,7 +3,9 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const Medical = require("../models/MedDirectory");
-const {deletefilewithfoldername} = require("../utils/util")
+const {deletefilewithfoldername} = require("../utils/util");
+const { Op } = require("sequelize");
+const Category = require("../models/Category");
 
 const uploadPath = path.join(__dirname, "../public/uploads/Medical");
 if (!fs.existsSync(uploadPath)) {
@@ -249,6 +251,36 @@ module.exports = {
         message: "Error fetching healthcare providers",
         error,
       });
+    }
+  },
+  getMedicalDirectorySearch:async(req,res)=>{
+    const search = req.query.search||"";
+    let whereCondition = {}
+    if(search){
+      whereCondition = {
+        [Op.or]:[
+          {name:{[Op.like]:`%${search}%`}}
+        ]
+      }
+    }
+    try {
+      const medical = await Medical.findAll({
+        attributes: ["id", "name", "priority","searchCategory"],
+        where:whereCondition,
+        // include: [
+        //   {
+        //     model: Category, 
+        //     attributes: ["id","name"],
+        //   },
+        // ]
+      });
+
+      res.status(200).json({ success: true, data: medical });
+    } catch (error) {
+      console.error("Error fetching Medical for admin:", error);
+      res
+        .status(500)
+        .json({ success: false, message: "Error fetching medical data", error });
     }
   },
   getMedicalDirectoryById: async (req, res) => {

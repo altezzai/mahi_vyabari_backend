@@ -7,6 +7,7 @@ const Category = require("../models/Category");
 const ShopCategory = require("../models/ShopCategory");
 const { json } = require("body-parser");
 const { deletefilewithfoldername } = require("../utils/util");
+const { Op } = require("sequelize");
 
 const uploadPath = path.join(__dirname, "../public/uploads/shopImages");
 if (!fs.existsSync(uploadPath)) {
@@ -116,6 +117,37 @@ module.exports = {
           },
         ],
         order: [["createdAt", "DESC"]],
+      });
+
+      res.status(200).json({ success: true, data: shops });
+    } catch (error) {
+      console.error("Error fetching shops for admin:", error);
+      res
+        .status(500)
+        .json({ success: false, message: "Error fetching shop data", error });
+    }
+  },
+  getShopSearch:async(req,res)=>{
+    const search = req.query.search||"";
+    let whereCondition = {}
+    if(search){
+      whereCondition = {
+        [Op.or]:[
+          {shopName:{[Op.like]:`%${search}%`}}
+        ]
+      }
+    }
+    try {
+      const shops = await Shop.findAll({
+        attributes: ["id", "shopName", "priority"],
+        where:whereCondition,
+        include: [
+          {
+            model: Category,
+            attributes: ["id", "name"],
+            through: { attributes: [] },
+          },
+        ]
       });
 
       res.status(200).json({ success: true, data: shops });

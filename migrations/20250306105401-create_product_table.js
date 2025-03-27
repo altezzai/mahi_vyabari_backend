@@ -1,5 +1,7 @@
 "use strict";
 
+const Shop = require("../models/Shop");
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable("products", {

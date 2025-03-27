@@ -2,7 +2,9 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const Product = require("../models/Product");
+const Shop = require("../models/Shop");
 const { deletefilewithfoldername } = require("../utils/util");
+const { Op } = require("sequelize");
 
 const uploadPath = path.join(__dirname, "../public/uploads/productImages");
 if (!fs.existsSync(uploadPath)) {
@@ -147,6 +149,11 @@ module.exports = {
         // Fetch all products from the database
         const products = await Product.findAll({
           order: [["createdAt", "DESC"]], // Order by latest created products
+          include:[{
+            model:Shop,
+            as:"shop",
+            attributes:["id","shopName"],
+          }]
         });
     
         // Check if products exist
@@ -159,6 +166,36 @@ module.exports = {
         console.error("Error fetching products:", error);
         res.status(500).json({ message: "Internal Server Error", error });
       }
+  },
+  getProductSearch:async(req,res)=>{
+    const search = req.query.search||"";
+    let whereCondition = {}
+    if(search){
+      whereCondition = {
+        [Op.or]:[
+          {productName:{[Op.like]:`%${search}%`}}
+        ]
+      }
+    }
+    try {
+      const products = await Product.findAll({
+        where:whereCondition,
+        include: [
+          {
+            model: Shop,
+            attributes: ["id", "shopName"],
+            as:"shop"
+          },
+        ]
+      });
+
+      res.status(200).json({ success: true, data: products });
+    } catch (error) {
+      console.error("Error fetching product for admin:", error);
+      res
+        .status(500)
+        .json({ success: false, message: "Error fetching product data", error });
+    }
   },
   getProductById:async(req,res)=>{
     try {

@@ -73,3 +73,4 @@ const Shop = sequelize.define(
 );
 
 module.exports = Shop;
+
