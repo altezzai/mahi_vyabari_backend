@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const emergencyController = require("../controller/emergencyController");
+const emergencyController = require("../controllers/emergencyController");
 
 router.post("/add-emergency",emergencyController.upload.single("icon"),emergencyController.addEmergency);
 router.put("/update-emergency/:id",emergencyController.upload.single("icon"),emergencyController.updateEmergency);

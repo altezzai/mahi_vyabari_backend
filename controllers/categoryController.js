@@ -141,14 +141,27 @@ module.exports = {
     }
   },
   getCategory: async (req, res) => {
+        const search = req.query.search || "";
+        const page = req.query.page || 1;
+        const limit = req.query.limit || 10;
+        const offset = (page - 1) * limit;
+        const whereCondition = {};
+        if (search) {
+          whereCondition = {
+            [Op.or]: [{ name: { [Op.like]: `%${search}%` } }],
+          };
+        }
     try {
       // Fetch all products from the database
-      const categories = await Category.findAll({
+      const categories = await Category.findAndCountAll({
+        limit,
+        offset,
+        where:whereCondition,
         order: [["createdAt", "DESC"]], // Order by latest created products
       });
   
       // Check if products exist
-      if (!categories.length) {
+      if (!categories) {
         return res.status(404).json({ message: "No categories found" });
       }
   

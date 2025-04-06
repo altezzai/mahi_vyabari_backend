@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-const userController = require("../controller/userController");
+const userController = require("../controllers/userController");
 
 router.post("/create-user",userController.upload.single("image"),userController.createUser);
 router.put("/edit-user/:id",userController.upload.single("image"),userController.editUser);

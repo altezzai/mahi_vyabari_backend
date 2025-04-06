@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const workerController = require("../controller/workerController");
+const workerController = require("../controllers/workerController");
 
 router.post("/add-worker-profile",workerController.upload.fields([{ name: "image" }, { name: "icon" }]),workerController.addWorkerProfile);
 router.put("/update-worker-profile/:id",workerController.upload.fields([{ name: "image" }, { name: "icon" }]),workerController.updateWorkerProfile);

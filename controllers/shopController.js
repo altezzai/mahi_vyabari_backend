@@ -105,49 +105,52 @@ module.exports = {
       });
     }
   },
-  getShops: async (req, res) => {
-    try {
-      const shops = await Shop.findAll({
-        attributes: ["id", "shopName", "priority"],
-        include: [
-          {
-            model: Category,
-            attributes: ["id", "category"],
-            through: { attributes: [] },
-          },
-        ],
-        order: [["createdAt", "DESC"]],
-      });
+  // getShops: async (req, res) => {
+  //   try {
+  //     const shops = await Shop.findAll({
+  //       attributes: ["id", "shopName", "priority"],
+  //       include: [
+  //         {
+  //           model: Category,
+  //           attributes: ["id", "category"],
+  //           through: { attributes: [] },
+  //         },
+  //       ],
+  //       order: [["createdAt", "DESC"]],
+  //     });
 
-      res.status(200).json({ success: true, data: shops });
-    } catch (error) {
-      console.error("Error fetching shops for admin:", error);
-      res
-        .status(500)
-        .json({ success: false, message: "Error fetching shop data", error });
-    }
-  },
-  getShopSearch:async(req,res)=>{
-    const search = req.query.search||"";
-    let whereCondition = {}
-    if(search){
+  //     res.status(200).json({ success: true, data: shops });
+  //   } catch (error) {
+  //     console.error("Error fetching shops for admin:", error);
+  //     res
+  //       .status(500)
+  //       .json({ success: false, message: "Error fetching shop data", error });
+  //   }
+  // },
+  getShopSearch: async (req, res) => {
+    const search = req.query.search || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit || 0;
+    let whereCondition = {};
+    if (search) {
       whereCondition = {
-        [Op.or]:[
-          {shopName:{[Op.like]:`%${search}%`}}
-        ]
-      }
+        [Op.or]: [{ shopName: { [Op.like]: `%${search}%` } }],
+      };
     }
     try {
-      const shops = await Shop.findAll({
+      const shops = await Shop.findAndCountAll({
+        limit,
+        offset,
         attributes: ["id", "shopName", "priority"],
-        where:whereCondition,
+        where: whereCondition,
         include: [
           {
             model: Category,
             attributes: ["id", "name"],
             through: { attributes: [] },
           },
-        ]
+        ],
       });
 
       res.status(200).json({ success: true, data: shops });

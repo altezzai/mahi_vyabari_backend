@@ -199,12 +199,25 @@ module.exports = {
     }
   },
   getClassfieds: async (req, res) => {
+        const search = req.query.search || "";
+        const page = req.query.page || 1;
+        const limit = req.query.limit || 10;
+        const offset = (page - 1) * limit;
+        const whereCondition = {};
+        if (search) {
+          whereCondition = {
+            [Op.or]: [{ itemName: { [Op.like]: `%${search}%` } }],
+          };
+        }
     try {
-      const classifieds = await Classified.findAll({
+      const classifieds = await Classified.findAndCountAll({
+        limit,
+        offset,
+        where: whereCondition,
         order: [["createdAt", "DESC"]],
       }); // Fetch all classifieds
       // Check if products exist
-      if (!classifieds.length) {
+      if (!classifieds) {
         return res.status(404).json({ message: "No classifieds found" });
       }
 

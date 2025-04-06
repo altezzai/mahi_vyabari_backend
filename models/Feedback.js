@@ -46,8 +46,8 @@ const Feedback = sequelize.define(
 
 // Associations (If Needed)
 User.hasMany(Feedback, { foreignKey: "userId" });
-Shop.hasMany(Feedback, { foreignKey: "shopId" });
 Feedback.belongsTo(User, { foreignKey: "userId" });
+Shop.hasMany(Feedback, {as:"Feedbacks",foreignKey: "shopId" });
 Feedback.belongsTo(Shop, { foreignKey: "shopId" });
 
 module.exports = Feedback;

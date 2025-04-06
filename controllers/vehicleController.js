@@ -5,6 +5,7 @@ const path = require("path");
 const VehicleSchedule = require("../models/VehicleSchedule");
 const VehicleService = require("../models/VehicleService");
 const { deletefilewithfoldername } = require("../utils/util");
+const { Op } = require("sequelize");
 
 const uploadPath = path.join(__dirname, "../public/uploads/Vehicle");
 if (!fs.existsSync(uploadPath)) {
@@ -183,8 +184,22 @@ module.exports = {
     }
   },
   getVehicleSchedules: async (req, res) => {
+    const search = req.query.search || "";
+    const page = req.query.page || 1;
+    const limit = req.query.limit || 10;
+    const offset = (page-1)*limit;
+    const whereCondition = {};
+    if(search){
+      whereCondition = {
+        [Op.or]:[{vehicleName:{[Op.like]:`%${search}%`}}]
+      }
+    }
     try {
-      const vehicleSchedules = await VehicleSchedule.findAll();
+      const vehicleSchedules = await VehicleSchedule.findAndCountAll({
+        limit,
+        offset,
+        where:whereCondition
+      });
       if (!vehicleSchedules.length) {
         return res
           .status(404)
@@ -388,7 +403,17 @@ module.exports = {
     }
   },
   getVehicleServiceProviders: async (req, res) => {
-    try {
+    const search = req.query.search || "";
+    const page = req.query.page || 1;
+    const limit = req.query.limit || 10;
+    const offset = (page-1) * limit;
+    const whereCondition = {}
+    if(search){
+      whereCondition = {
+        [Op.or]:[{}]
+      }
+    }
+     try {
       const vehicleServices = await VehicleService.findAll();
       if (!vehicleServices.length) {
         return res

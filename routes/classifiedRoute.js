@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const classifiedController = require("../controller/classifiedController");
+const classifiedController = require("../controllers/classifiedController");
 
 router.post("/add-classified",classifiedController.upload.fields([{ name: "image" },{ name: "icon" }]),classifiedController.addClassfied);
 router.put("/update-classified/:id",classifiedController.upload.fields([{ name: "image" },{ name: "icon" }]),classifiedController.updateClassfied);

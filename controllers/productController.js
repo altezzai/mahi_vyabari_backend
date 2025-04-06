@@ -144,31 +144,34 @@ module.exports = {
         res.status(500).json({ message: "Internal Server Error", error });
       }
   },
-  getProducts:async(req,res)=>{
-    try {
-        // Fetch all products from the database
-        const products = await Product.findAll({
-          order: [["createdAt", "DESC"]], // Order by latest created products
-          include:[{
-            model:Shop,
-            as:"shop",
-            attributes:["id","shopName"],
-          }]
-        });
+  // getProducts:async(req,res)=>{
+  //   try {
+  //       // Fetch all products from the database
+  //       const products = await Product.findAll({
+  //         order: [["createdAt", "DESC"]], // Order by latest created products
+  //         include:[{
+  //           model:Shop,
+  //           as:"shop",
+  //           attributes:["id","shopName"],
+  //         }]
+  //       });
     
-        // Check if products exist
-        if (!products.length) {
-          return res.status(404).json({ message: "No products found" });
-        }
+  //       // Check if products exist
+  //       if (!products.length) {
+  //         return res.status(404).json({ message: "No products found" });
+  //       }
     
-        res.status(200).json({ message: "Products fetched successfully", products });
-      } catch (error) {
-        console.error("Error fetching products:", error);
-        res.status(500).json({ message: "Internal Server Error", error });
-      }
-  },
+  //       res.status(200).json({ message: "Products fetched successfully", products });
+  //     } catch (error) {
+  //       console.error("Error fetching products:", error);
+  //       res.status(500).json({ message: "Internal Server Error", error });
+  //     }
+  // },
   getProductSearch:async(req,res)=>{
     const search = req.query.search||"";
+    const page = req.query.page ||1;
+    const limit = req.query.limit || 10;
+    const offset = (page - 1) * limit;
     let whereCondition = {}
     if(search){
       whereCondition = {
@@ -178,7 +181,9 @@ module.exports = {
       }
     }
     try {
-      const products = await Product.findAll({
+      const products = await Product.findAndCountAll({
+        limit,
+        offset,
         where:whereCondition,
         include: [
           {

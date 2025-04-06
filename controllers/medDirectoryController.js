@@ -3,7 +3,7 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const Medical = require("../models/MedDirectory");
-const {deletefilewithfoldername} = require("../utils/util");
+const { deletefilewithfoldername } = require("../utils/util");
 const { Op } = require("sequelize");
 const Category = require("../models/Category");
 
@@ -45,35 +45,35 @@ module.exports = {
     // } = req.body;
     // console.log(req.body);
     try {
-    //   if (
-    //     !searchCategory ||
-    //     !name ||
-    //     !phone ||
-    //     !searchSubcategory ||
-    //     !whatsapp ||
-    //     !website ||
-    //     !location ||
-    //     !description ||
-    //     !address ||
-    //     !openingTime ||
-    //     !closingTime ||
-    //     !workingDays ||
-    //     !priority ||
-    //     !area
-    //   ) {
-    //     return res.status(400).json({ message: "Please fill all the fields" });
-    //   }
-    //   if (!req.files.image || !req.files.icon) {
-    //     return res
-    //       .status(400)
-    //       .json({ message: "Both Image and Icon are required" });
-    //   }
+      //   if (
+      //     !searchCategory ||
+      //     !name ||
+      //     !phone ||
+      //     !searchSubcategory ||
+      //     !whatsapp ||
+      //     !website ||
+      //     !location ||
+      //     !description ||
+      //     !address ||
+      //     !openingTime ||
+      //     !closingTime ||
+      //     !workingDays ||
+      //     !priority ||
+      //     !area
+      //   ) {
+      //     return res.status(400).json({ message: "Please fill all the fields" });
+      //   }
+      //   if (!req.files.image || !req.files.icon) {
+      //     return res
+      //       .status(400)
+      //       .json({ message: "Both Image and Icon are required" });
+      //   }
 
       const medDirectoryData = {
         ...req.body,
-        image:req.files?.image?.[0]?.filename || null,
-        icon:req.files?.icon?.[0]?.filename || null
-      }
+        image: req.files?.image?.[0]?.filename || null,
+        icon: req.files?.icon?.[0]?.filename || null,
+      };
 
       const savedMedicalDirectory = await Medical.create(medDirectoryData);
       res.status(201).json({
@@ -150,7 +150,8 @@ module.exports = {
         searchCategory: searchCategory || healthcareProvider.searchCategory,
         name: name || healthcareProvider.name,
         phone: phone || healthcareProvider.phone,
-        searchSubcategory: searchSubcategory || healthcareProvider.searchSubcategory,
+        searchSubcategory:
+          searchSubcategory || healthcareProvider.searchSubcategory,
         whatsapp: whatsapp || healthcareProvider.whatsapp,
         website: website || healthcareProvider.website,
         location: location || healthcareProvider.location,
@@ -196,7 +197,7 @@ module.exports = {
       return res.status(200).json({
         success: true,
         message: "Healthcare Provider deleted successfully",
-        healthcareProvider
+        healthcareProvider,
       });
     } catch (error) {
       console.error("Error deleting healthcare provider:", error);
@@ -224,7 +225,7 @@ module.exports = {
       return res.status(200).json({
         success: true,
         message: "Healthcare Provider restored successfully",
-        healthcareProvider
+        healthcareProvider,
       });
     } catch (error) {
       console.error("Error restoring healthcare provider:", error);
@@ -235,41 +236,44 @@ module.exports = {
       });
     }
   },
-  getMedicalDirectory: async (req, res) => {
-    try {
-      const healthcareProviders = await Medical.findAll();
-      if (!healthcareProviders.length) {
-        return res
-          .status(404)
-          .json({ success: false, message: "Healthcare Provider not found" });
-      }
-      return res.status(200).json({ success: true, data: healthcareProviders });
-    } catch (error) {
-      console.error("Error fetching healthcare providers:", error);
-      return res.status(500).json({
-        success: false,
-        message: "Error fetching healthcare providers",
-        error,
-      });
-    }
-  },
-  getMedicalDirectorySearch:async(req,res)=>{
-    const search = req.query.search||"";
-    let whereCondition = {}
-    if(search){
+  // getMedicalDirectory: async (req, res) => {
+  //   try {
+  //     const healthcareProviders = await Medical.findAll();
+  //     if (!healthcareProviders.length) {
+  //       return res
+  //         .status(404)
+  //         .json({ success: false, message: "Healthcare Provider not found" });
+  //     }
+  //     return res.status(200).json({ success: true, data: healthcareProviders });
+  //   } catch (error) {
+  //     console.error("Error fetching healthcare providers:", error);
+  //     return res.status(500).json({
+  //       success: false,
+  //       message: "Error fetching healthcare providers",
+  //       error,
+  //     });
+  //   }
+  // },
+  getMedicalDirectorySearch: async (req, res) => {
+    const search = req.query.search || "";
+    const page = req.query.page || 1;
+    const limit = req.query.limit || 10;
+    const offset = (page - 1) * limit;
+    let whereCondition = {};
+    if (search) {
       whereCondition = {
-        [Op.or]:[
-          {name:{[Op.like]:`%${search}%`}}
-        ]
-      }
+        [Op.or]: [{ name: { [Op.like]: `%${search}%` } }],
+      };
     }
     try {
-      const medical = await Medical.findAll({
-        attributes: ["id", "name", "priority","searchCategory"],
-        where:whereCondition,
+      const medical = await Medical.findAndCountAll({
+        limit,
+        offset,
+        attributes: ["id", "name", "priority", "searchCategory"],
+        where: whereCondition,
         // include: [
         //   {
-        //     model: Category, 
+        //     model: Category,
         //     attributes: ["id","name"],
         //   },
         // ]
@@ -280,7 +284,11 @@ module.exports = {
       console.error("Error fetching Medical for admin:", error);
       res
         .status(500)
-        .json({ success: false, message: "Error fetching medical data", error });
+        .json({
+          success: false,
+          message: "Error fetching medical data",
+          error,
+        });
     }
   },
   getMedicalDirectoryById: async (req, res) => {

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const vehicleController = require("../controller/vehicleController");
+const vehicleController = require("../controllers/vehicleController");
 
 router.post("/add-vehicleSchedule", vehicleController.createVehicleSchedule);
 router.put("/update-vehicleSchedule/:id", vehicleController.updateVehicleSchedule);

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const categoryController = require("../controller/categoryController");
+const categoryController = require("../controllers/categoryController");
 
 router.post("/add-type",categoryController.addType);
 router.post("/delete-type/:id",categoryController.deleteType);

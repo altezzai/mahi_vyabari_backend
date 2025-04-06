@@ -6,12 +6,26 @@ const Emergency = require("../models/Emergency");
 const VehicleService = require("../models/VehicleService");
 const Worker = require("../models/Worker");
 const Classified = require("../models/Classified");
-const { Sequelize, where } = require("sequelize");
+const { Sequelize, where, Op } = require("sequelize");
 
 module.exports = {
   homePage: async (req, res) => {
+    const search = req.query.search || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    let whereCondition = {};
+    if (search) {
+      whereCondition = {
+        shopName: { [Op.like]: `%${search}%` },
+        trash: false,
+      };
+    }
     try {
       const shops = await Shop.findAll({
+        limit,
+        offset,
+        where: whereCondition,
         attributes: [
           "id",
           "shopName",
@@ -23,15 +37,15 @@ module.exports = {
         include: [
           {
             model: Feedback,
-            attributes: [],
             as: "Feedbacks",
+            attributes: [],
           },
         ],
-        where: { trash: false },
         group: ["Shop.id"],
         order: [[Sequelize.literal("averageRating"), "DESC"]],
+        subQuery:false,
       });
-      console.log("✅ Shops sorted by rating:", JSON.stringify(shops, null, 2));
+      // console.log("✅ Shops sorted by rating:", JSON.stringify(shops, null, 2));
       res.json({ message: "Top-rated shops", data: shops });
     } catch (error) {
       console.log(error);
@@ -45,15 +59,15 @@ module.exports = {
         where: { trash: false }, // Exclude shops marked as trash
       });
       res.status(201).json({
-        status:"SUCCESS",
-        shops
-      })
+        status: "SUCCESS",
+        shops,
+      });
     } catch (error) {
       console.error("Error fetching shops:", error);
       res.status(500).json({
-        status:"failed",
+        status: "failed",
         message: "Error fetching shops",
-      })
+      });
     }
   },
   getShopById: async (req, res) => {
@@ -89,7 +103,7 @@ module.exports = {
             as: "Feedbacks",
           },
         ],
-        where: { id:shopId, trash: false },
+        where: { id: shopId, trash: false },
         group: ["Shop.id"],
       });
 
@@ -98,9 +112,9 @@ module.exports = {
       }
 
       res.status(201).json({
-        status:"SUCCESS",
-        shop
-    });
+        status: "SUCCESS",
+        shop,
+      });
     } catch (error) {
       console.error("Error fetching shop:", error);
       res.status(500).json({ error: "Internal server error" });
@@ -114,7 +128,7 @@ module.exports = {
       });
       res.status(200).json({
         status: "SUCCESS",
-        doctors
+        doctors,
       });
     } catch (error) {
       console.error("Error fetching doctors:", error);
@@ -125,7 +139,7 @@ module.exports = {
     try {
       const { docterId } = req.params;
       const doctor = await Medical.findOne({
-        where: { id:docterId, searchCategory: "doctor", trash: false },
+        where: { id: docterId, searchCategory: "doctor", trash: false },
       });
 
       if (!doctor) {
@@ -133,8 +147,8 @@ module.exports = {
       }
 
       res.json({
-        status:"success",
-        doctor
+        status: "success",
+        doctor,
       });
     } catch (error) {
       console.error("Error fetching doctor:", error);
@@ -147,8 +161,8 @@ module.exports = {
         where: { category: "bus" },
       });
       res.status(200).json({
-        status:"success",
-        buses
+        status: "success",
+        buses,
       });
     } catch (error) {
       console.error("Error fetching bus schedules:", error);
@@ -161,8 +175,8 @@ module.exports = {
         where: { category: "train" },
       });
       res.status(200).json({
-        status:"success",
-        trains
+        status: "success",
+        trains,
       });
     } catch (error) {
       console.error("Error fetching train schedules:", error);
@@ -176,8 +190,8 @@ module.exports = {
         where: { searchCategory: "hospital", trash: false },
       });
       res.status(200).json({
-        status:"success",
-        doctors
+        status: "success",
+        doctors,
       });
     } catch (error) {
       console.error("Error fetching doctors:", error);
@@ -188,7 +202,7 @@ module.exports = {
     try {
       const { hospitalId } = req.params;
       const doctor = await Medical.findOne({
-        where: { id:hospitalId, searchCategory: "hospital",trash:false },
+        where: { id: hospitalId, searchCategory: "hospital", trash: false },
       });
 
       if (!doctor) {
@@ -204,7 +218,7 @@ module.exports = {
   getEmergencies: async (req, res) => {
     try {
       const emergencies = await Emergency.findAll({
-        where: {trash:false },
+        where: { trash: false },
       });
       res.json(emergencies);
     } catch (error) {
@@ -216,7 +230,7 @@ module.exports = {
     try {
       const services = await VehicleService.findAll({
         attributes: ["selectCategory", "vehicleNumber", "image"],
-        where: { trash:false},
+        where: { trash: false },
       });
       res.json(services);
     } catch (error) {
@@ -228,7 +242,7 @@ module.exports = {
     try {
       const { id } = req.params;
       const vehicleService = await VehicleService.findOne({
-        where: { id},
+        where: { id },
       });
 
       if (!vehicleService) {

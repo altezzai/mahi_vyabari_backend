@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const Emergency = require("../models/Emergency");
 const { deletefilewithfoldername } = require("../utils/util");
+const { Op } = require("sequelize");
 
 const uploadPath = path.join(__dirname, "../public/uploads/emergency");
 if (!fs.existsSync(uploadPath)) {
@@ -126,7 +127,7 @@ module.exports = {
       return res.status(200).json({
         success: true,
         message: "Emergency record moved to trash successfully",
-        emergency
+        emergency,
       });
     } catch (error) {
       console.error("Error soft deleting emergency:", error);
@@ -155,7 +156,7 @@ module.exports = {
       return res.status(200).json({
         success: true,
         message: "Emergency record moved to trash successfully",
-        emergency
+        emergency,
       });
     } catch (error) {
       console.error("Error soft deleting emergency:", error);
@@ -167,9 +168,23 @@ module.exports = {
     }
   },
   getEmergency: async (req, res) => {
+    const search = req.query.search || "";
+    const page = req.query.page || 1;
+    const limit = req.query.limit || 10;
+    const offset = (page - 1) * limit;
+    const whereCondition = {};
+    if (search) {
+      whereCondition = {
+        [Op.or]: [{ itemName: { [Op.like]: `%${search}%` } }],
+      };
+    }
     try {
-      const emergencies = await Emergency.findAll(); // Fetch all records
-      if (!emergencies.length) {
+      const emergencies = await Emergency.findAndCountAll({
+        limit,
+        offset,
+        where: whereCondition,
+      }); // Fetch all records
+      if (!emergencies) {
         return res
           .status(404)
           .json({ success: false, message: "Emergency record not found" });
