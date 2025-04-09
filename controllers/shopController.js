@@ -142,7 +142,7 @@ module.exports = {
       const shops = await Shop.findAndCountAll({
         limit,
         offset,
-        attributes: ["id", "shopName", "priority"],
+        attributes: ["id", "shopName", "priority","trash"],
         where: whereCondition,
         include: [
           {
@@ -194,29 +194,37 @@ module.exports = {
       const { shopId } = req.params; // Extract shop ID from URL
       // Find the shop
       const shop = await Shop.findByPk(shopId);
+      // console.log(req.body);
+      // console.log(req.files);
+      // console.log(shop);
       if (!shop) {
-        await deletefilewithfoldername(uploadPath, req.files.image[0]);
-        await deletefilewithfoldername(uploadPath, req.files.icon[0]);
+        // await deletefilewithfoldername(uploadPath, req.files.image[0]);
+        // await deletefilewithfoldername(uploadPath, req.files.icon[0]);
         return res.status(404).json({ message: "Shop not found" });
       }
-
+      console.log("helloo")
+      let newImage = shop.image;
+      let newIcon = shop.icon;
       // If an image is uploaded, handle file update
-      if (req.files.image[0]?.filename) {
+      if (req.files?.image?.[0]) {
+         
         if (shop.image) {
           const oldImagePath = path.join(uploadPath, shop.image);
           if (fs.existsSync(oldImagePath)) {
             fs.unlinkSync(oldImagePath);
           }
         }
+        newImage = req.files.image[0].filename
       }
 
-      if (req.files.icon[0]?.filename) {
+      if (req.files?.icon?.[0]) {
         if (shop.icon) {
           const oldIconPath = path.join(uploadPath, shop.icon);
           if (fs.existsSync(oldIconPath)) {
             fs.unlinkSync(oldIconPath);
           }
         }
+        newIcon = req.files.icon[0].filename;
       }
 
       const updateData = {
@@ -233,16 +241,17 @@ module.exports = {
         workingDays: req.body.workingDays || shop.workingDays,
         priority: req.body.priority || shop.priority,
         areas: req.body.areas || shop.areas,
-        image: req.files.image[0].filename || shop.image,
-        icon: req.files.icon[0].filename || shop.icon,
+        image: newImage || shop.image,
+        icon: newIcon || shop.icon,
       };
+      console.log(updateData);
       await shop.update(updateData);
       return res
         .status(200)
         .json({ message: "Shop updated successfully", shop });
     } catch (error) {
-      await deletefilewithfoldername(uploadPath, req.files.image[0]);
-      await deletefilewithfoldername(uploadPath, req.files.icon[0]);
+      // await deletefilewithfoldername(uploadPath, req.files.image[0]);
+      // await deletefilewithfoldername(uploadPath, req.files.icon[0]);
       console.error("Error updating shop:", error);
       return res.status(500).json({ message: "Error updating shop", error });
     }
