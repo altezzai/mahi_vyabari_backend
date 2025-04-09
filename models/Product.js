@@ -38,7 +38,7 @@ const Product = sequelize.define(
     },
     offerPercentage: {
       type: DataTypes.FLOAT,
-      defaultValue: 0,
+      defaultValue:0,
       validate: {
         min: 0,
         max: 100,

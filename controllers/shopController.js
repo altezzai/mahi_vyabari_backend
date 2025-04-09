@@ -8,6 +8,7 @@ const ShopCategory = require("../models/ShopCategory");
 const { json } = require("body-parser");
 const { deletefilewithfoldername } = require("../utils/util");
 const { Op } = require("sequelize");
+const Type = require("../models/Type");
 
 const uploadPath = path.join(__dirname, "../public/uploads/shopImages");
 if (!fs.existsSync(uploadPath)) {
@@ -105,29 +106,7 @@ module.exports = {
       });
     }
   },
-  // getShops: async (req, res) => {
-  //   try {
-  //     const shops = await Shop.findAll({
-  //       attributes: ["id", "shopName", "priority"],
-  //       include: [
-  //         {
-  //           model: Category,
-  //           attributes: ["id", "category"],
-  //           through: { attributes: [] },
-  //         },
-  //       ],
-  //       order: [["createdAt", "DESC"]],
-  //     });
-
-  //     res.status(200).json({ success: true, data: shops });
-  //   } catch (error) {
-  //     console.error("Error fetching shops for admin:", error);
-  //     res
-  //       .status(500)
-  //       .json({ success: false, message: "Error fetching shop data", error });
-  //   }
-  // },
-  getShopSearch: async (req, res) => {
+  getShop: async (req, res) => {
     const search = req.query.search || "";
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -152,7 +131,6 @@ module.exports = {
           },
         ],
       });
-
       res.status(200).json({ success: true, data: shops });
     } catch (error) {
       console.error("Error fetching shops for admin:", error);
@@ -316,4 +294,20 @@ module.exports = {
         .json({ success: false, message: "Error restoring shop", error });
     }
   },
+  getShopCategories:async(req,res)=>{
+    try {
+      const shopCategories = await Type.findOne({
+        where:{
+          name:"shop"
+        },
+        include:{
+          model:Category,
+        }
+      })
+      res.status(200).json({ success: true, shopCategories });
+    } catch (error) {
+      console.log(error)
+      res.status(500).json({ success: false, message: "Error getting shop categories"});
+    }
+  }
 };

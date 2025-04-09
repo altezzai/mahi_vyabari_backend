@@ -5,7 +5,8 @@ const productController = require("../controllers/productController")
 
 router.post("/add-product",productController.upload.single("image"),productController.addProduct);
 router.put("/update-product/:id",productController.upload.single("image"),productController.editProduct);
-router.get('/get-products',productController.getProductSearch);
+router.get('/get-products',productController.getProduct);
+router.get("/get-shop-names",productController.getShopName);
 // router.get("/get-product-search",productController.getProductSearch);
 router.get('/get-product/:id',productController.getProductById);
 router.patch('/delete-product/:id',productController.deleteProductById);

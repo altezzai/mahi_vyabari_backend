@@ -236,25 +236,7 @@ module.exports = {
       });
     }
   },
-  // getMedicalDirectory: async (req, res) => {
-  //   try {
-  //     const healthcareProviders = await Medical.findAll();
-  //     if (!healthcareProviders.length) {
-  //       return res
-  //         .status(404)
-  //         .json({ success: false, message: "Healthcare Provider not found" });
-  //     }
-  //     return res.status(200).json({ success: true, data: healthcareProviders });
-  //   } catch (error) {
-  //     console.error("Error fetching healthcare providers:", error);
-  //     return res.status(500).json({
-  //       success: false,
-  //       message: "Error fetching healthcare providers",
-  //       error,
-  //     });
-  //   }
-  // },
-  getMedicalDirectorySearch: async (req, res) => {
+  getMedicalDirectory: async (req, res) => {
     const search = req.query.search || "";
     const page = req.query.page || 1;
     const limit = req.query.limit || 10;
@@ -269,7 +251,7 @@ module.exports = {
       const medical = await Medical.findAndCountAll({
         limit,
         offset,
-        attributes: ["id", "name", "priority", "searchCategory"],
+        attributes: ["id", "name", "priority", "searchCategory","trash"],
         where: whereCondition,
         // include: [
         //   {

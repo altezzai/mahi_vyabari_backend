@@ -59,7 +59,10 @@ const Shop = sequelize.define(
       type: DataTypes.STRING,
     },
     areas: {
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM("mahe","chokli","palloor","pandakkal"),
+      validate:{
+        isIn:[["mahe","chokli","palloor","pandakkal"]]
+      }
     },
     trash: {
       type: DataTypes.BOOLEAN,

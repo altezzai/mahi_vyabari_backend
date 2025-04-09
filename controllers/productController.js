@@ -54,8 +54,8 @@ module.exports = {
       // }
       const productData = {
         ...req.body,
-        image:req.file ? req.file.filename : null
-      }
+        image: req.file ? req.file.filename : null,
+      };
       const savedProduct = await Product.create(productData);
       if (!savedProduct) {
         res.status(404).json(error.message);
@@ -73,193 +73,213 @@ module.exports = {
       });
     }
   },
-  editProduct:async(req,res)=>{
+  editProduct: async (req, res) => {
     try {
-        const { id } = req.params; // Get product ID from request params
-        const {
-          userId,
-          shopId,
-          productName,
-          originalPrice,
-          offerPrice,
-          offerPercentage,
-          description,
-        } = req.body;
-    
-        // Check if product exists
-        let product = await Product.findByPk(id);
-        if (!product) {
-          return res.status(404).json({ message: "Product not found" });
-        }
-    
-        // // Validate required fields
-        // if (!productName || !originalPrice || !shopId) {
-        //   return res.status(400).json({
-        //     message: "Missing required fields: productName, originalPrice, or shopId",
-        //   });
-        // }
-    
-        // Ensure prices are valid numbers
-        // if (isNaN(originalPrice) || (offerPrice && isNaN(offerPrice))) {
-        //   return res.status(400).json({ message: "Invalid price values" });
-        // }
-    
-        // Ensure offerPercentage is within valid range
-        // if (offerPercentage && (offerPercentage < 0 || offerPercentage > 100)) {
-        //   return res
-        //     .status(400)
-        //     .json({ message: "offerPercentage must be between 0 and 100" });
-        // }
-    
-        // Handle Image Upload
+      const { id } = req.params; // Get product ID from request params
+      const {
+        userId,
+        shopId,
+        productName,
+        originalPrice,
+        offerPrice,
+        offerPercentage,
+        description,
+      } = req.body;
 
-        let newImage = product.image; // Keep old image by default
-        if (req.file) {
-        // Delete old image if exists
-          if (product.image) {
-            const oldImagePath = path.join(uploadPath, product.image);
-            if (fs.existsSync(oldImagePath)) {
-              fs.unlinkSync(oldImagePath);
-            }
-          }
-    
-          // Assign new image filename
-          newImage = req.file.filename;
-        }
-    
-        // Update product data
-        await product.update({
-          shopId,
-          productName,
-          originalPrice,
-          offerPrice: offerPrice || product.offerPrice,
-          offerPercentage: offerPercentage || product.offerPercentage,
-          description: description || product.description,
-          image: newImage, // Updated image if applicable
-        });
-    
-        res.status(200).json({ message: "Product updated successfully", product });
-      } catch (error) {
-        console.error("Error updating product:", error);
-        res.status(500).json({ message: "Internal Server Error", error });
+      // Check if product exists
+      let product = await Product.findByPk(id);
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
       }
+
+      // // Validate required fields
+      // if (!productName || !originalPrice || !shopId) {
+      //   return res.status(400).json({
+      //     message: "Missing required fields: productName, originalPrice, or shopId",
+      //   });
+      // }
+
+      // Ensure prices are valid numbers
+      // if (isNaN(originalPrice) || (offerPrice && isNaN(offerPrice))) {
+      //   return res.status(400).json({ message: "Invalid price values" });
+      // }
+
+      // Ensure offerPercentage is within valid range
+      // if (offerPercentage && (offerPercentage < 0 || offerPercentage > 100)) {
+      //   return res
+      //     .status(400)
+      //     .json({ message: "offerPercentage must be between 0 and 100" });
+      // }
+
+      // Handle Image Upload
+
+      let newImage = product.image; // Keep old image by default
+      if (req.file) {
+        // Delete old image if exists
+        if (product.image) {
+          const oldImagePath = path.join(uploadPath, product.image);
+          if (fs.existsSync(oldImagePath)) {
+            fs.unlinkSync(oldImagePath);
+          }
+        }
+
+        // Assign new image filename
+        newImage = req.file.filename;
+      }
+
+      // Update product data
+      await product.update({
+        shopId,
+        productName,
+        originalPrice,
+        offerPrice: offerPrice || product.offerPrice,
+        offerPercentage: offerPercentage || product.offerPercentage,
+        description: description || product.description,
+        image: newImage, // Updated image if applicable
+      });
+
+      res
+        .status(200)
+        .json({ message: "Product updated successfully", product });
+    } catch (error) {
+      console.error("Error updating product:", error);
+      res.status(500).json({ message: "Internal Server Error", error });
+    }
   },
-  // getProducts:async(req,res)=>{
-  //   try {
-  //       // Fetch all products from the database
-  //       const products = await Product.findAll({
-  //         order: [["createdAt", "DESC"]], // Order by latest created products
-  //         include:[{
-  //           model:Shop,
-  //           as:"shop",
-  //           attributes:["id","shopName"],
-  //         }]
-  //       });
-    
-  //       // Check if products exist
-  //       if (!products.length) {
-  //         return res.status(404).json({ message: "No products found" });
-  //       }
-    
-  //       res.status(200).json({ message: "Products fetched successfully", products });
-  //     } catch (error) {
-  //       console.error("Error fetching products:", error);
-  //       res.status(500).json({ message: "Internal Server Error", error });
-  //     }
-  // },
-  getProductSearch:async(req,res)=>{
-    const search = req.query.search||"";
-    const page = req.query.page ||1;
+  getProduct: async (req, res) => {
+    const search = req.query.search || "";
+    const page = req.query.page || 1;
     const limit = req.query.limit || 10;
     const offset = (page - 1) * limit;
-    let whereCondition = {}
-    if(search){
+    let whereCondition = {};
+    if (search) {
       whereCondition = {
-        [Op.or]:[
-          {productName:{[Op.like]:`%${search}%`}}
-        ]
-      }
+        [Op.or]: [{ productName: { [Op.like]: `%${search}%` } }],
+      };
     }
     try {
       const products = await Product.findAndCountAll({
         limit,
         offset,
-        where:whereCondition,
+        where: whereCondition,
+        attributes: [
+          "id",
+          "productName",
+          "originalPrice",
+          "offerPrice",
+          "trash",
+        ],
         include: [
           {
             model: Shop,
             attributes: ["id", "shopName"],
-            as:"shop"
+            as: "shop",
           },
-        ]
+        ],
       });
 
       res.status(200).json({ success: true, data: products });
     } catch (error) {
       console.error("Error fetching product for admin:", error);
-      res
-        .status(500)
-        .json({ success: false, message: "Error fetching product data", error });
+      res.status(500).json({
+        success: false,
+        message: "Error fetching product data",
+        error,
+      });
     }
   },
-  getProductById:async(req,res)=>{
+  getProductById: async (req, res) => {
     try {
-        const { id } = req.params; // Extract product ID from request params
-    
-        // Find product by ID
-        const product = await Product.findByPk(id);
-    
-        // Check if product exists
-        if (!product) {
-          return res.status(404).json({ message: "Product not found" });
-        }
-    
-        res.status(200).json({ message: "Product fetched successfully", product });
-      } catch (error) {
-        console.error("Error fetching product:", error);
-        res.status(500).json({ message: "Internal Server Error", error });
+      const { id } = req.params; // Extract product ID from request params
+
+      // Find product by ID
+      const product = await Product.findByPk(id);
+
+      // Check if product exists
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
       }
+
+      res
+        .status(200)
+        .json({ message: "Product fetched successfully", product });
+    } catch (error) {
+      console.error("Error fetching product:", error);
+      res.status(500).json({ message: "Internal Server Error", error });
+    }
   },
-  deleteProductById:async(req,res)=>{
+  deleteProductById: async (req, res) => {
     try {
-        const { id } = req.params; // Extract product ID from request params
-    
-        // Find the product by ID
-        const product = await Product.findByPk(id);
-    
-        // Check if product exists
-        if (!product) {
-          return res.status(404).json({ message: "Product not found" });
-        }
-    
-        // Update the `trash` field to `true`
-        await product.update({ trash: true });
-    
-        res.status(200).json({ message: "Product deleted successfully (soft delete)", product });
-      } catch (error) {
-        console.error("Error deleting product:", error);
-        res.status(500).json({ message: "Internal Server Error", error });
+      const { id } = req.params; // Extract product ID from request params
+
+      // Find the product by ID
+      const product = await Product.findByPk(id);
+
+      // Check if product exists
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
       }
+
+      // Update the `trash` field to `true`
+      await product.update({ trash: true });
+
+      res.status(200).json({
+        message: "Product deleted successfully (soft delete)",
+        product,
+      });
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      res.status(500).json({ message: "Internal Server Error", error });
+    }
   },
-  restoreProductById:async(req,res)=>{
+  restoreProductById: async (req, res) => {
     try {
-        const { id } = req.params; // Extract product ID from request params
-    
-        // Find the product by ID
-        const product = await Product.findByPk(id);
-    
-        // Check if product exists
-        if (!product) {
-          return res.status(404).json({ message: "Product not found" });
-        }
-    
-        // Update the `trash` field to `true`
-        await product.update({ trash: false });
-    
-        res.status(200).json({ message: "Product deleted successfully (soft delete)", product });
-      } catch (error) {
-        console.error("Error deleting product:", error);
-        res.status(500).json({ message: "Internal Server Error", error });
+      const { id } = req.params; // Extract product ID from request params
+
+      // Find the product by ID
+      const product = await Product.findByPk(id);
+
+      // Check if product exists
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
       }
-  }
+
+      // Update the `trash` field to `true`
+      await product.update({ trash: false });
+
+      res.status(200).json({
+        message: "Product deleted successfully (soft delete)",
+        product,
+      });
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      res.status(500).json({ message: "Internal Server Error", error });
+    }
+  },
+  getShopName: async (req, res) => {
+    const search = req.query.search || "";
+    const limit = req.query.limit || 5;
+    const page = req.query.page || 1;
+    const offset = (page - 1) * limit;
+    let whereCondition = {};
+    if (search) {
+      whereCondition = {
+        shopName: { [Op.like]: `%${search}%` },
+      };
+    }
+    try {
+      const shops = await Shop.findAll({
+        limit,
+        offset,
+        where: whereCondition,
+        attributes: ["id", "shopName"],
+      });
+      res.status(200).json({ success: true, shops });
+    } catch (error) {
+      console.log(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error", error });
+    }
+  },
 };

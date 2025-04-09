@@ -60,7 +60,7 @@ module.exports = {
         type: Sequelize.STRING,
       },
       areas: {
-        type: Sequelize.STRING,
+        type: Sequelize.ENUM("mahe", "chokli", "palloor", "pandakkal"),
       },
       trash: {
         type: Sequelize.BOOLEAN,

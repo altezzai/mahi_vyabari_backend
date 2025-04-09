@@ -38,7 +38,7 @@ module.exports = {
       },
       offerPercentage: {
         type: Sequelize.FLOAT,
-        defaultValue: 0,
+        defaultValue:0,
         validate: {
           min: 0,
           max: 100,
