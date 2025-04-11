@@ -169,13 +169,13 @@ module.exports = {
   },
   getEmergency: async (req, res) => {
     const search = req.query.search || "";
-    const page = req.query.page || 1;
-    const limit = req.query.limit || 10;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
     const whereCondition = {};
     if (search) {
       whereCondition = {
-        [Op.or]: [{ itemName: { [Op.like]: `%${search}%` } }],
+        [Op.or]: [{ emergencyName: { [Op.like]: `%${search}%` } }],
       };
     }
     try {
@@ -183,6 +183,8 @@ module.exports = {
         limit,
         offset,
         where: whereCondition,
+        attributes:["id","emergencyName","phone","trash"],
+        order: [["createdAt", "DESC"]],
       }); // Fetch all records
       if (!emergencies) {
         return res

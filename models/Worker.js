@@ -19,7 +19,10 @@ const WorkerProfile = sequelize.define(
       type: DataTypes.INTEGER,
     },
     area: {
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM("mahe","chokli","palloor","pandakkal"),
+      validate:{
+        isIn:[["mahe","chokli","palloor","pandakkal"]]
+      }
     },
     phone: {
       type: DataTypes.STRING,

@@ -7,8 +7,10 @@ const Category = require("../models/Category");
 const ShopCategory = require("../models/ShopCategory");
 const { json } = require("body-parser");
 const { deletefilewithfoldername } = require("../utils/util");
-const { Op } = require("sequelize");
+const { Op, Sequelize } = require("sequelize");
 const Type = require("../models/Type");
+const Complaint = require("../models/Complaint");
+const Feedback = require("../models/Feedback");
 
 const uploadPath = path.join(__dirname, "../public/uploads/shopImages");
 if (!fs.existsSync(uploadPath)) {
@@ -302,12 +304,102 @@ module.exports = {
         },
         include:{
           model:Category,
+          attributes:["id","name"]
         }
       })
       res.status(200).json({ success: true, shopCategories });
     } catch (error) {
       console.log(error)
       res.status(500).json({ success: false, message: "Error getting shop categories"});
+    }
+  },
+  getShopFeedbacks:async(req,res)=>{
+    const search = req.query.search || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    let whereCondition = {};
+    if (search) {
+      whereCondition = {
+        shopName: { [Op.like]: `%${search}%` },
+        trash: false,
+      };
+    }
+    try {
+      const shops = await Shop.findAll({
+        limit,
+        offset,
+        where: whereCondition,
+        attributes: [
+          "id",
+          "shopName",
+          [
+            Sequelize.fn("AVG", Sequelize.col("Feedbacks.rating")),
+            "averageRating",
+          ],
+          [
+            Sequelize.fn("COUNT",Sequelize.col("Feedbacks.id")),"totalRating"
+          ]
+        ],
+        include: [
+          {
+            model: Feedback,
+            as: "Feedbacks",
+            attributes: [],
+          },
+        ],
+        group: ["Shop.id"],
+        order: [[Sequelize.literal("averageRating"), "DESC"]],
+        subQuery:false,
+      });
+      // console.log("✅ Shops sorted by rating:", JSON.stringify(shops, null, 2));
+      res.json({ message: "Top-rated shops", data: shops });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Error fetching shops", error });
+    }
+  },
+  getShopComplaints:async(req,res)=>{
+    const search = req.query.search || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    let whereCondition = {};
+    if (search) {
+      whereCondition = {
+        shopName: { [Op.like]: `%${search}%` },
+        trash: false,
+      };
+    }
+    try {
+      const shops = await Shop.findAll({
+        limit,
+        offset,
+        where: whereCondition,
+        attributes: [
+          "id",
+          "shopName",
+          [
+            Sequelize.fn("AVG", Sequelize.col("complaints.title")),
+            "averageRating",
+          ],
+        ],
+        include: [
+          {
+            model: Complaint,
+            as: "Feedbacks",
+            attributes: [],
+          },
+        ],
+        group: ["Shop.id"],
+        order: [[Sequelize.literal("averageRating"), "DESC"]],
+        subQuery:false,
+      });
+      // console.log("✅ Shops sorted by rating:", JSON.stringify(shops, null, 2));
+      res.json({ message: "Top-rated shops", data: shops });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Error fetching shops", error });
     }
   }
 };

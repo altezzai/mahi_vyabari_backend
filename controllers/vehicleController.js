@@ -185,22 +185,23 @@ module.exports = {
   },
   getVehicleSchedules: async (req, res) => {
     const search = req.query.search || "";
-    const page = req.query.page || 1;
-    const limit = req.query.limit || 10;
-    const offset = (page-1)*limit;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
     const whereCondition = {};
-    if(search){
+    if (search) {
       whereCondition = {
-        [Op.or]:[{vehicleName:{[Op.like]:`%${search}%`}}]
-      }
+        vehicleName: { [Op.like]: `%${search}%` },
+      };
     }
     try {
       const vehicleSchedules = await VehicleSchedule.findAndCountAll({
         limit,
         offset,
-        where:whereCondition
+        where: whereCondition,
+        attributes: ["id", "vehicleName", "category", "via", "to", "trash"],
       });
-      if (!vehicleSchedules.length) {
+      if (!vehicleSchedules) {
         return res
           .status(404)
           .json({ success: false, message: "Vehicle Schedule not found" });
@@ -404,18 +405,23 @@ module.exports = {
   },
   getVehicleServiceProviders: async (req, res) => {
     const search = req.query.search || "";
-    const page = req.query.page || 1;
-    const limit = req.query.limit || 10;
-    const offset = (page-1) * limit;
-    const whereCondition = {}
-    if(search){
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    const whereCondition = {};
+    if (search) {
       whereCondition = {
-        [Op.or]:[{}]
-      }
+        [Op.or]: [{ ownerName: { [Op.like]: `%${search}%` } }],
+      };
     }
-     try {
-      const vehicleServices = await VehicleService.findAll();
-      if (!vehicleServices.length) {
+    try {
+      const vehicleServices = await VehicleService.findAndCountAll({
+        limit,
+        offset,
+        where: whereCondition,
+        attributes: ["id", "ownerName", "category", "priority", "trash"],
+      });
+      if (!vehicleServices) {
         return res
           .status(404)
           .json({ success: false, message: "Vehicle Service not found" });

@@ -9,7 +9,7 @@ module.exports = {
         primaryKey: true,
         allowNull: false,
       },
-      itemName: {
+      emergencyName: {
         type: Sequelize.STRING,
         allowNull: false,
       },

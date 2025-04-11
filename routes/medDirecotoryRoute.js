@@ -9,5 +9,6 @@ router.patch("/delete-medicalDirectory/:id",medDirectoryController.deleteMedical
 router.patch("/restore-medicalDirectory/:id",medDirectoryController.restoreMedicalDirectory);
 router.get("/get-medicalDirectory",medDirectoryController.getMedicalDirectory);
 router.get("/get-medicalDirectory/:id",medDirectoryController.getMedicalDirectoryById);
+router.get("/get-medical-category",medDirectoryController.getMedicalCategory)
 
 module.exports = router;

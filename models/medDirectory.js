@@ -14,7 +14,7 @@ const HealthcareProvider = sequelize.define(
     icon: {
       type: DataTypes.STRING,
     },
-    searchCategory: {
+    category: {
       type: DataTypes.ENUM("doctor", "hospital"),
       validate: {
         isIn: [["doctor", "hospital"]],
@@ -31,8 +31,12 @@ const HealthcareProvider = sequelize.define(
         notEmpty: true,
       },
     },
-    searchSubcategory: {
+    subCategory: {
       type: DataTypes.STRING,
+      references: {
+        model: Category,
+        key: "id",
+      },
     },
     whatsapp: {
       type: DataTypes.STRING,
@@ -68,7 +72,10 @@ const HealthcareProvider = sequelize.define(
       },
     },
     area: {
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM("mahe", "chokli", "palloor", "pandakkal"),
+      validate: {
+        isIn: [["mahe", "chokli", "palloor", "pandakkal"]],
+      },
     },
     trash: {
       type: DataTypes.BOOLEAN,
@@ -80,5 +87,8 @@ const HealthcareProvider = sequelize.define(
     tableName: "HealthcareProviders",
   }
 );
+
+// HealthcareProvider.hasOne(Category,{foreignKey:"category"});
+// Category.belongsTo(HealthcareProvider,{foreignKey:"category"});
 
 module.exports = HealthcareProvider;

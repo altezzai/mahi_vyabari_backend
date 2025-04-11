@@ -9,8 +9,11 @@ module.exports = {
         primaryKey: true,
         allowNull: false,
       },
-      selectCategory: {
-        type: Sequelize.STRING,
+      ownerName:{
+        type:Sequelize.STRING,
+      },
+      category: {
+        type: Sequelize.ENUM("car", "rickshaw"),
       },
       minFee: {
         type: Sequelize.DECIMAL(10, 2),
@@ -33,7 +36,7 @@ module.exports = {
         type: Sequelize.TEXT,
       },
       area: {
-        type: Sequelize.STRING,
+        type: Sequelize.ENUM("mahe", "chokli", "palloor", "pandakkal"),
       },
       address: {
         type: Sequelize.TEXT,
@@ -56,7 +59,9 @@ module.exports = {
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        defaultValue: Sequelize.literal(
+          "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+        ),
       },
     });
   },

@@ -24,7 +24,10 @@ const ItemListing = sequelize.define(
       type: DataTypes.STRING,
     },
     area: {
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM("mahe", "chokli", "palloor", "pandakkal"),
+      validate: {
+        isIn: [["mahe", "chokli", "palloor", "pandakkal"]],
+      },
     },
     address: {
       type: DataTypes.TEXT,

@@ -22,7 +22,7 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       area: {
-        type: Sequelize.STRING,
+        type: Sequelize.ENUM("mahe", "chokli", "palloor", "pandakkal"),
       },
       phone: {
         type: Sequelize.STRING,
@@ -52,7 +52,9 @@ module.exports = {
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        defaultValue: Sequelize.literal(
+          "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+        ),
       },
     });
   },

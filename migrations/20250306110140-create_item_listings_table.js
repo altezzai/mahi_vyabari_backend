@@ -26,7 +26,7 @@ module.exports = {
         type: Sequelize.STRING,
       },
       area: {
-        type: Sequelize.STRING,
+         type: Sequelize.ENUM("mahe", "chokli", "palloor", "pandakkal"),
       },
       address: {
         type: Sequelize.TEXT,

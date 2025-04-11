@@ -59,8 +59,7 @@ const Product = sequelize.define(
   }
 );
 
-module.exports = Product;
-
-
 Shop.hasMany(Product,{foreignKey:"shopId",as:"products"});
 Product.belongsTo(Shop,{foreignKey:"shopId",as:"shop"});
+
+module.exports = Product;

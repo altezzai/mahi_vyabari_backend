@@ -7,7 +7,7 @@ const VehicleSchedule = sequelize.define(
       type: DataTypes.INTEGER,
     },
     category: {
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM("train","bus"),
     },
     vehicleName: {
       type: DataTypes.STRING,

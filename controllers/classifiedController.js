@@ -3,7 +3,9 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const Classified = require("../models/Classified");
+const Type = require("../models/Type");
 const { deletefilewithfoldername } = require("../utils/util");
+const Category = require("../models/Category");
 
 const uploadPath = path.join(__dirname, "../public/uploads/classified");
 
@@ -199,21 +201,22 @@ module.exports = {
     }
   },
   getClassfieds: async (req, res) => {
-        const search = req.query.search || "";
-        const page = req.query.page || 1;
-        const limit = req.query.limit || 10;
-        const offset = (page - 1) * limit;
-        const whereCondition = {};
-        if (search) {
-          whereCondition = {
-            [Op.or]: [{ itemName: { [Op.like]: `%${search}%` } }],
-          };
-        }
+    const search = req.query.search || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    const whereCondition = {};
+    if (search) {
+      whereCondition = {
+        [Op.or]: [{ itemName: { [Op.like]: `%${search}%` } }],
+      };
+    }
     try {
       const classifieds = await Classified.findAndCountAll({
         limit,
         offset,
         where: whereCondition,
+        attributes: ["itemName", "category", "priority", "trash"],
         order: [["createdAt", "DESC"]],
       }); // Fetch all classifieds
       // Check if products exist
@@ -244,6 +247,25 @@ module.exports = {
       return res
         .status(500)
         .json({ success: false, message: "Error fetching classified", error });
+    }
+  },
+  getClassfiedCategories: async (req, res) => {
+    try {
+      const classifiedCategories = await Type.findOne({
+        where: { typeName: "classified" },
+        include: {
+          model: Category,
+          attributes: ["id", "categoryName"],
+        },
+      });
+      res.status(200).json({ success: true, classifiedCategories });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        success: false,
+        message: "Error fetching classified categories",
+        error,
+      });
     }
   },
 };

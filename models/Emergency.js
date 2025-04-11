@@ -4,7 +4,7 @@ const sequelize = require("../config/database");
 const Emergency = sequelize.define(
   "Emergency",
   {
-    itemName: {
+    emergencyName: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {

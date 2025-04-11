@@ -4,8 +4,11 @@ const sequelize = require("../config/database");
 const VehicleService = sequelize.define(
   "VehicleService",
   {
-    selectCategory: {
-      type: DataTypes.STRING,
+    ownerName:{
+       type: DataTypes.STRING,
+    },
+    category: {
+      type: DataTypes.ENUM("car","rickshaw"),
     },
     minFee: {
       type: DataTypes.DECIMAL(10, 2),
@@ -31,7 +34,10 @@ const VehicleService = sequelize.define(
       type: DataTypes.TEXT,
     },
     area: {
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM("mahe","chokli","palloor","pandakkal"),
+      validate:{
+        isIn:[["mahe","chokli","palloor","pandakkal"]]
+      }
     },
     address: {
       type: DataTypes.TEXT,

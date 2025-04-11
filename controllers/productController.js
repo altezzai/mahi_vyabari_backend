@@ -154,7 +154,7 @@ module.exports = {
     let whereCondition = {};
     if (search) {
       whereCondition = {
-        [Op.or]: [{ productName: { [Op.like]: `%${search}%` } }],
+        productName: { [Op.like]: `%${search}%` }
       };
     }
     try {
@@ -176,6 +176,7 @@ module.exports = {
             as: "shop",
           },
         ],
+        order: [["createdAt", "DESC"]],
       });
 
       res.status(200).json({ success: true, data: products });
@@ -258,8 +259,8 @@ module.exports = {
   },
   getShopName: async (req, res) => {
     const search = req.query.search || "";
-    const limit = req.query.limit || 5;
     const page = req.query.page || 1;
+    const limit = req.query.limit || 5;
     const offset = (page - 1) * limit;
     let whereCondition = {};
     if (search) {

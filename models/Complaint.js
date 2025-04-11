@@ -56,7 +56,7 @@ const Complaint = sequelize.define(
 
 // Associations (If Needed)
 User.hasMany(Complaint, { foreignKey: "userId" });
-Shop.hasMany(Complaint, { foreignKey: "shopId" });
+Shop.hasMany(Complaint, { foreignKey: "shopId" ,as:"complaints"});
 Complaint.belongsTo(User, { foreignKey: "userId" });
 Complaint.belongsTo(Shop, { foreignKey: "shopId" });
 

@@ -7,45 +7,51 @@ const bodyparser = require("body-parser");
 const cors = require("cors");
 const session = require("express-session");
 const passport = require("passport");
+const helmet = require("helmet");
 const PORT = process.env.PORT || 3000;
 
 const shopRouter = require("./routes/shopRoute");
 const productRouter = require("./routes/productRoute");
 const categoryRouter = require("./routes/categoryRoute");
-const classifiedRouter = require("./routes/classifiedRoute")
-const emergenctRouter = require("./routes/emergencyRoute")
+const classifiedRouter = require("./routes/classifiedRoute");
+const emergenctRouter = require("./routes/emergencyRoute");
 const medDirectoryRouter = require("./routes/medDirecotoryRoute");
 const vehicleRouter = require("./routes/vehicleRoute");
-const workersRouter = require('./routes/workersRoute');
+const workersRouter = require("./routes/workersRoute");
 const userRouter = require("./routes/userRoute");
 const publicRouter = require("./routes/publicRoute");
+const customerRouter = require("./routes/customerRoute");
 
-app.use(session({
-    resave:false,
-    saveUninitialized:true,
-    secret:process.env.SESSION_SECRET
-}))
+app.use(
+  session({
+    resave: false,
+    saveUninitialized: true,
+    secret: process.env.SESSION_SECRET,
+  })
+);
 
+app.use("/public/uploads", express.static("public/uploads"));
 app.use(passport.initialize());
-app.use(passport.session())
+app.use(passport.session());
 app.use(bodyparser.json());
 app.use(express.json());
-app.use(bodyparser.urlencoded({extended:true}));
-app.use(express.urlencoded({extended:true}))
+app.use(bodyparser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+app.use(helmet());
 
-app.use("/api/shop",shopRouter);
-app.use("/api/product",productRouter);
-app.use("/api/category",categoryRouter);
-app.use("/api/classified",classifiedRouter);
-app.use("/api/emergency",emergenctRouter);
-app.use("/api/medDirectory",medDirectoryRouter);
-app.use("/api/vehicle",vehicleRouter);
-app.use("/api/workers",workersRouter);
-app.use("/api/user",userRouter);
-app.use("/api/public",publicRouter)
+app.use("/api/shop", shopRouter);
+app.use("/api/product", productRouter);
+app.use("/api/category", categoryRouter);
+app.use("/api/classified", classifiedRouter);
+app.use("/api/emergency", emergenctRouter);
+app.use("/api/medDirectory", medDirectoryRouter);
+app.use("/api/vehicle", vehicleRouter);
+app.use("/api/workers", workersRouter);
+app.use("/api/user", userRouter);
+app.use("/api/public", publicRouter);
+app.use("/api/customer",customerRouter);
 
-
-app.listen(PORT,()=>{
-    console.log(`server started on port number ${PORT}`);
-})
+app.listen(PORT, () => {
+  console.log(`server started on port number ${PORT}`);
+});

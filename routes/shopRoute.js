@@ -12,4 +12,8 @@ router.put("/update-shop/:shopId",shopController.upload.fields([{ name: "image" 
 router.patch("/delete-shop/:shopId",shopController.deleteShop);
 router.patch("/restore-shop/:shopId",shopController.restoreShop);
 
+router.get("/get-shop-feedbacks",shopController.getShopFeedbacks);
+
+router.get("/get-shop-complaints",shopController.getShopComplaints)
+
 module.exports = router;

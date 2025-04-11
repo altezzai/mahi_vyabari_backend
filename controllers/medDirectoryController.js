@@ -6,6 +6,7 @@ const Medical = require("../models/MedDirectory");
 const { deletefilewithfoldername } = require("../utils/util");
 const { Op } = require("sequelize");
 const Category = require("../models/Category");
+const Type = require("../models/Type");
 
 const uploadPath = path.join(__dirname, "../public/uploads/Medical");
 if (!fs.existsSync(uploadPath)) {
@@ -238,27 +239,22 @@ module.exports = {
   },
   getMedicalDirectory: async (req, res) => {
     const search = req.query.search || "";
-    const page = req.query.page || 1;
-    const limit = req.query.limit || 10;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
     let whereCondition = {};
     if (search) {
       whereCondition = {
-        [Op.or]: [{ name: { [Op.like]: `%${search}%` } }],
+        name: { [Op.like]: `%${search}%` }
       };
     }
     try {
       const medical = await Medical.findAndCountAll({
         limit,
         offset,
-        attributes: ["id", "name", "priority", "searchCategory","trash"],
+        attributes: ["id", "name", "priority", "category","trash"],
         where: whereCondition,
-        // include: [
-        //   {
-        //     model: Category,
-        //     attributes: ["id","name"],
-        //   },
-        // ]
+        order: [["createdAt", "DESC"]],
       });
 
       res.status(200).json({ success: true, data: medical });
@@ -294,4 +290,21 @@ module.exports = {
       });
     }
   },
+  getMedicalCategory:async(req,res)=>{
+    try {
+      const medicalCategory = await Type.findOne({
+        where:{
+          typeName:"medical"
+        },
+        include:{
+          model:Category,
+          attributes:["id","categoryName"]
+        }
+      })
+      return res.status(200).json({ success: true, data: medicalCategory });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({success:false,message:"Error"});
+    }
+  }
 };

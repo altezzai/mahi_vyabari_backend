@@ -18,7 +18,7 @@ module.exports = {
       icon: {
         type: Sequelize.STRING,
       },
-      searchCategory: {
+      category: {
         type: Sequelize.ENUM("doctor", "hospital"),
       },
       name: {
@@ -29,7 +29,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      searchSubcategory: {
+      subCategory: {
         type: Sequelize.STRING,
       },
       whatsapp: {
@@ -60,7 +60,7 @@ module.exports = {
         type: Sequelize.CHAR(1),
       },
       area: {
-        type: Sequelize.STRING,
+        type: Sequelize.ENUM("mahe", "chokli", "palloor", "pandakkal"),
       },
       trash: {
         type: Sequelize.BOOLEAN,
@@ -74,7 +74,9 @@ module.exports = {
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        defaultValue: Sequelize.literal(
+          "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+        ),
       },
     });
   },

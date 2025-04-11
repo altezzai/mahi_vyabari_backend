@@ -6,6 +6,8 @@ const Worker = require("../models/Worker");
 const WorkerCategory = require("../models/WorkerCategory");
 const { deletefilewithfoldername } = require("../utils/util");
 const { Op } = require("sequelize");
+const Type = require("../models/Type");
+const Category = require("../models/Category");
 
 const uploadPath = path.join(__dirname, "../public/uploads/workers");
 if (!fs.existsSync(uploadPath)) {
@@ -126,24 +128,20 @@ module.exports = {
         description,
       });
 
-      return res
-        .status(200)
-        .json({
-          success: true,
-          message: "Worker profile updated successfully",
-          data: worker,
-        });
+      return res.status(200).json({
+        success: true,
+        message: "Worker profile updated successfully",
+        data: worker,
+      });
     } catch (error) {
       // await deletefilewithfoldername(uploadPath,req.files.image[0].filename)
       // await deletefilewithfoldername(uploadPath,req.files.icon[0].filename)
       console.error("Error updating worker profile:", error);
-      return res
-        .status(500)
-        .json({
-          success: false,
-          message: "Error updating worker profile",
-          error,
-        });
+      return res.status(500).json({
+        success: false,
+        message: "Error updating worker profile",
+        error,
+      });
     }
   },
   deleteWorkerProfile: async (req, res) => {
@@ -161,22 +159,18 @@ module.exports = {
       // Soft delete by setting trash to true
       await worker.update({ trash: true });
 
-      return res
-        .status(200)
-        .json({
-          success: true,
-          message: "Worker profile deleted successfully",
-          worker,
-        });
+      return res.status(200).json({
+        success: true,
+        message: "Worker profile deleted successfully",
+        worker,
+      });
     } catch (error) {
       console.error("Error deleting worker profile:", error);
-      return res
-        .status(500)
-        .json({
-          success: false,
-          message: "Error deleting worker profile",
-          error,
-        });
+      return res.status(500).json({
+        success: false,
+        message: "Error deleting worker profile",
+        error,
+      });
     }
   },
   restoreWorkerProfile: async (req, res) => {
@@ -194,22 +188,18 @@ module.exports = {
       // Soft delete by setting trash to true
       await worker.update({ trash: false });
 
-      return res
-        .status(200)
-        .json({
-          success: true,
-          message: "Worker profile restored successfully",
-          worker,
-        });
+      return res.status(200).json({
+        success: true,
+        message: "Worker profile restored successfully",
+        worker,
+      });
     } catch (error) {
       console.error("Error restoring worker profile:", error);
-      return res
-        .status(500)
-        .json({
-          success: false,
-          message: "Error restoring worker profile",
-          error,
-        });
+      return res.status(500).json({
+        success: false,
+        message: "Error restoring worker profile",
+        error,
+      });
     }
   },
   getWorkerProfiles: async (req, res) => {
@@ -239,13 +229,11 @@ module.exports = {
       return res.status(200).json({ success: true, data: workers });
     } catch (error) {
       console.error("Error fetching worker profiles:", error);
-      return res
-        .status(500)
-        .json({
-          success: false,
-          message: "Error fetching worker profiles",
-          error,
-        });
+      return res.status(500).json({
+        success: false,
+        message: "Error fetching worker profiles",
+        error,
+      });
     }
   },
   getWorkerProfileById: async (req, res) => {
@@ -264,13 +252,28 @@ module.exports = {
       return res.status(200).json({ success: true, data: worker });
     } catch (error) {
       console.error("Error fetching worker profile:", error);
-      return res
-        .status(500)
-        .json({
-          success: false,
-          message: "Error fetching worker profile",
-          error,
-        });
+      return res.status(500).json({
+        success: false,
+        message: "Error fetching worker profile",
+        error,
+      });
+    }
+  },
+  getWorkerCategory: async (req, res) => {
+    try {
+      const workerCategory = await Type.findOne({
+        where: {
+          typeName: "worker",
+        },
+        include: {
+          model: Category,
+          attributes: ["id", "categoryName"],
+        },
+      });
+      return res.status(200).json({ success: true, data: workerCategory });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ success: false, message: "Error" + error });
     }
   },
 };

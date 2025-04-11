@@ -13,7 +13,7 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       category: {
-        type: Sequelize.STRING,
+        type: Sequelize.ENUM("train","bus"),
       },
       vehicleName: {
         type: Sequelize.STRING,

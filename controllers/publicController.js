@@ -30,14 +30,14 @@ module.exports = {
           "id",
           "shopName",
           [
-            Sequelize.fn("AVG", Sequelize.col("Feedbacks.rating")),
+            Sequelize.fn("AVG", Sequelize.col("feedbacks.rating")),
             "averageRating",
           ],
         ],
         include: [
           {
             model: Feedback,
-            as: "Feedbacks",
+            as: "feedbacks",
             attributes: [],
           },
         ],

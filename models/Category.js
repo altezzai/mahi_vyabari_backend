@@ -21,7 +21,7 @@ const Category = sequelize.define(
     icon: {
       type: DataTypes.STRING,
     },
-    name: {
+    categoryName: {
       type: DataTypes.STRING,
     },
     description: {

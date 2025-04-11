@@ -9,5 +9,6 @@ router.patch("/delete-classified/:id",classifiedController.deleteClassfied);
 router.patch("/restore-classified/:id",classifiedController.restoreClassfied);
 router.get("/get-classifieds",classifiedController.getClassfieds);
 router.get("/get-classified/:id",classifiedController.getClassfiedById);
+router.get("/get-classified-categories",classifiedController.getClassfiedCategories)
 
 module.exports = router;

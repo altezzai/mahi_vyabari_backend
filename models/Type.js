@@ -10,7 +10,7 @@ const Type = sequelize.define(
       autoIncrement: true,
       primaryKey: true,
     },
-    name: {
+    typeName: {
       type: DataTypes.STRING,
       unique: true,
     },
@@ -25,7 +25,6 @@ const Type = sequelize.define(
   {
     tableName: "types",
     timestamps: true,
-    underscored: true,
   }
 );
 
