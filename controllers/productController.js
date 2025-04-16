@@ -42,7 +42,7 @@ module.exports = {
         result: savedProduct,
       });
     } catch (error) {
-      // await deletefilewithfoldername(uploadPath, req.file);
+      await deletefilewithfoldername(uploadPath, req.file?.filename);
       console.log(error);
       res.status(401).json({
         success: false,
@@ -50,20 +50,20 @@ module.exports = {
       });
     }
   },
-  editProduct: async (req, res) => {
+  updateProduct: async (req, res) => {
+    const {
+      shopId,
+      productName,
+      originalPrice,
+      offerPrice,
+      offerPercentage,
+      description,
+    } = req.body;
     try {
       const { id } = req.params;
-      const {
-        userId,
-        shopId,
-        productName,
-        originalPrice,
-        offerPrice,
-        offerPercentage,
-        description,
-      } = req.body;
       let product = await Product.findByPk(id);
       if (!product) {
+        await deletefilewithfoldername(uploadPath,req.file.filename);
         return res
           .status(404)
           .json({ success: false, message: "Product not found" });
@@ -140,7 +140,16 @@ module.exports = {
   getProductById: async (req, res) => {
     try {
       const { id } = req.params;
-      const product = await Product.findByPk(id);
+      const product = await Product.findOne({
+        where:{id},
+        include:[
+          {
+            model:Shop,
+            attributes:["shopName"],
+            as:"shop"
+          }
+        ]
+      });
       if (!product) {
         return res
           .status(404)
