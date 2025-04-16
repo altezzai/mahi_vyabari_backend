@@ -6,6 +6,8 @@ const VehicleSchedule = require("../models/VehicleSchedule");
 const VehicleService = require("../models/VehicleService");
 const { deletefilewithfoldername } = require("../utils/util");
 const { Op } = require("sequelize");
+const Type = require("../models/Type");
+const Category = require("../models/Category");
 
 const uploadPath = path.join(__dirname, "../public/uploads/Vehicle");
 if (!fs.existsSync(uploadPath)) {
@@ -207,8 +209,8 @@ module.exports = {
         result: savedService,
       });
     } catch (error) {
-      // deletefilewithfoldername(uploadPath, req.files.image[0].filename);
-      // deletefilewithfoldername(uploadPath, req.files.icon[0].filename);
+      deletefilewithfoldername(uploadPath, req.files?.image?.[0]?.filename);
+      deletefilewithfoldername(uploadPath, req.files?.icon?.[0]?.filename);
       console.log(error);
       res.status(401).json({
         success: false,
@@ -217,23 +219,29 @@ module.exports = {
     }
   },
   updateVehicleServiceProvider: async (req, res) => {
+    const {
+      selectCategory,
+      minFee,
+      vehicleNumber,
+      priority,
+      phone,
+      whatsapp,
+      description,
+      area,
+      address,
+    } = req.body;
     try {
       const { id } = req.params;
-      const {
-        selectCategory,
-        minFee,
-        vehicleNumber,
-        priority,
-        phone,
-        whatsapp,
-        description,
-        area,
-        address,
-      } = req.body;
       const vehicleService = await VehicleService.findByPk(id);
       if (!vehicleService) {
-        // await deletefilewithfoldername(uploadPath, req.files.image[0].filename);
-        // await deletefilewithfoldername(uploadPath, req.files.icon[0].filename);
+        await deletefilewithfoldername(
+          uploadPath,
+          req.files?.image?.[0]?.filename
+        );
+        await deletefilewithfoldername(
+          uploadPath,
+          req.files?.icon?.[0]?.filename
+        );
         return res
           .status(404)
           .json({ success: false, message: "Vehicle Service not found" });
@@ -276,8 +284,14 @@ module.exports = {
         data: vehicleService,
       });
     } catch (error) {
-      // await deletefilewithfoldername(uploadPath, req.files.image[0].filename);
-      // await deletefilewithfoldername(uploadPath, req.files.icon[0].filename);
+      await deletefilewithfoldername(
+        uploadPath,
+        req.files?.image?.[0]?.filename
+      );
+      await deletefilewithfoldername(
+        uploadPath,
+        req.files?.icon?.[0]?.filename
+      );
       console.error(error);
       return res.status(500).json({
         success: false,
@@ -383,6 +397,28 @@ module.exports = {
         success: false,
         message: "Internal Server Error",
       });
+    }
+  },
+  getVehicleServiceCategories: async (req, res) => {
+    try {
+      const vehicleServiceCategories = await Type.findOne({
+        where: {
+          typeName: "taxi",
+        },
+        attributes: [],
+        include: [
+          {
+            model: Category,
+            attributes: ["id", "categoryName"],
+          },
+        ],
+      });
+      res.status(200).json({ success: true, vehicleServiceCategories });
+    } catch (error) {
+      console.log(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
 };

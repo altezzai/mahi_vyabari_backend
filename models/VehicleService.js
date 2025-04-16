@@ -6,9 +6,10 @@ const VehicleService = sequelize.define(
   {
     ownerName: {
       type: DataTypes.STRING,
+      allowNull:false,
     },
     category: {
-      type: DataTypes.ENUM("car", "rickshaw"),
+      type: DataTypes.STRING,
     },
     minFee: {
       type: DataTypes.DECIMAL(10, 2),
@@ -18,7 +19,10 @@ const VehicleService = sequelize.define(
       allowNull: false,
     },
     priority: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.ENUM("A","B","C"),
+      validate:{
+        isIn: [['A', 'B', 'C']]
+      }
     },
     phone: {
       type: DataTypes.STRING,
