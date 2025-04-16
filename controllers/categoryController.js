@@ -27,9 +27,6 @@ module.exports = {
   upload,
   addCategory: async (req, res) => {
     try {
-      // if (!req.file) {
-      //   return res.status(400).json({ message: "category icon is required" });
-      // }
       const categoryData = {
         ...req.body,
         icon: req.file ? req.file.filename : null,
@@ -39,21 +36,20 @@ module.exports = {
       if (!savedCategory) {
         // await deletefilewithfoldername(uploadPath, req.file.filename);
         res.status(404).json({
-          status: "FAILED",
+          success: false,
           message: "Can't upload Category Data",
         });
       }
       res.status(200).json({
-        status: "SUCCESS",
+        success: true,
         data: savedCategory,
       });
     } catch (error) {
       // await deletefilewithfoldername(uploadPath, req.file.filename);
       console.log(error);
       res.status(500).json({
-        status: "FAILED",
+        success: false,
         message: "An error occure while uploading Category data",
-        error: error,
       });
     }
   },
@@ -65,20 +61,16 @@ module.exports = {
       if (!category) {
         res.status(400).json({ success: false, message: "Category not found" });
       }
-      let newIcon = category.icon; // Keep old image by default
+      let newIcon = category.icon;
       if (req.file) {
-        // Delete old image if exists
         if (category.icon) {
           const oldImagePath = path.join(uploadPath, category.icon);
           if (fs.existsSync(oldImagePath)) {
             fs.unlinkSync(oldImagePath);
           }
         }
-
-        // Assign new image filename
         newIcon = req.file.filename;
       }
-      // Update the category with new data
       await category.update({
         userId: userId || category.userId,
         typeId: typeId || category.typeId,
@@ -100,150 +92,164 @@ module.exports = {
   },
   deleteCategory: async (req, res) => {
     try {
-      const { id } = req.params; // Extract product ID from request params
-  
-      // Find the product by ID
+      const { id } = req.params;
       const category = await Category.findByPk(id);
-  
-      // Check if product exists
       if (!category) {
         return res.status(404).json({ message: "Product not found" });
       }
-  
-      // Update the `trash` field to `true`
       await category.update({ trash: true });
-  
-      res.status(200).json({ message: "category  deleted successfully (soft delete)", category });
+      res.status(200).json({
+        success: true,
+        category,
+      });
     } catch (error) {
       console.error("Error deleting category:", error);
-      res.status(500).json({ message: "Internal Server Error", error });
+      res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
   restoreCategory: async (req, res) => {
     try {
-      const { id } = req.params; // Extract product ID from request params
-  
-      // Find the product by ID
+      const { id } = req.params;
       const category = await Category.findByPk(id);
-  
-      // Check if product exists
       if (!category) {
-        return res.status(404).json({ message: "Category not found" });
+        return res
+          .status(404)
+          .json({ success: false, message: "Category not found" });
       }
-  
-      // Update the `trash` field to `true`
       await category.update({ trash: false });
-  
-      res.status(200).json({ message: "category restored successfully (soft delete)", category });
+      res.status(200).json({
+        success: true,
+        category,
+      });
     } catch (error) {
       console.error("Error deleting category:", error);
-      res.status(500).json({ message: "Internal Server Error", error });
+      res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
-  getCategory: async (req, res) => {
-        const search = req.query.search || "";
-        const page = req.query.page || 1;
-        const limit = req.query.limit || 10;
-        const offset = (page - 1) * limit;
-        const whereCondition = {};
-        if (search) {
-          whereCondition = {
-            [Op.or]: [{ name: { [Op.like]: `%${search}%` } }],
-          };
-        }
+  getCategories: async (req, res) => {
+    const search = req.query.search || "";
+    const page = req.query.page || 1;
+    const limit = req.query.limit || 10;
+    const offset = (page - 1) * limit;
+    const whereCondition = {};
+    if (search) {
+      whereCondition = {
+        [Op.or]: [{ name: { [Op.like]: `%${search}%` } }],
+      };
+    }
     try {
-      // Fetch all products from the database
       const categories = await Category.findAndCountAll({
         limit,
         offset,
-        where:whereCondition,
-        order: [["createdAt", "DESC"]], // Order by latest created products
+        where: whereCondition,
+        order: [["createdAt", "DESC"]],
       });
-  
-      // Check if products exist
       if (!categories) {
-        return res.status(404).json({ message: "No categories found" });
+        return res
+          .status(404)
+          .json({ success: false, message: "No categories found" });
       }
-  
-      res.status(200).json({ message: "Categories fetched successfully", categories });
+      res.status(200).json({ success: true, categories });
     } catch (error) {
       console.error("Error fetching categories:", error);
-      res.status(500).json({ message: "Internal Server Error", error });
+      res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
   getCategoryById: async (req, res) => {
     try {
-      const { id } = req.params; // Extract product ID from request params
-  
-      // Find product by ID
+      const { id } = req.params;
       const category = await Category.findByPk(id);
-  
-      // Check if product exists
       if (!category) {
-        return res.status(404).json({ message: "Category not found" });
+        return res
+          .status(404)
+          .json({ success: false, message: "Category not found" });
       }
-  
-      res.status(200).json({ message: "category fetched successfully", category });
+      res.status(200).json({ success: true, category });
     } catch (error) {
       console.error("Error fetching category:", error);
-      res.status(500).json({ message: "Internal Server Error", error });
+      res.status(500).json({ message: "Internal Server Error" });
     }
   },
   addType: async (req, res) => {
     try {
       const data = req.body;
       const newType = await Type.bulkCreate(data);
-      res
-        .status(201)
-        .json({ message: "Type created successfully", data: newType });
+      res.status(201).json({ success: true, data: newType });
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      console.log(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
   deleteType: async (req, res) => {
     try {
       const { id } = req.params;
       const type = await Type.findByPk(id);
-      if (!type) return res.status(404).json({ message: "Type not found" });
-
+      if (!type)
+        return res
+          .status(404)
+          .json({ success: false, message: "Type not found" });
       await type.update({ trash: true });
-      res.json({ message: "Type deleted (soft delete)", data: type });
+      res.json({ success: true, data: type });
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      console.log(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
   restoreType: async (req, res) => {
     try {
       const { id } = req.params;
       const type = await Type.findByPk(id);
-      if (!type) return res.status(404).json({ message: "Type not found" });
-
+      if (!type)
+        return res
+          .status(404)
+          .json({ success: false, message: "Type not found" });
       await type.update({ trash: false });
-      res.json({ message: "Type restored successfully", data: type });
+      res.json({ success: true, data: type });
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      console.log(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
   getTypes: async (req, res) => {
     try {
       const types = await Type.findAll();
-      res.json(types);
+      res.json({ success: true, types });
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      console.log(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
   getTypeById: async (req, res) => {
     try {
       const { id } = req.params;
       const type = await Type.findByPk(id);
-      if (!type) return res.status(404).json({ message: "Type not found" });
-
+      if (!type)
+        return res
+          .status(404)
+          .json({ success: false, message: "Type not found" });
       res.status(200).json({
-        message: "Type found successfully",
+        success: true,
         data: type,
       });
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      console.log(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
 };

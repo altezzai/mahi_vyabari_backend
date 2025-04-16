@@ -13,7 +13,7 @@ const WorkerCategory = sequelize.define(
     },
     workerId: {
       type: DataTypes.INTEGER,
-      allowNull:false,
+      allowNull: false,
       references: {
         model: Worker,
         key: "id",

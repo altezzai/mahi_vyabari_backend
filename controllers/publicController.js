@@ -43,36 +43,37 @@ module.exports = {
         ],
         group: ["Shop.id"],
         order: [[Sequelize.literal("averageRating"), "DESC"]],
-        subQuery:false,
+        subQuery: false,
       });
-      // console.log("✅ Shops sorted by rating:", JSON.stringify(shops, null, 2));
-      res.json({ message: "Top-rated shops", data: shops });
+      res.json({ success: true, data: shops });
     } catch (error) {
       console.log(error);
-      res.status(500).json({ message: "Error fetching shops", error });
+      res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
   getShops: async (req, res) => {
     try {
       const shops = await Shop.findAll({
         attributes: ["image", "shopName", "location", "priority"],
-        where: { trash: false }, // Exclude shops marked as trash
+        where: { trash: false },
       });
       res.status(201).json({
-        status: "SUCCESS",
+        success: true,
         shops,
       });
     } catch (error) {
-      console.error("Error fetching shops:", error);
+      console.error(error);
       res.status(500).json({
-        status: "failed",
-        message: "Error fetching shops",
+        success: false,
+        message: "Internal Server Error",
       });
     }
   },
   getShopById: async (req, res) => {
     try {
-      const { shopId } = req.params;
+      const { id } = req.params;
       const shop = await Shop.findOne({
         attributes: [
           "id",
@@ -103,116 +104,130 @@ module.exports = {
             as: "Feedbacks",
           },
         ],
-        where: { id: shopId, trash: false },
+        where: { id, trash: false },
         group: ["Shop.id"],
       });
-
       if (!shop) {
-        return res.status(404).json({ error: "Shop not found" });
+        return res
+          .status(404)
+          .json({ success: false, message: "Shop Not Found" });
       }
-
       res.status(201).json({
-        status: "SUCCESS",
+        success: true,
         shop,
       });
     } catch (error) {
-      console.error("Error fetching shop:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
   },
   getDocters: async (req, res) => {
     try {
       const doctors = await Medical.findAll({
         attributes: ["name", "image", "searchSubcategory"],
-        where: { searchCategory: "doctor", trash: false },
+        where: { category: "doctor", trash: false },
       });
       res.status(200).json({
-        status: "SUCCESS",
+        success: true,
         doctors,
       });
     } catch (error) {
-      console.error("Error fetching doctors:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
   },
   getDocterById: async (req, res) => {
     try {
-      const { docterId } = req.params;
+      const { id } = req.params;
       const doctor = await Medical.findOne({
-        where: { id: docterId, searchCategory: "doctor", trash: false },
+        where: { id, category: "doctor", trash: false },
       });
-
       if (!doctor) {
-        return res.status(404).json({ error: "Doctor not found" });
+        return res
+          .status(404)
+          .json({ success: false, message: "Doctor not found" });
       }
-
       res.json({
-        status: "success",
+        success: true,
         doctor,
       });
     } catch (error) {
-      console.error("Error fetching doctor:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
   },
-  getBusSchedule: async (req, res) => {
+  getBusSchedules: async (req, res) => {
     try {
       const buses = await VehicleSchedule.findAll({
         where: { category: "bus" },
       });
       res.status(200).json({
-        status: "success",
+        success: true,
         buses,
       });
     } catch (error) {
-      console.error("Error fetching bus schedules:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
   },
-  getTrainSchedule: async (req, res) => {
+  getTrainSchedules: async (req, res) => {
     try {
       const trains = await VehicleSchedule.findAll({
         where: { category: "train" },
       });
       res.status(200).json({
-        status: "success",
+        success: true,
         trains,
       });
     } catch (error) {
-      console.error("Error fetching train schedules:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
   },
   getHospitals: async (req, res) => {
     try {
-      const doctors = await Medical.findAll({
+      const hospitals = await Medical.findAll({
         attributes: ["name", "image", "searchSubcategory"],
         where: { searchCategory: "hospital", trash: false },
       });
       res.status(200).json({
-        status: "success",
-        doctors,
+        success: true,
+        hospitals,
       });
     } catch (error) {
-      console.error("Error fetching doctors:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
   },
   getHospitalsById: async (req, res) => {
     try {
-      const { hospitalId } = req.params;
-      const doctor = await Medical.findOne({
-        where: { id: hospitalId, searchCategory: "hospital", trash: false },
+      const { id } = req.params;
+      const hospital = await Medical.findOne({
+        where: { id, category: "hospital", trash: false },
       });
-
-      if (!doctor) {
-        return res.status(404).json({ error: "Hospital not found" });
+      if (!hospital) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Hospital not found" });
       }
-
-      res.json(doctor);
+      res.json({ success: true, hospital });
     } catch (error) {
-      console.error("Error fetching Hospital:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
   },
   getEmergencies: async (req, res) => {
@@ -220,22 +235,26 @@ module.exports = {
       const emergencies = await Emergency.findAll({
         where: { trash: false },
       });
-      res.json(emergencies);
+      res.json({ success: true, emergencies });
     } catch (error) {
-      console.error("Error fetching emergencies:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
   },
-  getVehicleService: async (req, res) => {
+  getVehicleServices: async (req, res) => {
     try {
-      const services = await VehicleService.findAll({
+      const vehicleServices = await VehicleService.findAll({
         attributes: ["selectCategory", "vehicleNumber", "image"],
         where: { trash: false },
       });
-      res.json(services);
+      res.status(200).json({ success: true, vehicleServices });
     } catch (error) {
-      console.error("Error fetching vehicle services:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
   },
   getVehicleServiceById: async (req, res) => {
@@ -244,73 +263,83 @@ module.exports = {
       const vehicleService = await VehicleService.findOne({
         where: { id },
       });
-
       if (!vehicleService) {
-        return res.status(404).json({ error: "Vehicle service not found" });
+        return res
+          .status(404)
+          .json({ success: false, message: "Vehicle service not found" });
       }
-
-      res.json(vehicleService);
+      res.status(200).json({ success: true, vehicleService });
     } catch (error) {
-      console.error("Error fetching vehicle service:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
   },
   getLocalWorkers: async (req, res) => {
     try {
-      const services = await Worker.findAll({
+      const workers = await Worker.findAll({
         attributes: ["name", "categories", "image"],
         where: { trash: false },
       });
-      res.json(services);
+      res.json({ success: true, workers });
     } catch (error) {
-      console.error("Error fetching workers Data:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
   },
   getLocalWorkersById: async (req, res) => {
     try {
       const { id } = req.params;
-      const Worker = await Worker.findOne({
+      const worker = await Worker.findOne({
         where: { id, trash: false },
       });
-
-      if (!Worker) {
-        return res.status(404).json({ error: "Worker not found" });
+      if (!worker) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Worker not found" });
       }
-
-      res.json(vehicleService);
+      res.status(200).json({ success: true, worker });
     } catch (error) {
-      console.error("Error fetching Worker data:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
   },
-  getClassified: async (req, res) => {
+  getClassifieds: async (req, res) => {
     try {
-      const classified = await Classified.findAll({
+      const classifieds = await Classified.findAll({
         attributes: ["itemName", "price", "image"],
         where: { trash: false },
       });
-      res.json(classified);
+      res.status(200).json({ success: true, classifieds });
     } catch (error) {
-      console.error("Error fetching classifed Data:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
   },
   getClassifiedById: async (req, res) => {
     try {
       const { id } = req.params;
-      const Worker = await Classified.findOne({
+      const classified = await Classified.findOne({
         where: { id, trash: false },
       });
-
-      if (!Worker) {
-        return res.status(404).json({ error: "Classfied not found" });
+      if (!classified) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Classfied not found" });
       }
-
-      res.json(vehicleService);
+      res.status(200).json({ success: true, classified });
     } catch (error) {
-      console.error("Error fetching Classifed data:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
   },
 };

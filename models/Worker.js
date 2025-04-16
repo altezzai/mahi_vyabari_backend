@@ -19,17 +19,17 @@ const WorkerProfile = sequelize.define(
       type: DataTypes.INTEGER,
     },
     area: {
-      type: DataTypes.ENUM("mahe","chokli","palloor","pandakkal"),
-      validate:{
-        isIn:[["mahe","chokli","palloor","pandakkal"]]
-      }
+      type: DataTypes.ENUM("mahe", "chokli", "palloor", "pandakkal"),
+      validate: {
+        isIn: [["mahe", "chokli", "palloor", "pandakkal"]],
+      },
     },
     phone: {
       type: DataTypes.STRING,
       validate: {
         notEmpty: true,
       },
-      allowNull:false
+      allowNull: false,
     },
     whatsapp: {
       type: DataTypes.STRING,
@@ -43,10 +43,10 @@ const WorkerProfile = sequelize.define(
     description: {
       type: DataTypes.TEXT,
     },
-    trash:{
-      type:DataTypes.BOOLEAN,
-      defaultValue:false
-    }
+    trash: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
   },
   {
     tableName: "Workers",

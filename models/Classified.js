@@ -61,7 +61,7 @@ const ItemListing = sequelize.define(
   },
   {
     timestamps: true,
-    tableName:"classifieds",
+    tableName: "classifieds",
   }
 );
 

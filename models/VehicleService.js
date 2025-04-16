@@ -4,18 +4,18 @@ const sequelize = require("../config/database");
 const VehicleService = sequelize.define(
   "VehicleService",
   {
-    ownerName:{
-       type: DataTypes.STRING,
+    ownerName: {
+      type: DataTypes.STRING,
     },
     category: {
-      type: DataTypes.ENUM("car","rickshaw"),
+      type: DataTypes.ENUM("car", "rickshaw"),
     },
     minFee: {
       type: DataTypes.DECIMAL(10, 2),
     },
     vehicleNumber: {
       type: DataTypes.STRING,
-      allowNull:false
+      allowNull: false,
     },
     priority: {
       type: DataTypes.INTEGER,
@@ -34,10 +34,10 @@ const VehicleService = sequelize.define(
       type: DataTypes.TEXT,
     },
     area: {
-      type: DataTypes.ENUM("mahe","chokli","palloor","pandakkal"),
-      validate:{
-        isIn:[["mahe","chokli","palloor","pandakkal"]]
-      }
+      type: DataTypes.ENUM("mahe", "chokli", "palloor", "pandakkal"),
+      validate: {
+        isIn: [["mahe", "chokli", "palloor", "pandakkal"]],
+      },
     },
     address: {
       type: DataTypes.TEXT,
@@ -48,10 +48,10 @@ const VehicleService = sequelize.define(
     icon: {
       type: DataTypes.STRING,
     },
-    trash:{
-      type:DataTypes.BOOLEAN,
-      defaultValue:false
-    }
+    trash: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
   },
   {
     tableName: "vehicleservice",

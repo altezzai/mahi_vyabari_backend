@@ -24,10 +24,10 @@ const Emergency = sequelize.define(
     icon: {
       type: DataTypes.STRING,
     },
-    trash:{
-      type:DataTypes.BOOLEAN,
-      defaultValue:false
-    }
+    trash: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
   },
   {
     tableName: "emergencies",

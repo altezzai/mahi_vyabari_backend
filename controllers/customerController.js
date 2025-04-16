@@ -18,7 +18,7 @@ module.exports = {
         limit,
         offset,
         where: whereCondition,
-        attributes:["id","customerName","coupenCount","trash","status"],
+        attributes: ["id", "customerName", "coupenCount", "trash", "status"],
         order: [["createdAt", "DESC"]],
       });
       return res.status(200).json({ success: true, customers });
@@ -26,7 +26,7 @@ module.exports = {
       console.log(error);
       return res
         .status(500)
-        .json({ success: false, message: "Error fetching customers" + error });
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
 };

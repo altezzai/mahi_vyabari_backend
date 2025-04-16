@@ -28,41 +28,7 @@ const upload = multer({ storage });
 module.exports = {
   upload,
   addClassfied: async (req, res) => {
-    // const {
-    //   category,
-    //   itemName,
-    //   price,
-    //   homeTown,
-    //   area,
-    //   address,
-    //   description,
-    //   priority,
-    //   phone,
-    //   whatsapp,
-    // } = req.body;
-    // if (
-    //   !category ||
-    //   !itemName ||
-    //   !price ||
-    //   !homeTown ||
-    //   !area ||
-    //   !address ||
-    //   !description ||
-    //   !priority ||
-    //   !phone ||
-    //   !whatsapp
-    // ) {
-    //   await deletefilewithfoldername(uploadPath,req.files.image[0].filename)
-    //   await deletefilewithfoldername(uploadPath,req.files.icon[0].filename)
-    //   return res.status(400).json({ message: "Please fill all the fields" });
-    // }
     try {
-      //   if (!req.files.image || !req.files.icon) {
-      //     return res
-      //       .status(400)
-      //       .json({ message: "Both shopImage and shopIconImage are required" });
-      //   }
-
       const classifiedData = {
         ...req.body,
         image: req.files?.image?.[0]?.filename || null,
@@ -70,7 +36,7 @@ module.exports = {
       };
       const savedClassified = await Classified.create(classifiedData);
       res.status(201).json({
-        status: "success",
+        success: true,
         savedShop: savedClassified,
       });
     } catch (error) {
@@ -78,8 +44,8 @@ module.exports = {
       // await deletefilewithfoldername(uploadPath, req.files.icon[0].filename);
       console.log(error);
       res.status(401).json({
-        status: "FAILED",
-        message: "An error occured while uploading new classified data",
+        success: false,
+        message: "Internal Server Error",
       });
     }
   },
@@ -97,43 +63,36 @@ module.exports = {
       whatsapp,
     } = req.body;
     try {
-      const { id } = req.params; // Get item ID
-      // Find existing item
+      const { id } = req.params;
       const item = await Classified.findByPk(id);
-
       if (!item) {
         // await deletefilewithfoldername(uploadPath, req.files.image[0].filename);
         // await deletefilewithfoldername(uploadPath, req.files.icon[0].filename);
-        return res.status(404).json({ message: "Item not found" });
+        return res
+          .status(404)
+          .json({ success: false, message: "Item not found" });
       }
-
-      // Handle file deletion and updating
       let newImage = item.image;
       let newIcon = item.icon;
-
       if (req.files?.image) {
         if (item.image) {
           const oldImagePath = path.join(uploadPath, item.image);
           if (fs.existsSync(oldImagePath)) {
-            fs.unlinkSync(oldImagePath); // Delete old image
+            fs.unlinkSync(oldImagePath);
           }
         }
-
-        newImage = req.files.image[0].filename; // Assign new image
+        newImage = req.files.image[0].filename;
       }
 
       if (req.files?.icon) {
         if (item.icon) {
           const oldIconPath = path.join(uploadPath, item.icon);
           if (fs.existsSync(oldIconPath)) {
-            fs.unlinkSync(oldIconPath); // Delete old icon
+            fs.unlinkSync(oldIconPath);
           }
         }
-
-        newIcon = req.files.icon[0].filename; // Assign new icon
+        newIcon = req.files.icon[0].filename;
       }
-
-      // Update fields (only if provided)
       await item.update({
         category: category || item.category,
         itemName: itemName || item.itemName,
@@ -148,56 +107,50 @@ module.exports = {
         image: newImage,
         icon: newIcon,
       });
-
-      return res
-        .status(200)
-        .json({ message: "Item updated successfully", item });
+      return res.status(200).json({ success: true, item });
     } catch (error) {
+      console.log(error);
       // await deletefilewithfoldername(uploadPath, req.files.image[0].filename);
       // await deletefilewithfoldername(uploadPath, req.files.icon[0].filename);
-      return res.status(500).json({ message: "Error updating item", error });
+      return res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
   deleteClassfied: async (req, res) => {
     try {
-      const { id } = req.params; // Get item ID from request params
-
-      // Find the item by ID
+      const { id } = req.params;
       const item = await Classified.findByPk(id);
-
       if (!item) {
-        return res.status(404).json({ message: "Item not found" });
+        return res
+          .status(404)
+          .json({ success: false, message: "Item not found" });
       }
-
-      // Perform soft delete by updating `trash` field to true
       await item.update({ trash: true });
-
-      return res
-        .status(200)
-        .json({ message: "Item soft deleted successfully", item });
+      return res.status(200).json({ success: true, item });
     } catch (error) {
-      return res.status(500).json({ message: "Error deleting item", error });
+      console.log(error);
+      return res
+        .status(500)
+        .json({ success: false, message: "Internal Sever Error" });
     }
   },
   restoreClassfied: async (req, res) => {
     try {
-      const { id } = req.params; // Get item ID from request params
-
-      // Find the item by ID
+      const { id } = req.params;
       const item = await Classified.findByPk(id);
-
       if (!item) {
-        return res.status(404).json({ message: "Item not found" });
+        return res
+          .status(404)
+          .json({ success: false, message: "Item not found" });
       }
-
-      // Perform soft delete by updating `trash` field to true
       await item.update({ trash: false });
-
-      return res
-        .status(200)
-        .json({ message: "Item soft deleted successfully", item });
+      return res.status(200).json({ success: true, item });
     } catch (error) {
-      return res.status(500).json({ message: "Error deleting item", error });
+      console.log(error);
+      return res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
   getClassfieds: async (req, res) => {
@@ -218,35 +171,36 @@ module.exports = {
         where: whereCondition,
         attributes: ["itemName", "category", "priority", "trash"],
         order: [["createdAt", "DESC"]],
-      }); // Fetch all classifieds
-      // Check if products exist
+      });
       if (!classifieds) {
-        return res.status(404).json({ message: "No classifieds found" });
+        return res
+          .status(404)
+          .json({ success: false, message: "No classifieds found" });
       }
 
       return res.status(200).json({ success: true, data: classifieds });
     } catch (error) {
+      console.log(error);
       return res
         .status(500)
-        .json({ success: false, message: "Error fetching classifieds", error });
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
   getClassfiedById: async (req, res) => {
     try {
-      const { id } = req.params; // Get the ID from request params
+      const { id } = req.params;
       const classified = await Classified.findByPk(id);
-
       if (!classified) {
         return res
           .status(404)
           .json({ success: false, message: "Classified not found" });
       }
-
       return res.status(200).json({ success: true, data: classified });
     } catch (error) {
+      console.log(error);
       return res
         .status(500)
-        .json({ success: false, message: "Error fetching classified", error });
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
   getClassfiedCategories: async (req, res) => {
@@ -263,8 +217,7 @@ module.exports = {
       console.log(error);
       res.status(500).json({
         success: false,
-        message: "Error fetching classified categories",
-        error,
+        message: "Internal Server Error",
       });
     }
   },

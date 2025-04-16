@@ -30,19 +30,12 @@ module.exports = {
   upload,
   addWorkerProfile: async (req, res) => {
     try {
-      // if (!req.files.image || !req.files.icon) {
-      //   return res
-      //     .status(400)
-      //     .json({ message: "Both shopImage and shopIconImage are required" });
-      // }
-
       const workerData = {
         ...req.body,
         image: req.files?.image?.[0]?.filename || null,
         icon: req.files?.icon?.[0]?.filename || null,
       };
       const savedWorker = await Worker.create(workerData);
-
       if (savedWorker.categories && savedWorker.categories.length > 0) {
         await WorkerCategory.bulkCreate(
           JSON.parse(savedWorker.categories).map((category) => ({
@@ -52,7 +45,7 @@ module.exports = {
         );
       }
       res.status(201).json({
-        status: "success",
+        success: true,
         result: savedWorker,
       });
     } catch (error) {
@@ -60,8 +53,8 @@ module.exports = {
       // await deletefilewithfoldername(uploadPath,req.files.icon[0].filename)
       console.log(error);
       res.status(401).json({
-        status: "FAILED",
-        message: "An error occured while uploading new Worker Profile data",
+        success: false,
+        message: "Internal Server Error",
       });
     }
   },
@@ -78,8 +71,6 @@ module.exports = {
         whatsapp,
         description,
       } = req.body;
-
-      // Find the existing worker profile
       const worker = await Worker.findByPk(id);
       if (!worker) {
         // await deletefilewithfoldername(uploadPath,req.files.image[0].filename)
@@ -88,33 +79,26 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Worker profile not found" });
       }
-
       let newImage = worker.image;
       let newIcon = worker.icon;
-
-      // Handle image update
       if (req.files?.image) {
         if (worker.image) {
           const oldImagePath = path.join(uploadPath, worker.image);
           if (fs.existsSync(oldImagePath)) {
-            fs.unlinkSync(oldImagePath); // Delete old image
+            fs.unlinkSync(oldImagePath);
           }
         }
-        newImage = req.files.image[0].filename; // Save new image filename
+        newImage = req.files.image[0].filename;
       }
-
-      // Handle icon update
       if (req.files?.icon) {
         if (worker.icon) {
           const oldIconPath = path.join(uploadPath, worker.icon);
           if (fs.existsSync(oldIconPath)) {
-            fs.unlinkSync(oldIconPath); // Delete old icon
+            fs.unlinkSync(oldIconPath);
           }
         }
-        newIcon = req.files.icon[0].filename; // Save new icon filename
+        newIcon = req.files.icon[0].filename;
       }
-
-      // Update worker profile
       await worker.update({
         categories,
         name,
@@ -127,78 +111,61 @@ module.exports = {
         icon: newIcon,
         description,
       });
-
       return res.status(200).json({
         success: true,
-        message: "Worker profile updated successfully",
         data: worker,
       });
     } catch (error) {
       // await deletefilewithfoldername(uploadPath,req.files.image[0].filename)
       // await deletefilewithfoldername(uploadPath,req.files.icon[0].filename)
-      console.error("Error updating worker profile:", error);
+      console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Error updating worker profile",
-        error,
+        message: "Internal Server Error",
       });
     }
   },
   deleteWorkerProfile: async (req, res) => {
     try {
       const { id } = req.params;
-
-      // Find the existing worker profile
       const worker = await Worker.findByPk(id);
       if (!worker) {
         return res
           .status(404)
           .json({ success: false, message: "Worker profile not found" });
       }
-
-      // Soft delete by setting trash to true
       await worker.update({ trash: true });
-
       return res.status(200).json({
         success: true,
-        message: "Worker profile deleted successfully",
         worker,
       });
     } catch (error) {
-      console.error("Error deleting worker profile:", error);
+      console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Error deleting worker profile",
-        error,
+        message: "Internal Server Error",
       });
     }
   },
   restoreWorkerProfile: async (req, res) => {
     try {
       const { id } = req.params;
-
-      // Find the existing worker profile
       const worker = await Worker.findByPk(id);
       if (!worker) {
         return res
           .status(404)
           .json({ success: false, message: "Worker profile not found" });
       }
-
-      // Soft delete by setting trash to true
       await worker.update({ trash: false });
-
       return res.status(200).json({
         success: true,
-        message: "Worker profile restored successfully",
         worker,
       });
     } catch (error) {
-      console.error("Error restoring worker profile:", error);
+      console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Error restoring worker profile",
-        error,
+        message: "Internal Server Error",
       });
     }
   },
@@ -214,7 +181,6 @@ module.exports = {
       };
     }
     try {
-      // Fetch all worker profiles
       const workers = await Worker.findAndCountAll({
         limit,
         offset,
@@ -228,34 +194,28 @@ module.exports = {
       }
       return res.status(200).json({ success: true, data: workers });
     } catch (error) {
-      console.error("Error fetching worker profiles:", error);
+      console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Error fetching worker profiles",
-        error,
+        message: "Internal Server Error",
       });
     }
   },
   getWorkerProfileById: async (req, res) => {
     try {
       const { id } = req.params;
-
-      // Find worker profile by ID
       const worker = await Worker.findByPk(id);
-
       if (!worker) {
         return res
           .status(404)
           .json({ success: false, message: "Worker profile not found" });
       }
-
       return res.status(200).json({ success: true, data: worker });
     } catch (error) {
-      console.error("Error fetching worker profile:", error);
+      console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Error fetching worker profile",
-        error,
+        message: "Internal Server Error",
       });
     }
   },
@@ -273,7 +233,9 @@ module.exports = {
       return res.status(200).json({ success: true, data: workerCategory });
     } catch (error) {
       console.log(error);
-      return res.status(500).json({ success: false, message: "Error" + error });
+      return res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
 };

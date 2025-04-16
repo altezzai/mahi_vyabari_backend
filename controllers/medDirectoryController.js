@@ -28,57 +28,15 @@ const upload = multer({ storage });
 module.exports = {
   upload,
   addMedicalDirectory: async (req, res) => {
-    // const {
-    //   searchCategory,
-    //   name,
-    //   phone,
-    //   searchSubcategory,
-    //   whatsapp,
-    //   website,
-    //   location,
-    //   description,
-    //   address,
-    //   openingTime,
-    //   closingTime,
-    //   workingDays,
-    //   priority,
-    //   area,
-    // } = req.body;
-    // console.log(req.body);
     try {
-      //   if (
-      //     !searchCategory ||
-      //     !name ||
-      //     !phone ||
-      //     !searchSubcategory ||
-      //     !whatsapp ||
-      //     !website ||
-      //     !location ||
-      //     !description ||
-      //     !address ||
-      //     !openingTime ||
-      //     !closingTime ||
-      //     !workingDays ||
-      //     !priority ||
-      //     !area
-      //   ) {
-      //     return res.status(400).json({ message: "Please fill all the fields" });
-      //   }
-      //   if (!req.files.image || !req.files.icon) {
-      //     return res
-      //       .status(400)
-      //       .json({ message: "Both Image and Icon are required" });
-      //   }
-
       const medDirectoryData = {
         ...req.body,
         image: req.files?.image?.[0]?.filename || null,
         icon: req.files?.icon?.[0]?.filename || null,
       };
-
       const savedMedicalDirectory = await Medical.create(medDirectoryData);
       res.status(201).json({
-        status: "success",
+        success: true,
         result: savedMedicalDirectory,
       });
     } catch (error) {
@@ -86,8 +44,8 @@ module.exports = {
       // await deletefilewithfoldername(uploadPath,req.files.icon[0].filename);
       console.log(error);
       res.status(401).json({
-        status: "FAILED",
-        message: "An error occured while uploading new shop data",
+        success: false,
+        message: "Internal Server Error",
       });
     }
   },
@@ -95,14 +53,11 @@ module.exports = {
     try {
       const { id } = req.params;
       const healthcareProvider = await Medical.findByPk(id);
-
       if (!healthcareProvider) {
         return res
           .status(404)
           .json({ success: false, message: "Healthcare Provider not found" });
       }
-
-      // Destructure request body
       const {
         searchCategory,
         name,
@@ -119,11 +74,8 @@ module.exports = {
         priority,
         area,
       } = req.body;
-
-      // Handle file uploads (image & icon)
       let newImage = healthcareProvider.image;
       let newIcon = healthcareProvider.icon;
-
       if (req.files?.image?.[0]) {
         if (healthcareProvider.image) {
           const oldImagePath = path.join(uploadPath, healthcareProvider.image);
@@ -133,7 +85,6 @@ module.exports = {
         }
         newImage = req.files.image[0].filename;
       }
-
       if (req.files?.icon?.[0]) {
         if (healthcareProvider.icon) {
           const oldIconPath = path.join(uploadPath, healthcareProvider.icon);
@@ -143,8 +94,6 @@ module.exports = {
         }
         newIcon = req.files.icon[0].filename;
       }
-
-      // Update the healthcare provider
       await healthcareProvider.update({
         image: newImage,
         icon: newIcon,
@@ -164,20 +113,17 @@ module.exports = {
         priority: priority || healthcareProvider.priority,
         area: area || healthcareProvider.area,
       });
-
       return res.status(200).json({
         success: true,
-        message: "Healthcare Provider updated successfully",
         data: healthcareProvider,
       });
     } catch (error) {
       // await deletefilewithfoldername(uploadPath,req.files.image[0].filename);
       // await deletefilewithfoldername(uploadPath,req.files.icon[0].filename);
-      console.error("Error updating healthcare provider:", error);
+      console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Error updating healthcare provider",
-        error,
+        message: "Internal Server Error",
       });
     }
   },
@@ -185,27 +131,21 @@ module.exports = {
     try {
       const { id } = req.params;
       const healthcareProvider = await Medical.findByPk(id);
-
       if (!healthcareProvider) {
         return res
           .status(404)
           .json({ success: false, message: "Healthcare Provider not found" });
       }
-
-      // Soft delete by setting trash to true
       await healthcareProvider.update({ trash: true });
-
       return res.status(200).json({
         success: true,
-        message: "Healthcare Provider deleted successfully",
         healthcareProvider,
       });
     } catch (error) {
-      console.error("Error deleting healthcare provider:", error);
+      console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Error deleting healthcare provider",
-        error,
+        message: "Internal Server Error",
       });
     }
   },
@@ -213,31 +153,25 @@ module.exports = {
     try {
       const { id } = req.params;
       const healthcareProvider = await Medical.findByPk(id);
-
       if (!healthcareProvider) {
         return res
           .status(404)
           .json({ success: false, message: "Healthcare Provider not found" });
       }
-
-      // Soft delete by setting trash to true
       await healthcareProvider.update({ trash: false });
-
       return res.status(200).json({
         success: true,
-        message: "Healthcare Provider restored successfully",
         healthcareProvider,
       });
     } catch (error) {
-      console.error("Error restoring healthcare provider:", error);
+      console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Error restoring healthcare provider",
-        error,
+        message: "Internal Server Error",
       });
     }
   },
-  getMedicalDirectory: async (req, res) => {
+  getMedicalDirectories: async (req, res) => {
     const search = req.query.search || "";
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -245,66 +179,62 @@ module.exports = {
     let whereCondition = {};
     if (search) {
       whereCondition = {
-        name: { [Op.like]: `%${search}%` }
+        name: { [Op.like]: `%${search}%` },
       };
     }
     try {
       const medical = await Medical.findAndCountAll({
         limit,
         offset,
-        attributes: ["id", "name", "priority", "category","trash"],
+        attributes: ["id", "name", "priority", "category", "trash"],
         where: whereCondition,
         order: [["createdAt", "DESC"]],
       });
 
       res.status(200).json({ success: true, data: medical });
     } catch (error) {
-      console.error("Error fetching Medical for admin:", error);
-      res
-        .status(500)
-        .json({
-          success: false,
-          message: "Error fetching medical data",
-          error,
-        });
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: "Internal Server Error",
+      });
     }
   },
   getMedicalDirectoryById: async (req, res) => {
     try {
       const { id } = req.params;
       const healthcareProvider = await Medical.findByPk(id);
-
       if (!healthcareProvider) {
         return res
           .status(404)
           .json({ success: false, message: "Healthcare Provider not found" });
       }
-
       return res.status(200).json({ success: true, data: healthcareProvider });
     } catch (error) {
-      console.error("Error fetching healthcare provider:", error);
+      console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Error fetching healthcare provider",
-        error,
+        message: "Internal Server Error",
       });
     }
   },
-  getMedicalCategory:async(req,res)=>{
+  getMedicalCategory: async (req, res) => {
     try {
       const medicalCategory = await Type.findOne({
-        where:{
-          typeName:"medical"
+        where: {
+          typeName: "medical",
         },
-        include:{
-          model:Category,
-          attributes:["id","categoryName"]
-        }
-      })
+        include: {
+          model: Category,
+          attributes: ["id", "categoryName"],
+        },
+      });
       return res.status(200).json({ success: true, data: medicalCategory });
     } catch (error) {
       console.log(error);
-      return res.status(500).json({success:false,message:"Error"});
+      return res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
     }
-  }
+  },
 };

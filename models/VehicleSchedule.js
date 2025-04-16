@@ -7,14 +7,14 @@ const VehicleSchedule = sequelize.define(
       type: DataTypes.INTEGER,
     },
     category: {
-      type: DataTypes.ENUM("train","bus"),
+      type: DataTypes.ENUM("train", "bus"),
     },
     vehicleName: {
       type: DataTypes.STRING,
     },
     vehicleNumber: {
       type: DataTypes.STRING,
-      allowNull:false
+      allowNull: false,
     },
     via: {
       type: DataTypes.STRING,
@@ -22,7 +22,7 @@ const VehicleSchedule = sequelize.define(
     },
     to: {
       type: DataTypes.STRING,
-      allowNull:false
+      allowNull: false,
     },
     departureTime: {
       type: DataTypes.TIME,
@@ -30,10 +30,10 @@ const VehicleSchedule = sequelize.define(
     arrivalTime: {
       type: DataTypes.TIME,
     },
-    trash:{
-      type:DataTypes.BOOLEAN,
-      defaultValue:false
-    }
+    trash: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
   },
   {
     tableName: "vehicleschedules",

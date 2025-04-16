@@ -5,7 +5,6 @@ const path = require("path");
 const Shop = require("../models/Shop");
 const Category = require("../models/Category");
 const ShopCategory = require("../models/ShopCategory");
-const { json } = require("body-parser");
 const { deletefilewithfoldername } = require("../utils/util");
 const { Op, Sequelize } = require("sequelize");
 const Type = require("../models/Type");
@@ -33,58 +32,12 @@ module.exports = {
   upload,
   addshop: async (req, res) => {
     try {
-      // const {
-      //   shopName,
-      //   categories,
-      //   phone,
-      //   whatsapp,
-      //   website,
-      //   location,
-      //   description,
-      //   address,
-      //   openingTime,
-      //   closingTime,
-      //   workingDays,
-      //   priority,
-      //   areas,
-      // } = req.body;
-
-      // if (
-      //   !shopName ||
-      //   !categories ||
-      //   !phone ||
-      //   !whatsapp ||
-      //   !website ||
-      //   !location ||
-      //   !description ||
-      //   !address ||
-      //   !openingTime ||
-      //   !closingTime ||
-      //   !workingDays ||
-      //   !priority ||
-      //   !areas
-      // ) {
-      //   await deletefilewithfoldername(uploadPath, req.files.image[0].filename);
-      //   await deletefilewithfoldername(uploadPath, req.files.icon[0].filename);
-      //   return res.status(400).json({
-      //     success: false,
-      //     message: "data is missing..!!,please fill all the field...!",
-      //   });
-      // }
-      // if (!req.files.image || !req.files.icon) {
-      //   return res
-      //     .status(400)
-      //     .json({ message: "Both shopImage and shopIconImage are required" });
-      // }
-
       const shopData = {
         ...req.body,
         image: req.files?.image?.[0]?.filename || null,
         icon: req.files?.icon?.[0]?.filename || null,
       };
-
       const savedShop = await Shop.create(shopData);
-
       if (savedShop.categories && savedShop.categories.length > 0) {
         await ShopCategory.bulkCreate(
           JSON.parse(savedShop.categories).map((category) => ({
@@ -93,18 +46,17 @@ module.exports = {
           }))
         );
       }
-
       res.status(201).json({
-        status: "success",
+        success: true,
         savedShop: savedShop,
       });
     } catch (error) {
       console.log(error);
       // await deletefilewithfoldername(uploadPath, req.files.image[0].filename);
       // await deletefilewithfoldername(uploadPath, req.files.icon[0].filename);
-      res.status(401).json({
-        status: "FAILED",
-        message: "An error occured while uploading new shop data",
+      res.status(500).json({
+        success: false,
+        message: "Internal Server Error",
       });
     }
   },
@@ -123,34 +75,32 @@ module.exports = {
       const shops = await Shop.findAndCountAll({
         limit,
         offset,
-        attributes: ["id", "shopName", "priority","trash"],
+        attributes: ["id", "shopName", "priority", "trash"],
         where: whereCondition,
         include: [
           {
             model: Category,
-            attributes: ["id", "name"],
+            attributes: ["id", "categoryName"],
             through: { attributes: [] },
           },
         ],
       });
       res.status(200).json({ success: true, data: shops });
     } catch (error) {
-      console.error("Error fetching shops for admin:", error);
+      console.error(error);
       res
         .status(500)
-        .json({ success: false, message: "Error fetching shop data", error });
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
   getShopById: async (req, res) => {
     try {
-      const { shopId } = req.params; // Extract shop ID from URL params
-
-      // Using findByPk to fetch shop data by primary key
+      const { shopId } = req.params;
       const shop = await Shop.findByPk(shopId, {
         include: [
           {
             model: Category,
-            through: { attributes: [] }, // Exclude junction table fields
+            through: { attributes: [] },
           },
         ],
       });
@@ -160,41 +110,35 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Shop not found" });
       }
-
       res.status(200).json({ success: true, data: shop });
     } catch (error) {
-      console.error("Error fetching shop by ID:", error);
+      console.error(error);
       res
         .status(500)
-        .json({ success: false, message: "Error fetching shop data", error });
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
   updateShopById: async (req, res) => {
     try {
-      const { shopId } = req.params; // Extract shop ID from URL
-      // Find the shop
+      const { shopId } = req.params;
       const shop = await Shop.findByPk(shopId);
-      // console.log(req.body);
-      // console.log(req.files);
-      // console.log(shop);
       if (!shop) {
         // await deletefilewithfoldername(uploadPath, req.files.image[0]);
         // await deletefilewithfoldername(uploadPath, req.files.icon[0]);
-        return res.status(404).json({ message: "Shop not found" });
+        return res
+          .status(404)
+          .json({ success: false, message: "Shop not found" });
       }
-      console.log("helloo")
       let newImage = shop.image;
       let newIcon = shop.icon;
-      // If an image is uploaded, handle file update
       if (req.files?.image?.[0]) {
-         
         if (shop.image) {
           const oldImagePath = path.join(uploadPath, shop.image);
           if (fs.existsSync(oldImagePath)) {
             fs.unlinkSync(oldImagePath);
           }
         }
-        newImage = req.files.image[0].filename
+        newImage = req.files.image[0].filename;
       }
 
       if (req.files?.icon?.[0]) {
@@ -224,96 +168,76 @@ module.exports = {
         image: newImage || shop.image,
         icon: newIcon || shop.icon,
       };
-      console.log(updateData);
       await shop.update(updateData);
-      return res
-        .status(200)
-        .json({ message: "Shop updated successfully", shop });
+      return res.status(200).json({ success: true, shop });
     } catch (error) {
       // await deletefilewithfoldername(uploadPath, req.files.image[0]);
       // await deletefilewithfoldername(uploadPath, req.files.icon[0]);
-      console.error("Error updating shop:", error);
-      return res.status(500).json({ message: "Error updating shop", error });
+      console.error(error);
+      return res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
   deleteShop: async (req, res) => {
     try {
-      const { shopId } = req.params; // Get shop ID from request params
-
-      // Find the shop by ID
+      const { shopId } = req.params;
       const shop = await Shop.findByPk(shopId);
-
       if (!shop) {
         return res
           .status(404)
           .json({ success: false, message: "Shop not found" });
       }
-
-      // Update the trash field to true (soft delete)
       await shop.update({ trash: true });
-
       res.status(200).json({
         success: true,
-        message: "Shop deleted successfully (soft delete)",
         shop,
       });
     } catch (error) {
-      console.error("Error soft deleting shop:", error);
+      console.error(error);
       res
         .status(500)
-        .json({ success: false, message: "Error deleting shop", error });
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
   restoreShop: async (req, res) => {
     try {
-      const { shopId } = req.params; // Get shop ID from request params
-
-      // Find the shop by ID
+      const { shopId } = req.params;
       const shop = await Shop.findByPk(shopId);
-
       if (!shop) {
         return res
           .status(404)
           .json({ success: false, message: "Shop not found" });
       }
-
-      if (!shop.trash) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Shop is already active" });
-      }
-
-      // Update the trash field to false (restore shop)
       await shop.update({ trash: false });
-
-      res
-        .status(200)
-        .json({ success: true, message: "Shop restored successfully", shop });
+      res.status(200).json({ success: true, shop });
     } catch (error) {
-      console.error("Error restoring shop:", error);
+      console.error(error);
       res
         .status(500)
-        .json({ success: false, message: "Error restoring shop", error });
+        .json({ success: false, message: "Internal Server Errro" });
     }
   },
-  getShopCategories:async(req,res)=>{
+  getShopCategories: async (req, res) => {
     try {
       const shopCategories = await Type.findOne({
-        where:{
-          name:"shop"
+        where: {
+          name: "shop",
         },
-        include:{
-          model:Category,
-          attributes:["id","name"]
-        }
-      })
+        include: {
+          model: Category,
+          attributes: ["id", "name"],
+        },
+      });
       res.status(200).json({ success: true, shopCategories });
     } catch (error) {
-      console.log(error)
-      res.status(500).json({ success: false, message: "Error getting shop categories"});
+      console.log(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
-  getShopFeedbacks:async(req,res)=>{
+  getShopFeedbacks: async (req, res) => {
     const search = req.query.search || "";
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -334,32 +258,31 @@ module.exports = {
           "id",
           "shopName",
           [
-            Sequelize.fn("AVG", Sequelize.col("Feedbacks.rating")),
+            Sequelize.fn("AVG", Sequelize.col("feedbacks.rating")),
             "averageRating",
           ],
-          [
-            Sequelize.fn("COUNT",Sequelize.col("Feedbacks.id")),"totalRating"
-          ]
+          [Sequelize.fn("COUNT", Sequelize.col("feedbacks.id")), "totalRating"],
         ],
         include: [
           {
             model: Feedback,
-            as: "Feedbacks",
+            as: "feedbacks",
             attributes: [],
           },
         ],
         group: ["Shop.id"],
         order: [[Sequelize.literal("averageRating"), "DESC"]],
-        subQuery:false,
+        subQuery: false,
       });
-      // console.log("✅ Shops sorted by rating:", JSON.stringify(shops, null, 2));
-      res.json({ message: "Top-rated shops", data: shops });
+      res.status(200).json({ success: true, data: shops });
     } catch (error) {
       console.log(error);
-      res.status(500).json({ message: "Error fetching shops", error });
+      res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
-  getShopComplaints:async(req,res)=>{
+  getShopComplaints: async (req, res) => {
     const search = req.query.search || "";
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -379,27 +302,23 @@ module.exports = {
         attributes: [
           "id",
           "shopName",
-          [
-            Sequelize.fn("AVG", Sequelize.col("complaints.title")),
-            "averageRating",
-          ],
         ],
         include: [
           {
             model: Complaint,
-            as: "Feedbacks",
-            attributes: [],
+            as: "complaints",
+            attributes: ["description","title"],
           },
         ],
         group: ["Shop.id"],
-        order: [[Sequelize.literal("averageRating"), "DESC"]],
-        subQuery:false,
+        subQuery: false,
       });
-      // console.log("✅ Shops sorted by rating:", JSON.stringify(shops, null, 2));
-      res.json({ message: "Top-rated shops", data: shops });
+      res.status(200).json({ success: true, data: shops });
     } catch (error) {
       console.log(error);
-      res.status(500).json({ message: "Error fetching shops", error });
+      res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
     }
-  }
+  },
 };

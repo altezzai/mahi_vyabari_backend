@@ -27,55 +27,32 @@ module.exports = {
   upload,
   addProduct: async (req, res) => {
     try {
-      // const {
-      //   shopId,
-      //   productName,
-      //   originalPrice,
-      //   offerPrice,
-      //   offerPercentage,
-      //   description,
-      // } = req.body;
-      // if (!req.file) {
-      //   return res.status(400).json({ message: "product image is required" });
-      // }
-      // if (
-      //   !shopId ||
-      //   !productName ||
-      //   !originalPrice ||
-      //   !offerPrice ||
-      //   !offerPercentage ||
-      //   !description
-      // ) {
-      //   await deletefilewithfoldername(uploadPath, req.file);
-      //   res.status(400).json({
-      //     status: "failed",
-      //     message: "data is missing while uploading the product details...!",
-      //   });
-      // }
       const productData = {
         ...req.body,
         image: req.file ? req.file.filename : null,
       };
       const savedProduct = await Product.create(productData);
       if (!savedProduct) {
-        res.status(404).json(error.message);
+        res
+          .status(404)
+          .json({ success: false, message: "Can't Upload Product Data" });
       }
       res.status(200).json({
-        success: "SUCCESS",
+        success: true,
         result: savedProduct,
       });
     } catch (error) {
       // await deletefilewithfoldername(uploadPath, req.file);
       console.log(error);
       res.status(401).json({
-        status: "FAILED",
-        message: "An error occured while adding the product",
+        success: false,
+        message: "Internal Server Error",
       });
     }
   },
   editProduct: async (req, res) => {
     try {
-      const { id } = req.params; // Get product ID from request params
+      const { id } = req.params;
       const {
         userId,
         shopId,
@@ -85,49 +62,22 @@ module.exports = {
         offerPercentage,
         description,
       } = req.body;
-
-      // Check if product exists
       let product = await Product.findByPk(id);
       if (!product) {
-        return res.status(404).json({ message: "Product not found" });
+        return res
+          .status(404)
+          .json({ success: false, message: "Product not found" });
       }
-
-      // // Validate required fields
-      // if (!productName || !originalPrice || !shopId) {
-      //   return res.status(400).json({
-      //     message: "Missing required fields: productName, originalPrice, or shopId",
-      //   });
-      // }
-
-      // Ensure prices are valid numbers
-      // if (isNaN(originalPrice) || (offerPrice && isNaN(offerPrice))) {
-      //   return res.status(400).json({ message: "Invalid price values" });
-      // }
-
-      // Ensure offerPercentage is within valid range
-      // if (offerPercentage && (offerPercentage < 0 || offerPercentage > 100)) {
-      //   return res
-      //     .status(400)
-      //     .json({ message: "offerPercentage must be between 0 and 100" });
-      // }
-
-      // Handle Image Upload
-
-      let newImage = product.image; // Keep old image by default
+      let newImage = product.image;
       if (req.file) {
-        // Delete old image if exists
         if (product.image) {
           const oldImagePath = path.join(uploadPath, product.image);
           if (fs.existsSync(oldImagePath)) {
             fs.unlinkSync(oldImagePath);
           }
         }
-
-        // Assign new image filename
         newImage = req.file.filename;
       }
-
-      // Update product data
       await product.update({
         shopId,
         productName,
@@ -135,18 +85,17 @@ module.exports = {
         offerPrice: offerPrice || product.offerPrice,
         offerPercentage: offerPercentage || product.offerPercentage,
         description: description || product.description,
-        image: newImage, // Updated image if applicable
+        image: newImage,
       });
-
-      res
-        .status(200)
-        .json({ message: "Product updated successfully", product });
+      res.status(200).json({ success: true, product });
     } catch (error) {
-      console.error("Error updating product:", error);
-      res.status(500).json({ message: "Internal Server Error", error });
+      console.error(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
-  getProduct: async (req, res) => {
+  getProducts: async (req, res) => {
     const search = req.query.search || "";
     const page = req.query.page || 1;
     const limit = req.query.limit || 10;
@@ -154,7 +103,7 @@ module.exports = {
     let whereCondition = {};
     if (search) {
       whereCondition = {
-        productName: { [Op.like]: `%${search}%` }
+        productName: { [Op.like]: `%${search}%` },
       };
     }
     try {
@@ -181,80 +130,70 @@ module.exports = {
 
       res.status(200).json({ success: true, data: products });
     } catch (error) {
-      console.error("Error fetching product for admin:", error);
+      console.error(error);
       res.status(500).json({
         success: false,
-        message: "Error fetching product data",
-        error,
+        message: "Internal Server Error",
       });
     }
   },
   getProductById: async (req, res) => {
     try {
-      const { id } = req.params; // Extract product ID from request params
-
-      // Find product by ID
+      const { id } = req.params;
       const product = await Product.findByPk(id);
-
-      // Check if product exists
       if (!product) {
-        return res.status(404).json({ message: "Product not found" });
+        return res
+          .status(404)
+          .json({ success: false, message: "Product not found" });
       }
-
-      res
-        .status(200)
-        .json({ message: "Product fetched successfully", product });
+      res.status(200).json({ success: true, product });
     } catch (error) {
-      console.error("Error fetching product:", error);
-      res.status(500).json({ message: "Internal Server Error", error });
+      console.error(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
   deleteProductById: async (req, res) => {
     try {
-      const { id } = req.params; // Extract product ID from request params
-
-      // Find the product by ID
+      const { id } = req.params;
       const product = await Product.findByPk(id);
-
-      // Check if product exists
       if (!product) {
-        return res.status(404).json({ message: "Product not found" });
+        return res
+          .status(404)
+          .json({ success: false, message: "Product not found" });
       }
-
-      // Update the `trash` field to `true`
       await product.update({ trash: true });
-
       res.status(200).json({
-        message: "Product deleted successfully (soft delete)",
+        success: true,
         product,
       });
     } catch (error) {
-      console.error("Error deleting product:", error);
-      res.status(500).json({ message: "Internal Server Error", error });
+      console.error(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
   restoreProductById: async (req, res) => {
     try {
-      const { id } = req.params; // Extract product ID from request params
-
-      // Find the product by ID
+      const { id } = req.params;
       const product = await Product.findByPk(id);
-
-      // Check if product exists
       if (!product) {
-        return res.status(404).json({ message: "Product not found" });
+        return res
+          .status(404)
+          .json({ success: false, message: "Product not found" });
       }
-
-      // Update the `trash` field to `true`
       await product.update({ trash: false });
-
       res.status(200).json({
-        message: "Product deleted successfully (soft delete)",
+        success: true,
         product,
       });
     } catch (error) {
-      console.error("Error deleting product:", error);
-      res.status(500).json({ message: "Internal Server Error", error });
+      console.error(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
   getShopName: async (req, res) => {
@@ -280,7 +219,7 @@ module.exports = {
       console.log(error);
       res
         .status(500)
-        .json({ success: false, message: "Internal Server Error", error });
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
 };

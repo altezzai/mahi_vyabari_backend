@@ -21,8 +21,8 @@ const Product = sequelize.define(
       allowNull: false,
       trim: true,
     },
-    image:{
-      type:DataTypes.STRING,
+    image: {
+      type: DataTypes.STRING,
     },
     originalPrice: {
       type: DataTypes.FLOAT,
@@ -38,7 +38,7 @@ const Product = sequelize.define(
     },
     offerPercentage: {
       type: DataTypes.FLOAT,
-      defaultValue:0,
+      defaultValue: 0,
       validate: {
         min: 0,
         max: 100,
@@ -59,7 +59,7 @@ const Product = sequelize.define(
   }
 );
 
-Shop.hasMany(Product,{foreignKey:"shopId",as:"products"});
-Product.belongsTo(Shop,{foreignKey:"shopId",as:"shop"});
+Shop.hasMany(Product, { foreignKey: "shopId", as: "products" });
+Product.belongsTo(Shop, { foreignKey: "shopId", as: "shop" });
 
 module.exports = Product;

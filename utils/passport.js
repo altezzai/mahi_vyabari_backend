@@ -8,8 +8,8 @@ passport.serializeUser(function (user, done) {
 
 passport.deserializeUser(async (id, done) => {
   try {
-    const user = await User.findOne({googleId:id});
-    console.log(user)
+    const user = await User.findOne({ googleId: id });
+    console.log(user);
     done(null, user);
   } catch (error) {
     done(error, null);
@@ -22,7 +22,7 @@ passport.use(
       clientID: process.env.CLIENT_ID,
       clientSecret: process.env.CLIENT_SECRET,
       callbackURL: process.env.CALLBACK_URL,
-      passReqToCallback:true
+      passReqToCallback: true,
     },
     async (request, accessToken, refreshToken, profile, done) => {
       try {
@@ -32,7 +32,7 @@ passport.use(
         if (user) {
           if (!user.googleId) {
             user.googleId = profile.id;
-            user.image = user.image || profile.photos[0].value; // Keep existing image if available
+            user.image = user.image || profile.photos[0].value;
             await user.save();
           }
         } else {

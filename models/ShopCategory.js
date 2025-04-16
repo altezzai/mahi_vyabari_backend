@@ -37,6 +37,9 @@ const ShopCategory = sequelize.define(
 );
 
 Shop.belongsToMany(Category, { through: ShopCategory, foreignKey: "shopId" });
-Category.belongsToMany(Shop, { through: ShopCategory, foreignKey: "categoryId",});
+Category.belongsToMany(Shop, {
+  through: ShopCategory,
+  foreignKey: "categoryId",
+});
 
 module.exports = ShopCategory;

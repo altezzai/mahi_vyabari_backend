@@ -50,7 +50,7 @@ app.use("/api/vehicle", vehicleRouter);
 app.use("/api/workers", workersRouter);
 app.use("/api/user", userRouter);
 app.use("/api/public", publicRouter);
-app.use("/api/customer",customerRouter);
+app.use("/api/customer", customerRouter);
 
 app.listen(PORT, () => {
   console.log(`server started on port number ${PORT}`);

@@ -7,8 +7,8 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       unique: true,
     },
-    userName:{
-      type:DataTypes.STRING
+    userName: {
+      type: DataTypes.STRING,
     },
     email: {
       type: DataTypes.STRING,

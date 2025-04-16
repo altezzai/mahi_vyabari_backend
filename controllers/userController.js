@@ -35,7 +35,7 @@ module.exports = {
       if (!email || !password || !phone) {
         // await deletefilewithfoldername(uploadPath, req.file.filename);
         res.status(400).json({
-          status: "failed",
+          success: false,
           message: "data is missing for user uploading",
         });
       }
@@ -45,7 +45,7 @@ module.exports = {
       if (existingUser) {
         // await deletefilewithfoldername(uploadPath, req.file.filename);
         res.status(409).json({
-          status: "failed",
+          success: false,
           message: "User is already existing",
         });
       } else {
@@ -55,46 +55,30 @@ module.exports = {
           password: await hashPassword(password),
         };
         const savedUser = await User.create(userData);
-        res.json({
-          status: "success",
+        res.status(200).json({
+          success: true,
           result: savedUser,
         });
       }
     } catch (error) {
       console.log(error);
       res.status(500).json({
-        status: "failed",
-        message: "An error occured while uploading the user data",
+        success: false,
+        message: "Internal Server Error",
       });
     }
   },
   editUser: async (req, res) => {
-    // const { email, password, phone } = req.body;
-    // if (!email || !password || !phone) {
-    //   await deletefilewithfoldername(uploadPath, req.file.filename);
-    //   res.status(400).json({
-    //     status: "failed",
-    //     message: "data is missing for user uploading",
-    //   });
-    // }
-
-    const user = await User.findByPk(req.params.id);
-    const oldImage = user.image;
-    console.log(oldImage);
     try {
+      const user = await User.findByPk(req.params.id);
       if (!user) {
         // await deletefilewithfoldername(uploadPath, req.file.filename);
         res.status(409).json({
-          status: "failed",
-          message: "collage not found",
+          success: false,
+          message: "user not found",
         });
       }
-      const updatedUserData = {
-        ...req.body,
-        password: await hashPassword(req.body.password),
-        image: req.file ? req.file.filename : oldImage,
-      };
-      await user.update(updatedUserData);
+      const oldImage = user.image;
       try {
         if (req.file?.filename) {
           if (oldImage) {
@@ -107,16 +91,22 @@ module.exports = {
       } catch (error) {
         console.log("error on deleting old user image: ", error);
       }
+      const updatedUserData = {
+        ...req.body,
+        password: await hashPassword(req.body.password),
+        image: req.file ? req.file.filename : oldImage,
+      };
+      await user.update(updatedUserData);
       res.status(200).json({
-        status: "success",
+        success: true,
         result: user,
       });
     } catch (error) {
       // await deletefilewithfoldername(uploadPath, req.file.filename);
       console.log(error);
       res.status(500).json({
-        status: "failed",
-        message: "An error occured while updating the user data",
+        success: false,
+        message: "Internal Server Error",
       });
     }
   },
@@ -124,7 +114,7 @@ module.exports = {
     const { email, password } = req.body;
     if (!email || !password) {
       res.status(409).json({
-        status: "failed",
+        success: false,
         message: "email and password is required..!!",
       });
     }
@@ -133,14 +123,14 @@ module.exports = {
     });
     if (!user) {
       res.status(403).json({
-        status: "failed",
+        success: false,
         message: "invalid email or email is not registered..!",
       });
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       res.status(401).json({
-        status: "failed",
+        success: false,
         message: "invalid password..!",
       });
     }
@@ -148,7 +138,7 @@ module.exports = {
     const token = await createToken(tokenData);
     if (!token) {
       res.status(401).json({
-        status: "failed",
+        success: false,
         message: "An error occured while creating jwt Token",
       });
     }
@@ -157,79 +147,67 @@ module.exports = {
       maxAge: 1000 * 60 * 60 * 24 * 7,
     });
     res.status(200).json({
-      status: "success",
+      success: true,
       result: user,
     });
   },
   geDashboard: async (req, res) => {
     console.log(req.body);
     res.status(200).json({
-      status: "success",
+      success: true,
       message: "successfully registered...!",
     });
   },
   feedback: async (req, res) => {
     try {
       const { userId, shopId, rating } = req.body;
-
-      // Validate input
       if (!userId || !shopId || !rating) {
         return res
           .status(400)
-          .json({ error: "User ID, Event ID, and Rating are required!" });
+          .json({
+            success: false,
+            message: "User ID, Event ID, and Rating are required!",
+          });
       }
-
-      if (rating < 1 || rating > 5) {
-        return res
-          .status(400)
-          .json({ error: "Rating must be between 1 and 5" });
-      }
-
-      // Create feedback entry
       const feedback = await Feedback.create({
         userId,
         shopId,
         rating,
       });
-
-      res
-        .status(201)
-        .json({ message: "Feedback added successfully!", feedback });
+      res.status(201).json({ success: true, feedback });
     } catch (error) {
-      console.error("Error adding feedback:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
   },
   complaints: async (req, res) => {
     try {
       const { userId, shopId, title, description } = req.body;
-
-      // if (!userId || !shopId || !title || !description) {
-      //   return res.status(400).json({ error: "All fields are required!" });
-      // }
-
       const complaint = await Complaint.create({
         userId,
         shopId,
         title,
         description,
       });
-
-      res
-        .status(201)
-        .json({ message: "Complaint filed successfully!", complaint });
+      res.status(201).json({ success: true, complaint });
     } catch (error) {
-      console.error("Error filing complaint:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
   },
   getAllComplaints: async (req, res) => {
     try {
       const complaints = await Complaint.findAll();
-      res.status(200).json(complaints);
+      res.status(200).json({ success: true, complaints });
     } catch (error) {
-      console.error("Error fetching complaints:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
   },
   getComplaintsById: async (req, res) => {
@@ -239,44 +217,45 @@ module.exports = {
       });
       res.status(200).json(complaints);
     } catch (error) {
-      console.error("Error fetching user complaints:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
   },
   updateComplaints: async (req, res) => {
     try {
       const { status, resolution } = req.body;
       const complaint = await Complaint.findByPk(req.params.id);
-
       if (!complaint) {
-        return res.status(404).json({ error: "Complaint not found" });
+        return res
+          .status(404)
+          .json({ success: false, message: "Complaint not found" });
       }
-
       await complaint.update({ status, resolution });
-
-      res
-        .status(200)
-        .json({ message: "Complaint updated successfully!", complaint });
+      res.status(200).json({ success: true, complaint });
     } catch (error) {
-      console.error("Error updating complaint:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
   },
   deleteComplaints: async (req, res) => {
     try {
       const complaint = await Complaint.findByPk(req.params.id);
-
       if (!complaint) {
-        return res.status(404).json({ error: "Complaint not found" });
+        return res
+          .status(404)
+          .json({ success: false, message: "Complaint not found" });
       }
-
       await complaint.update({ trash: true });
-      res
-        .status(200)
-        .json({ message: "Complaint deleted successfully!", complaint });
+      res.status(200).json({ success: true, complaint });
     } catch (error) {
-      console.error("Error deleting complaint:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
   },
   Logout: async (req, res) => {
