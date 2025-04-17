@@ -49,8 +49,14 @@ module.exports = {
         result: savedWorker,
       });
     } catch (error) {
-      // await deletefilewithfoldername(uploadPath,req.files.image[0].filename)
-      // await deletefilewithfoldername(uploadPath,req.files.icon[0].filename)
+      await deletefilewithfoldername(
+        uploadPath,
+        req.files?.image?.[0]?.filename
+      );
+      await deletefilewithfoldername(
+        uploadPath,
+        req.files?.icon?.[0]?.filename
+      );
       console.log(error);
       res.status(401).json({
         success: false,
@@ -59,22 +65,28 @@ module.exports = {
     }
   },
   updateWorkerProfile: async (req, res) => {
+    const {
+      categories,
+      name,
+      minWage,
+      priority,
+      area,
+      phone,
+      whatsapp,
+      description,
+    } = req.body;
     try {
       const { id } = req.params;
-      const {
-        categories,
-        name,
-        minWage,
-        priority,
-        area,
-        phone,
-        whatsapp,
-        description,
-      } = req.body;
       const worker = await Worker.findByPk(id);
       if (!worker) {
-        // await deletefilewithfoldername(uploadPath,req.files.image[0].filename)
-        // await deletefilewithfoldername(uploadPath,req.files.icon[0].filename)
+        await deletefilewithfoldername(
+          uploadPath,
+          req.files?.image?.[0]?.filename
+        );
+        await deletefilewithfoldername(
+          uploadPath,
+          req.files?.icon?.[0]?.filename
+        );
         return res
           .status(404)
           .json({ success: false, message: "Worker profile not found" });
@@ -116,8 +128,14 @@ module.exports = {
         data: worker,
       });
     } catch (error) {
-      // await deletefilewithfoldername(uploadPath,req.files.image[0].filename)
-      // await deletefilewithfoldername(uploadPath,req.files.icon[0].filename)
+      await deletefilewithfoldername(
+        uploadPath,
+        req.files?.image?.[0]?.filename
+      );
+      await deletefilewithfoldername(
+        uploadPath,
+        req.files?.icon?.[0]?.filename
+      );
       console.error(error);
       return res.status(500).json({
         success: false,
@@ -171,8 +189,8 @@ module.exports = {
   },
   getWorkerProfiles: async (req, res) => {
     const search = req.query.search || "";
-    const page = req.query.page || 1;
-    const limit = req.query.limit || 10;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
     const whereCondition = {};
     if (search) {
@@ -185,8 +203,15 @@ module.exports = {
         limit,
         offset,
         where: whereCondition,
+        attributes: ["id", "workerName", "priority", "trash"],
+        include: [
+          {
+            model: Category,
+            attributes: ["id", "categoryName"],
+            through: { attributes: [] },
+          },
+        ],
       });
-      console.log(workers);
       if (!workers) {
         return res
           .status(404)
@@ -225,6 +250,7 @@ module.exports = {
         where: {
           typeName: "worker",
         },
+        attributes:[],
         include: {
           model: Category,
           attributes: ["id", "categoryName"],
