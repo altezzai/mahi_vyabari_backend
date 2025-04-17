@@ -6,6 +6,7 @@ const Emergency = require("../models/Emergency");
 const VehicleService = require("../models/VehicleService");
 const Worker = require("../models/Worker");
 const Classified = require("../models/Classified");
+const ShopCategory = require("../models/ShopCategory");
 const { Sequelize, where, Op } = require("sequelize");
 
 module.exports = {
@@ -55,13 +56,65 @@ module.exports = {
   },
   getShops: async (req, res) => {
     try {
-      const shops = await Shop.findAll({
-        attributes: ["image", "shopName", "location", "priority"],
-        where: { trash: false },
+      const searchQuery = req.query.q || "";
+      const area = req.query.area || "";
+      const category = req.query.category || "";
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const offset = (page - 1) * limit;
+      let whereCondition = { trash: false };
+      if (searchQuery) {
+        whereCondition = {
+          shopName: { [Op.like]: `%${searchQuery}%` },
+        };
+      }
+      if (area) {
+        whereCondition = {
+          areas: area,
+        };
+      }
+      if (category) {
+        const shopCategoryEntries = await ShopCategory.findAll({
+          where: { categoryId: category },
+          attributes: ["shopId"],
+        });
+
+        const shopIds = shopCategoryEntries.map((entry) => entry.shopId);
+
+        // If no matching shops for category, return empty result
+        if (shopIds.length === 0) {
+          return res.status(200).json({
+            success: true,
+            totalPages: 0,
+            currentPage: page,
+            data: ["No shops found"],
+          });
+        }
+
+        whereCondition.id = shopIds;
+      }
+
+      const { count, rows: shops } = await Shop.findAndCountAll({
+        limit,
+        offset,
+
+        attributes: [
+          "id",
+          "image",
+          "shopName",
+          "location",
+          "priority",
+          "areas",
+        ],
+        where: whereCondition,
+        order: [["priority", "ASC"]],
       });
-      res.status(201).json({
+      const totalPages = Math.ceil(count / limit);
+      res.status(200).json({
         success: true,
-        shops,
+        totalPages,
+        currentPage: page,
+        data: shops,
       });
     } catch (error) {
       console.error(error);
