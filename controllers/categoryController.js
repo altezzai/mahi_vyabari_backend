@@ -133,7 +133,9 @@ module.exports = {
   getCategories: async (req, res) => {
     const search = req.query.search || "";
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = parseInt(req.query.limit) ;
+    console.log(limit);
+    console.log(req.query);
     const offset = (page - 1) * limit;
     const whereCondition = {};
     if (search) {

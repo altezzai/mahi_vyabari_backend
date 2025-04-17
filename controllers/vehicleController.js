@@ -162,6 +162,7 @@ module.exports = {
         offset,
         where: whereCondition,
         attributes: ["id", "vehicleName", "category", "via", "to", "trash"],
+        order: [["createdAt", "DESC"]],
       });
       if (!vehicleSchedules) {
         return res
@@ -360,6 +361,7 @@ module.exports = {
         offset,
         where: whereCondition,
         attributes: ["id", "ownerName", "category", "priority", "trash"],
+        order: [["createdAt", "DESC"]],
       });
       if (!vehicleServices) {
         return res

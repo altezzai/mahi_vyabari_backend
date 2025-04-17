@@ -59,4 +59,11 @@ module.exports = {
         .json({ success: false, message: "Internal Server Error" });
     }
   },
+  assignUserCoupon:async(req,res)=>{
+    try {
+      
+    } catch (error) {
+      
+    }
+  }
 };

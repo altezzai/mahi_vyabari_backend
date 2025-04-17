@@ -53,8 +53,8 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      // await deletefilewithfoldername(uploadPath, req.files.image[0].filename);
-      // await deletefilewithfoldername(uploadPath, req.files.icon[0].filename);
+      await deletefilewithfoldername(uploadPath, req.files?.image?.[0]?.filename);
+      await deletefilewithfoldername(uploadPath, req.files?.icon?.[0]?.filename);
       res.status(500).json({
         success: false,
         message: "Internal Server Error",
@@ -85,6 +85,7 @@ module.exports = {
             through: { attributes: [] },
           },
         ],
+        order: [["createdAt", "DESC"]],
       });
       res.status(200).json({ success: true, data: shops });
     } catch (error) {
