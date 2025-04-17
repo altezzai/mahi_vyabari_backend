@@ -29,6 +29,10 @@ const Tourism = sequelize.define(
     entryFee: {
       type: DataTypes.STRING,
     },
+    trash:{
+      type: DataTypes.BOOLEAN,
+      defaultValue:false
+    }
   },
   {
     tableName: "tourism",
