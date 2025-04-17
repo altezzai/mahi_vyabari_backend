@@ -52,7 +52,6 @@ module.exports = {
           await JSON.parse(tourism.images).forEach((imageName) => {
             if (!imageName || typeof imageName !== "string") return;
             const oldImagePath = path.join(uploadPath, imageName);
-            console.log(oldImagePath);
             if (fs.existsSync(oldImagePath)) {
               fs.unlinkSync(oldImagePath);
             }
@@ -60,7 +59,6 @@ module.exports = {
         }
         newImages = JSON.stringify(req.files.map((file) => file.filename));
       }
-      console.log(newImages);
       const updatedTourism = await tourism.update({
         placeName,
         phone,

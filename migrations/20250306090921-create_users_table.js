@@ -42,6 +42,10 @@ module.exports = {
         type: Sequelize.STRING,
         defaultValue: 'active',
       },
+      verified:{
+        type:Sequelize.BOOLEAN,
+        defaultValue:false
+      },
       trash: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,

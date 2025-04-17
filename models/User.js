@@ -49,6 +49,10 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       defaultValue: "active",
     },
+    verified:{
+       type:DataTypes.BOOLEAN,
+       defaultValue:false
+    },
     trash: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
