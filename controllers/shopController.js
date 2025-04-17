@@ -53,8 +53,14 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      await deletefilewithfoldername(uploadPath, req.files?.image?.[0]?.filename);
-      await deletefilewithfoldername(uploadPath, req.files?.icon?.[0]?.filename);
+      await deletefilewithfoldername(
+        uploadPath,
+        req.files?.image?.[0]?.filename
+      );
+      await deletefilewithfoldername(
+        uploadPath,
+        req.files?.icon?.[0]?.filename
+      );
       res.status(500).json({
         success: false,
         message: "Internal Server Error",
@@ -76,8 +82,8 @@ module.exports = {
       const shops = await Shop.findAndCountAll({
         limit,
         offset,
-        attributes: ["id", "shopName", "priority", "trash"],
         where: whereCondition,
+        attributes: ["id", "shopName", "priority", "trash"],
         include: [
           {
             model: Category,
@@ -193,8 +199,14 @@ module.exports = {
       await shop.update(updateData);
       return res.status(200).json({ success: true, shop });
     } catch (error) {
-      await deletefilewithfoldername(uploadPath, req.files?.image?.[0]?.filename);
-      await deletefilewithfoldername(uploadPath, req.files?.icon?.[0]?.filename);
+      await deletefilewithfoldername(
+        uploadPath,
+        req.files?.image?.[0]?.filename
+      );
+      await deletefilewithfoldername(
+        uploadPath,
+        req.files?.icon?.[0]?.filename
+      );
       console.error(error);
       return res
         .status(500)
