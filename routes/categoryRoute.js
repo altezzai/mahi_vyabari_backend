@@ -4,10 +4,10 @@ const router = express.Router();
 const categoryController = require("../controllers/categoryController");
 
 router.post("/add-type", categoryController.addType);
-router.post("/delete-type/:id", categoryController.deleteType);
-router.post("/restore-type/:id", categoryController.restoreType);
-router.post("/get-types", categoryController.getTypes);
-router.post("/get-type/:id", categoryController.getTypeById);
+router.patch("/delete-type/:id", categoryController.deleteType);
+router.patch("/restore-type/:id", categoryController.restoreType);
+router.get("/get-types", categoryController.getTypes);
+router.get("/get-type/:id", categoryController.getTypeById);
 
 router.post(
   "/add-category",
