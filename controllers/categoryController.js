@@ -34,7 +34,7 @@ module.exports = {
 
       const savedCategory = await Category.create(categoryData);
       if (!savedCategory) {
-        // await deletefilewithfoldername(uploadPath, req.file.filename);
+        await deletefilewithfoldername(uploadPath, req.file?.filename);
         res.status(404).json({
           success: false,
           message: "Can't upload Category Data",
@@ -45,7 +45,7 @@ module.exports = {
         data: savedCategory,
       });
     } catch (error) {
-      // await deletefilewithfoldername(uploadPath, req.file.filename);
+      await deletefilewithfoldername(uploadPath, req.file?.filename);
       console.log(error);
       res.status(500).json({
         success: false,
@@ -132,8 +132,8 @@ module.exports = {
   },
   getCategories: async (req, res) => {
     const search = req.query.search || "";
-    const page = req.query.page || 1;
-    const limit = req.query.limit || 10;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
     const whereCondition = {};
     if (search) {

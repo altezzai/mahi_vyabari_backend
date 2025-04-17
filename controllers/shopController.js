@@ -6,10 +6,11 @@ const Shop = require("../models/Shop");
 const Category = require("../models/Category");
 const ShopCategory = require("../models/ShopCategory");
 const { deletefilewithfoldername } = require("../utils/util");
-const { Op, Sequelize } = require("sequelize");
+const { Op, Sequelize, literal } = require("sequelize");
 const Type = require("../models/Type");
 const Complaint = require("../models/Complaint");
 const Feedback = require("../models/Feedback");
+const User = require("../models/User");
 
 const uploadPath = path.join(__dirname, "../public/uploads/shopImages");
 if (!fs.existsSync(uploadPath)) {
@@ -60,7 +61,7 @@ module.exports = {
       });
     }
   },
-  getShop: async (req, res) => {
+  getShops: async (req, res) => {
     const search = req.query.search || "";
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -100,11 +101,11 @@ module.exports = {
         include: [
           {
             model: Category,
+            attributes: ["id", "categoryName"],
             through: { attributes: [] },
           },
         ],
       });
-      console.log(shop);
       if (!shop) {
         return res
           .status(404)
@@ -118,13 +119,33 @@ module.exports = {
         .json({ success: false, message: "Internal Server Error" });
     }
   },
-  updateShopById: async (req, res) => {
+  updateShop: async (req, res) => {
+    const {
+      shopName,
+      categories,
+      phone,
+      whatsapp,
+      location,
+      description,
+      address,
+      openingTime,
+      closingTime,
+      workingDays,
+      priority,
+      areas,
+    } = req.body;
     try {
       const { shopId } = req.params;
       const shop = await Shop.findByPk(shopId);
       if (!shop) {
-        // await deletefilewithfoldername(uploadPath, req.files.image[0]);
-        // await deletefilewithfoldername(uploadPath, req.files.icon[0]);
+        await deletefilewithfoldername(
+          uploadPath,
+          req.files?.image?.[0]?.filename
+        );
+        await deletefilewithfoldername(
+          uploadPath,
+          req.files?.icon?.[0]?.filename
+        );
         return res
           .status(404)
           .json({ success: false, message: "Shop not found" });
@@ -152,27 +173,27 @@ module.exports = {
       }
 
       const updateData = {
-        shopName: req.body.shopName || shop.shopName,
-        categories: req.body.categories || shop.categories,
-        phone: req.body.phone || shop.phone,
-        whatsapp: req.body.whatsapp || shop.whatsapp,
-        website: req.body.website || shop.website,
-        location: req.body.location || shop.location,
-        description: req.body.description || shop.location,
-        address: req.body.address || shop.address,
-        openingTime: req.body.openingTime || shop.openingTime,
-        closingTime: req.body.closingTime || shop.closingTime,
-        workingDays: req.body.workingDays || shop.workingDays,
-        priority: req.body.priority || shop.priority,
-        areas: req.body.areas || shop.areas,
+        shopName: shopName || shop.shopName,
+        categories: categories || shop.categories,
+        phone: phone || shop.phone,
+        whatsapp: whatsapp || shop.whatsapp,
+        website: website || shop.website,
+        location: location || shop.location,
+        description: description || shop.location,
+        address: address || shop.address,
+        openingTime: openingTime || shop.openingTime,
+        closingTime: closingTime || shop.closingTime,
+        workingDays: workingDays || shop.workingDays,
+        priority: priority || shop.priority,
+        areas: areas || shop.areas,
         image: newImage || shop.image,
         icon: newIcon || shop.icon,
       };
       await shop.update(updateData);
       return res.status(200).json({ success: true, shop });
     } catch (error) {
-      // await deletefilewithfoldername(uploadPath, req.files.image[0]);
-      // await deletefilewithfoldername(uploadPath, req.files.icon[0]);
+      await deletefilewithfoldername(uploadPath, req.files?.image?.[0]?.filename);
+      await deletefilewithfoldername(uploadPath, req.files?.icon?.[0]?.filename);
       console.error(error);
       return res
         .status(500)
@@ -222,11 +243,12 @@ module.exports = {
     try {
       const shopCategories = await Type.findOne({
         where: {
-          name: "shop",
+          typeName: "shop",
         },
+        attributes: [],
         include: {
           model: Category,
-          attributes: ["id", "name"],
+          attributes: ["id", "categoryName"],
         },
       });
       res.status(200).json({ success: true, shopCategories });
@@ -261,7 +283,10 @@ module.exports = {
             Sequelize.fn("AVG", Sequelize.col("feedbacks.rating")),
             "averageRating",
           ],
-          [Sequelize.fn("COUNT", Sequelize.col("feedbacks.id")), "totalRating"],
+          [
+            Sequelize.fn("COUNT", Sequelize.col("feedbacks.id")),
+            "totalRatingCount",
+          ],
         ],
         include: [
           {
@@ -299,18 +324,21 @@ module.exports = {
         limit,
         offset,
         where: whereCondition,
-        attributes: [
-          "id",
-          "shopName",
-        ],
+        attributes: ["id", "shopName"],
         include: [
           {
             model: Complaint,
             as: "complaints",
-            attributes: ["description","title"],
+            attributes: ["description", "title"],
+            include: [
+              {
+                model: User,
+                as: "user",
+                attributes: ["userName", "email"],
+              },
+            ],
           },
         ],
-        group: ["Shop.id"],
         subQuery: false,
       });
       res.status(200).json({ success: true, data: shops });

@@ -36,7 +36,10 @@ const ItemListing = sequelize.define(
       type: DataTypes.TEXT,
     },
     priority: {
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM("A","B","C"),
+      validate:{
+        isIn:[["A","B","C"]]
+      }
     },
     phone: {
       type: DataTypes.STRING,

@@ -40,8 +40,8 @@ module.exports = {
         result: savedMedicalDirectory,
       });
     } catch (error) {
-      // await deletefilewithfoldername(uploadPath,req.files.image[0].filename);
-      // await deletefilewithfoldername(uploadPath,req.files.icon[0].filename);
+      await deletefilewithfoldername(uploadPath,req.files?.image?.[0]?.filename);
+      await deletefilewithfoldername(uploadPath,req.files?.icon?.[0]?.filename);
       console.log(error);
       res.status(401).json({
         success: false,
@@ -50,6 +50,22 @@ module.exports = {
     }
   },
   updateMedicalDirectory: async (req, res) => {
+    const {
+      searchCategory,
+      name,
+      phone,
+      searchSubcategory,
+      whatsapp,
+      website,
+      location,
+      description,
+      address,
+      openingTime,
+      closingTime,
+      workingDays,
+      priority,
+      area,
+    } = req.body;
     try {
       const { id } = req.params;
       const healthcareProvider = await Medical.findByPk(id);
@@ -58,22 +74,6 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Healthcare Provider not found" });
       }
-      const {
-        searchCategory,
-        name,
-        phone,
-        searchSubcategory,
-        whatsapp,
-        website,
-        location,
-        description,
-        address,
-        openingTime,
-        closingTime,
-        workingDays,
-        priority,
-        area,
-      } = req.body;
       let newImage = healthcareProvider.image;
       let newIcon = healthcareProvider.icon;
       if (req.files?.image?.[0]) {
@@ -118,8 +118,8 @@ module.exports = {
         data: healthcareProvider,
       });
     } catch (error) {
-      // await deletefilewithfoldername(uploadPath,req.files.image[0].filename);
-      // await deletefilewithfoldername(uploadPath,req.files.icon[0].filename);
+      await deletefilewithfoldername(uploadPath,req.files?.image?.[0]?.filename);
+      await deletefilewithfoldername(uploadPath,req.files?.icon?.[0]?.filename);
       console.error(error);
       return res.status(500).json({
         success: false,
@@ -224,6 +224,7 @@ module.exports = {
         where: {
           typeName: "medical",
         },
+        attributes:[],
         include: {
           model: Category,
           attributes: ["id", "categoryName"],

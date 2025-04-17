@@ -53,12 +53,15 @@ const Shop = sequelize.define(
       type: DataTypes.STRING,
     },
     workingDays: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING
     },
     priority: {
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM("A","B","C"),
+      validate:{
+        isIn:[["A","B","C"]]
+      }
     },
-    areas: {
+    area: {
       type: DataTypes.ENUM("mahe", "chokli", "palloor", "pandakkal"),
       validate: {
         isIn: [["mahe", "chokli", "palloor", "pandakkal"]],

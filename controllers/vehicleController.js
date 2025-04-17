@@ -212,7 +212,7 @@ module.exports = {
       deletefilewithfoldername(uploadPath, req.files?.image?.[0]?.filename);
       deletefilewithfoldername(uploadPath, req.files?.icon?.[0]?.filename);
       console.log(error);
-      res.status(401).json({
+      res.status(500).json({
         success: false,
         message: "Intrnal Server Error",
       });

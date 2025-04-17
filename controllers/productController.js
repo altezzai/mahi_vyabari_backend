@@ -97,8 +97,8 @@ module.exports = {
   },
   getProducts: async (req, res) => {
     const search = req.query.search || "";
-    const page = req.query.page || 1;
-    const limit = req.query.limit || 10;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
     let whereCondition = {};
     if (search) {
@@ -207,8 +207,8 @@ module.exports = {
   },
   getShopName: async (req, res) => {
     const search = req.query.search || "";
-    const page = req.query.page || 1;
-    const limit = req.query.limit || 5;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
     const offset = (page - 1) * limit;
     let whereCondition = {};
     if (search) {

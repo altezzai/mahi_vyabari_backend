@@ -3,20 +3,23 @@ const sequelize = require("../config/database");
 const WorkerProfile = sequelize.define(
   "Worker",
   {
-    categories: {
-      type: DataTypes.STRING,
-    },
-    name: {
+    workerName: {
       type: DataTypes.STRING,
       validate: {
         notEmpty: true,
       },
     },
+    categories: {
+      type: DataTypes.STRING,
+    },
     minWage: {
       type: DataTypes.DECIMAL(10, 2),
     },
     priority: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.ENUM("A","B","C"),
+      validate:{
+        isIn:[["A","B","C"]],
+      }
     },
     area: {
       type: DataTypes.ENUM("mahe", "chokli", "palloor", "pandakkal"),

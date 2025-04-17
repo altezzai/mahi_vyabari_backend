@@ -24,8 +24,9 @@ const deletefile = async (files) => {
 };
 const deletefilewithfoldername = async (uploadPath, filename) => {
   try {
-    if (file) {
+    if (filename) {
       const filePath = path.join(uploadPath, filename);
+      console.log(filePath);
       if (fs.existsSync(filePath)) {
         await fs.promises.unlink(filePath);
       }

@@ -11,7 +11,7 @@ router.post(
 router.put(
   "/update-product/:id",
   productController.upload.single("image"),
-  productController.editProduct
+  productController.updateProduct
 );
 router.get("/get-products", productController.getProducts);
 router.get("/get-shop-names", productController.getShopName);

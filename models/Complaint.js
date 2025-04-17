@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
-const User = require("./User"); // Assuming you have a User model
-const Shop = require("./Shop"); // Assuming you have a Shop model
+const User = require("./User"); 
+const Shop = require("./Shop"); 
 
 const Complaint = sequelize.define(
   "Complaint",
@@ -55,9 +55,9 @@ const Complaint = sequelize.define(
 );
 
 // Associations (If Needed)
-User.hasMany(Complaint, { foreignKey: "userId" });
+User.hasMany(Complaint, { foreignKey: "userId"});
 Shop.hasMany(Complaint, { foreignKey: "shopId", as: "complaints" });
-Complaint.belongsTo(User, { foreignKey: "userId" });
+Complaint.belongsTo(User, { foreignKey: "userId", as:"user"});
 Complaint.belongsTo(Shop, { foreignKey: "shopId" });
 
 module.exports = Complaint;

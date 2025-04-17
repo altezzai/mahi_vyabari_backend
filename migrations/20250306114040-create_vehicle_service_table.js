@@ -11,9 +11,10 @@ module.exports = {
       },
       ownerName:{
         type:Sequelize.STRING,
+        allowNull:false,
       },
       category: {
-        type: Sequelize.ENUM("car", "rickshaw"),
+        type: Sequelize.STRING,
       },
       minFee: {
         type: Sequelize.DECIMAL(10, 2),
@@ -23,7 +24,7 @@ module.exports = {
         allowNull: false,
       },
       priority: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.ENUM("A","B","C"),
       },
       phone: {
         type: Sequelize.STRING,

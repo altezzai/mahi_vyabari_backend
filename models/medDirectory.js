@@ -66,7 +66,7 @@ const HealthcareProvider = sequelize.define(
       type: DataTypes.STRING,
     },
     priority: {
-      type: DataTypes.CHAR(1),
+      type: DataTypes.ENUM("A","B","C"),
       validate: {
         isIn: [["A", "B", "C"]],
       },
@@ -88,7 +88,5 @@ const HealthcareProvider = sequelize.define(
   }
 );
 
-// HealthcareProvider.hasOne(Category,{foreignKey:"category"});
-// Category.belongsTo(HealthcareProvider,{foreignKey:"category"});
 
 module.exports = HealthcareProvider;

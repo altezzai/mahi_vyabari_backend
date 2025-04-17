@@ -35,7 +35,7 @@ module.exports = {
         type: Sequelize.TEXT,
       },
       priority: {
-        type: Sequelize.STRING,
+        type: Sequelize.ENUM("A","B","C"),
       },
       phone: {
         type: Sequelize.STRING,

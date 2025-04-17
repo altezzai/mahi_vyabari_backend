@@ -9,17 +9,17 @@ module.exports = {
         primaryKey: true,
         allowNull: false,
       },
-      categories: {
+      workerName: {
         type: Sequelize.STRING,
       },
-      name: {
+      categories: {
         type: Sequelize.STRING,
       },
       minWage: {
         type: Sequelize.DECIMAL(10, 2),
       },
       priority: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.ENUM("A","B","C"),
       },
       area: {
         type: Sequelize.ENUM("mahe", "chokli", "palloor", "pandakkal"),

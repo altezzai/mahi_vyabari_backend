@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const vehicleController = require("../controllers/vehicleController");
+const { route } = require("./emergencyRoute");
 
 router.post("/add-vehicleSchedule", vehicleController.createVehicleSchedule);
 router.put(
@@ -48,5 +49,6 @@ router.get(
   "/get-vehicle-Service/:id",
   vehicleController.getVehicleServiceProviderById
 );
+router.get("/get-vehicle-service-categories",vehicleController.getVehicleServiceCategories)
 
 module.exports = router;

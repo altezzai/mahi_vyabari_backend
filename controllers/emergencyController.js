@@ -31,13 +31,6 @@ module.exports = {
         icon: req.file ? req.file.filename : null,
       };
       const savedEmergency = await Emergency.create(emergencyData);
-      if (!savedEmergency) {
-        // await deletefilewithfoldername(uploadPath,req.file.filename);
-        res.status(404).json({
-          success: false,
-          message: "Can't upload Emergency Data",
-        });
-      }
       res.status(200).json({
         success: true,
         data: savedEmergency,
@@ -60,7 +53,7 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Emergency record not found" });
       }
-      let newFile = req.file ? req.file.filename : emergency.icon;
+      let newFile = emergency.icon;
       if (req.file) {
         if (emergency.icon) {
           const oldFilePath = path.join(uploadPath, emergency.icon);
@@ -68,6 +61,7 @@ module.exports = {
             fs.unlinkSync(oldFilePath);
           }
         }
+        newFile = req.file.filename
       }
       await emergency.update({
         title: itemName || emergency.itemName,

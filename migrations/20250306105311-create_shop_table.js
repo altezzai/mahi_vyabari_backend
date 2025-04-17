@@ -57,9 +57,9 @@ module.exports = {
         type: Sequelize.STRING,
       },
       priority: {
-        type: Sequelize.STRING,
+        type: Sequelize.ENUM("A","B","C"),
       },
-      areas: {
+      area: {
         type: Sequelize.ENUM("mahe", "chokli", "palloor", "pandakkal"),
       },
       trash: {
