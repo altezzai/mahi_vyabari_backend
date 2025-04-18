@@ -32,7 +32,7 @@ const HealthcareProvider = sequelize.define(
       },
     },
     subCategory: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       references: {
         model: Category,
         key: "id",
@@ -88,5 +88,7 @@ const HealthcareProvider = sequelize.define(
   }
 );
 
+Category.hasMany(HealthcareProvider,{foreignKey:"subCategory",as:"categoryInfo"})
+HealthcareProvider.belongsTo(Category,{foreignKey:"subCategory",as:"categoryInfo"});
 
 module.exports = HealthcareProvider;

@@ -26,7 +26,7 @@ module.exports = {
                   <h2 style="color: #4CAF50;">Welcome, ${userName} 👋</h2>
                   <p>Your account has been created by the Admin.</p>
                   <p><strong>Login Email:</strong> ${email}</p>
-                  <p><strong>Password:</strong> ${password}</p>
+                  <p><strong>Password:</strong><span style="font-weight:900;"> ${password}</span></p>
                   <p>Please login and change your password immediately for security reasons.</p>
                   <br/>
                   <p>Thanks,<br/>Team Mahe Vyapari</p>

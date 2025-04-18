@@ -8,6 +8,7 @@ const Worker = require("../models/Worker");
 const Classified = require("../models/Classified");
 const ShopCategory = require("../models/ShopCategory");
 const { Sequelize, where, Op } = require("sequelize");
+const Category = require("../models/Category");
 
 module.exports = {
   homePage: async (req, res) => {
@@ -70,7 +71,7 @@ module.exports = {
       }
       if (area) {
         whereCondition = {
-          areas: area,
+          area: area,
         };
       }
       if (category) {
@@ -78,9 +79,7 @@ module.exports = {
           where: { categoryId: category },
           attributes: ["shopId"],
         });
-
         const shopIds = shopCategoryEntries.map((entry) => entry.shopId);
-
         // If no matching shops for category, return empty result
         if (shopIds.length === 0) {
           return res.status(200).json({
@@ -97,14 +96,7 @@ module.exports = {
       const { count, rows: shops } = await Shop.findAndCountAll({
         limit,
         offset,
-        attributes: [
-          "id",
-          "image",
-          "shopName",
-          "location",
-          "priority",
-          "areas",
-        ],
+        attributes: ["id", "image", "shopName", "location", "priority", "area"],
         where: whereCondition,
         order: [["priority", "ASC"]],
       });
@@ -176,14 +168,52 @@ module.exports = {
     }
   },
   getDocters: async (req, res) => {
+    const searchQuery = req.query.q || "";
+    const area = req.query.area || "";
+    const category = req.query.category || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    let whereCondition = { trash: false };
+    if (searchQuery) {
+      whereCondition = {
+        name: { [Op.like]: `%${searchQuery}%` },
+      };
+    }
+    if (area) {
+      whereCondition = {
+        areas: area,
+      };
+    }
+    whereCondition.category = "doctor";
+    const categoryInclude = {
+      model: Category,
+      attributes: ["id", "categoryName"],
+      as: "categoryInfo",
+    };
+
+    if (category) {
+      categoryInclude.where = {
+        categoryName: {
+          [Op.like]: `%${category}%`,
+        },
+      };
+    }
     try {
-      const doctors = await Medical.findAll({
-        attributes: ["name", "image", "searchSubcategory"],
-        where: { category: "doctor", trash: false },
+      const { count, rows: doctors } = await Medical.findAndCountAll({
+        limit,
+        offset,
+        attributes: ["name", "image"],
+        where: whereCondition,
+        include: [categoryInclude],
+        order: [["priority", "ASC"]],
       });
+      const totalPages = Math.ceil(count / limit);
       res.status(200).json({
         success: true,
-        doctors,
+        totalPages,
+        currentPage: page,
+        data: doctors,
       });
     } catch (error) {
       console.error(error);
@@ -197,6 +227,12 @@ module.exports = {
       const { id } = req.params;
       const doctor = await Medical.findOne({
         where: { id, category: "doctor", trash: false },
+        include: [
+          {
+            model: Category,
+            attributes: ["id", "categoryName"],
+          },
+        ],
       });
       if (!doctor) {
         return res

@@ -13,7 +13,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: "Users", // Ensure this matches your actual users table name
+          model: "users", // Ensure this matches your actual users table name
           key: "id",
         },
         onDelete: "CASCADE",

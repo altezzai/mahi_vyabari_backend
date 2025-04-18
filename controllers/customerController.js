@@ -80,4 +80,44 @@ module.exports = {
         .json({ success: false, message: "Internal Server Error" });
     }
   },
+  deleteCustomer: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const customer = await Customer.findByPk(id);
+      if (!customer) {
+        return res
+          .status(404)
+          .json({ success: true, message: "Customer Not Found" });
+      }
+      await customer.update({ trash: true });
+      res
+        .status(200)
+        .json({ success: true, message: "Customer deleted successfully" });
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
+    }
+  },
+  restoreCustomer: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const customer = await Customer.findByPk(id);
+      if (!customer) {
+        return res
+          .status(404)
+          .json({ success: true, message: "Customer Not Found" });
+      }
+      await customer.update({ trash: false });
+      res
+        .status(200)
+        .json({ success: true, message: "Customer restored successfully" });
+    } catch (error) {
+      console.log(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
+    }
+  },
 };

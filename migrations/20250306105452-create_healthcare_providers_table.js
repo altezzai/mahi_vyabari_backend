@@ -30,7 +30,12 @@ module.exports = {
         allowNull: false,
       },
       subCategory: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
+        references: {
+          model: "categories",
+          key: "id",
+        },
+        onDelete: "CASCADE",
       },
       whatsapp: {
         type: Sequelize.STRING,
