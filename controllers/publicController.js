@@ -170,33 +170,21 @@ module.exports = {
   getDocters: async (req, res) => {
     const searchQuery = req.query.q || "";
     const area = req.query.area || "";
-    const category = req.query.category || "";
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
-    let whereCondition = { trash: false };
+    let whereCondition = { trash: false, category: "doctor" };
     if (searchQuery) {
       whereCondition = {
-        name: { [Op.like]: `%${searchQuery}%` },
+        [Op.or]: [
+          { name: { [Op.like]: `%${searchQuery}%` } },
+          { "$categoryInfo.categoryName$": { [Op.like]: `%${searchQuery}%` } },
+        ],
       };
     }
     if (area) {
       whereCondition = {
         areas: area,
-      };
-    }
-    whereCondition.category = "doctor";
-    const categoryInclude = {
-      model: Category,
-      attributes: ["id", "categoryName"],
-      as: "categoryInfo",
-    };
-
-    if (category) {
-      categoryInclude.where = {
-        categoryName: {
-          [Op.like]: `%${category}%`,
-        },
       };
     }
     try {
@@ -205,7 +193,13 @@ module.exports = {
         offset,
         attributes: ["name", "image"],
         where: whereCondition,
-        include: [categoryInclude],
+        include: [
+          {
+            model: Category,
+            attributes: ["id", "categoryName"],
+            as: "categoryInfo",
+          },
+        ],
         order: [["priority", "ASC"]],
       });
       const totalPages = Math.ceil(count / limit);
