@@ -19,5 +19,7 @@ router.get("/workers",publicController.getLocalWorkers);
 router.get("/worker/:id",publicController.getLocalWorkersById);
 router.get("/classifieds",publicController.getClassifieds);
 router.get("/classified/:id",publicController.getClassifiedById);
+router.get("/tourism",publicController.getTourism);
+router.get("/tourism/:id",publicController.getTourismById);
 
 module.exports = router;

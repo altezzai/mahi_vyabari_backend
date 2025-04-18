@@ -8,6 +8,7 @@ const Worker = require("../models/Worker");
 const Classified = require("../models/Classified");
 const ShopCategory = require("../models/ShopCategory");
 const WorkerCategory = require("../models/WorkerCategory");
+const Tourism = require("../models/Tourism");
 const { Sequelize, where, Op } = require("sequelize");
 const Category = require("../models/Category");
 
@@ -620,11 +621,13 @@ module.exports = {
       const { id } = req.params;
       const classified = await Classified.findOne({
         where: { id },
-        include:[{
-          model:Category,
-          as:"itemCategory",
-          attributes:["id","categoryName"]
-        }]
+        include: [
+          {
+            model: Category,
+            as: "itemCategory",
+            attributes: ["id", "categoryName"],
+          },
+        ],
       });
       if (!classified) {
         return res
@@ -634,6 +637,50 @@ module.exports = {
       res.status(200).json({ success: true, classified });
     } catch (error) {
       console.error(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
+    }
+  },
+  getTourism: async (req, res) => {
+    const area = req.query.area || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    let whereCondition = { trash: false };
+    if (area) {
+      whereCondition = {
+        area: area,
+      };
+    }
+    try {
+      const { count, rows: tourism } = await Tourism.findAndCountAll({
+        limit,
+        offset,
+        attributes: ["id", "placeName", "images"],
+        where: whereCondition,
+      });
+      const totalPages = Math.ceil(count / limit);
+      res
+        .status(200)
+        .json({ success: true, totalPages, currentPage: page, data: tourism });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: true, message: "Internal Server Error" });
+    }
+  },
+  getTourismById: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const tourism = await Tourism.findOne({ where: { id } });
+      if (!tourism) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Tourism not found" });
+      }
+      res.status(200).json({ success: true, data: tourism });
+    } catch (error) {
+      console.log(error);
       res
         .status(500)
         .json({ success: false, message: "Internal server error" });
