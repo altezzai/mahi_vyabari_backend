@@ -9,12 +9,17 @@ module.exports = {
         primaryKey: true,
         allowNull: false,
       },
-      ownerName:{
-        type:Sequelize.STRING,
-        allowNull:false,
+      ownerName: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       category: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
+        references: {
+          model: "categories",
+          key: "id",
+        },
+        onDelete: "CASCADE",
       },
       minFee: {
         type: Sequelize.DECIMAL(10, 2),
@@ -24,7 +29,7 @@ module.exports = {
         allowNull: false,
       },
       priority: {
-        type: Sequelize.ENUM("A","B","C"),
+        type: Sequelize.ENUM("A", "B", "C"),
       },
       phone: {
         type: Sequelize.STRING,

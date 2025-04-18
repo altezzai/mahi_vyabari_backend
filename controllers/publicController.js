@@ -7,6 +7,7 @@ const VehicleService = require("../models/VehicleService");
 const Worker = require("../models/Worker");
 const Classified = require("../models/Classified");
 const ShopCategory = require("../models/ShopCategory");
+const WorkerCategory = require("../models/WorkerCategory");
 const { Sequelize, where, Op } = require("sequelize");
 const Category = require("../models/Category");
 
@@ -184,14 +185,14 @@ module.exports = {
     }
     if (area) {
       whereCondition = {
-        areas: area,
+        area: area,
       };
     }
     try {
       const { count, rows: doctors } = await Medical.findAndCountAll({
         limit,
         offset,
-        attributes: ["name", "image"],
+        attributes: ["id", "name", "image", "category", "trash", "area"],
         where: whereCondition,
         include: [
           {
@@ -220,11 +221,12 @@ module.exports = {
     try {
       const { id } = req.params;
       const doctor = await Medical.findOne({
-        where: { id, category: "doctor", trash: false },
+        where: { id },
         include: [
           {
             model: Category,
             attributes: ["id", "categoryName"],
+            as: "categoryInfo",
           },
         ],
       });
@@ -245,13 +247,34 @@ module.exports = {
     }
   },
   getBusSchedules: async (req, res) => {
+    const via = req.query.via || "mahe";
+    const to = req.query.to || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    let whereCondition = { trash: false, category: "bus" };
+    if (via && to) {
+      whereCondition = {
+        ...whereCondition,
+        [Op.and]: [
+          { via: { [Op.like]: `%${via}%` } },
+          { to: { [Op.like]: `%${to}%` } },
+        ],
+      };
+    }
     try {
-      const buses = await VehicleSchedule.findAll({
-        where: { category: "bus" },
+      const { count, rows: buses } = await VehicleSchedule.findAndCountAll({
+        limit,
+        offset,
+        where: whereCondition,
+        order: [["departureTime", "ASC"]],
       });
+      const totalPages = Math.ceil(count / limit);
       res.status(200).json({
         success: true,
-        buses,
+        totalPages,
+        currentPage: page,
+        data: buses,
       });
     } catch (error) {
       console.error(error);
@@ -261,13 +284,34 @@ module.exports = {
     }
   },
   getTrainSchedules: async (req, res) => {
+    const via = req.query.via || "mahe";
+    const to = req.query.to || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    let whereCondition = { trash: false, category: "train" };
+    if (via && to) {
+      whereCondition = {
+        ...whereCondition,
+        [Op.and]: [
+          { via: { [Op.like]: `%${via}%` } },
+          { to: { [Op.like]: `%${to}%` } },
+        ],
+      };
+    }
     try {
-      const trains = await VehicleSchedule.findAll({
-        where: { category: "train" },
+      const { count, rows: trains } = await VehicleSchedule.findAndCountAll({
+        limit,
+        offset,
+        where: whereCondition,
+        order: [["departureTime", "ASC"]],
       });
+      const totalPages = Math.ceil(count / limit);
       res.status(200).json({
         success: true,
-        trains,
+        totalPages,
+        currentPage: page,
+        data: trains,
       });
     } catch (error) {
       console.error(error);
@@ -277,14 +321,46 @@ module.exports = {
     }
   },
   getHospitals: async (req, res) => {
+    const searchQuery = req.query.q || "";
+    const area = req.query.area || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    let whereCondition = { trash: false, category: "hospital" };
+    if (searchQuery) {
+      whereCondition = {
+        [Op.or]: [
+          { name: { [Op.like]: `%${searchQuery}%` } },
+          { "$categoryInfo.categoryName$": { [Op.like]: `%${searchQuery}%` } },
+        ],
+      };
+    }
+    if (area) {
+      whereCondition = {
+        area: area,
+      };
+    }
     try {
-      const hospitals = await Medical.findAll({
-        attributes: ["name", "image", "searchSubcategory"],
-        where: { searchCategory: "hospital", trash: false },
+      const { count, rows: hospitals } = await Medical.findAndCountAll({
+        limit,
+        offset,
+        attributes: ["id", "name", "image", "trash", "category", "area"],
+        where: whereCondition,
+        include: [
+          {
+            model: Category,
+            attributes: ["id", "categoryName"],
+            as: "categoryInfo",
+          },
+        ],
+        order: [["priority", "ASC"]],
       });
+      const totalPages = Math.ceil(count / limit);
       res.status(200).json({
         success: true,
-        hospitals,
+        totalPages,
+        currentPage: page,
+        data: hospitals,
       });
     } catch (error) {
       console.error(error);
@@ -297,7 +373,7 @@ module.exports = {
     try {
       const { id } = req.params;
       const hospital = await Medical.findOne({
-        where: { id, category: "hospital", trash: false },
+        where: { id },
       });
       if (!hospital) {
         return res
@@ -313,11 +389,22 @@ module.exports = {
     }
   },
   getEmergencies: async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
     try {
-      const emergencies = await Emergency.findAll({
+      const { count, rows: emergencies } = await Emergency.findAndCountAll({
+        limit,
+        offset,
         where: { trash: false },
       });
-      res.json({ success: true, emergencies });
+      const totalPages = Math.ceil(count / limit);
+      res.json({
+        success: true,
+        totalPages,
+        currentPage: page,
+        data: emergencies,
+      });
     } catch (error) {
       console.error(error);
       res
@@ -326,12 +413,51 @@ module.exports = {
     }
   },
   getVehicleServices: async (req, res) => {
+    const searchQuery = req.query.q || "";
+    const area = req.query.area || "";
+    const category = req.query.category || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    let whereCondition = { trash: false };
+    if (searchQuery) {
+      whereCondition = {
+        ownerName: { [Op.like]: `%${searchQuery}%` },
+      };
+    }
+    if (area) {
+      whereCondition = {
+        area: area,
+      };
+    }
+    if (category) {
+      whereCondition = {
+        category: category,
+      };
+    }
     try {
-      const vehicleServices = await VehicleService.findAll({
-        attributes: ["selectCategory", "vehicleNumber", "image"],
-        where: { trash: false },
+      const { count, rows: vehicleServices } =
+        await VehicleService.findAndCountAll({
+          limit,
+          offset,
+          attributes: ["id", "ownerName", "vehicleNumber", "image"],
+          where: whereCondition,
+          include: [
+            {
+              model: Category,
+              as: "taxiCategory",
+              attributes: ["categoryName", "id"],
+            },
+          ],
+          order: [["priority", "ASC"]],
+        });
+      const totalPages = Math.ceil(count / limit);
+      res.status(200).json({
+        success: true,
+        totalPages,
+        currentPage: page,
+        data: vehicleServices,
       });
-      res.status(200).json({ success: true, vehicleServices });
     } catch (error) {
       console.error(error);
       res
@@ -344,6 +470,13 @@ module.exports = {
       const { id } = req.params;
       const vehicleService = await VehicleService.findOne({
         where: { id },
+        include: [
+          {
+            model: Category,
+            as: "taxiCategory",
+            attributes: ["categoryName", "id"],
+          },
+        ],
       });
       if (!vehicleService) {
         return res
@@ -359,12 +492,51 @@ module.exports = {
     }
   },
   getLocalWorkers: async (req, res) => {
-    try {
-      const workers = await Worker.findAll({
-        attributes: ["name", "categories", "image"],
-        where: { trash: false },
+    const searchQuery = req.query.q || "";
+    const area = req.query.area || "";
+    const category = req.query.category || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    let whereCondition = { trash: false };
+    if (searchQuery) {
+      whereCondition = {
+        workerName: { [Op.like]: `%${searchQuery}%` },
+      };
+    }
+    if (area) {
+      whereCondition = {
+        area: area,
+      };
+    }
+    if (category) {
+      const workerCategoryEntries = await WorkerCategory.findAll({
+        where: { categoryId: category },
+        attributes: ["workerId"],
       });
-      res.json({ success: true, workers });
+      const workerIds = workerCategoryEntries.map((entry) => entry.workerId);
+      // If no matching shops for category, return empty result
+      if (workerIds.length === 0) {
+        return res.status(200).json({
+          success: true,
+          totalPages: 0,
+          currentPage: page,
+          data: ["No shops found"],
+        });
+      }
+
+      whereCondition.id = workerIds;
+    }
+    try {
+      const { count, rows: workers } = await Worker.findAndCountAll({
+        limit,
+        offset,
+        attributes: ["id", "workerName", "image"],
+        where: whereCondition,
+        order: [["priority", "ASC"]],
+      });
+      const totalPages = Math.ceil(count / limit);
+      res.json({ success: true, totalPages, currentPage: page, data: workers });
     } catch (error) {
       console.error(error);
       res
@@ -373,6 +545,7 @@ module.exports = {
     }
   },
   getLocalWorkersById: async (req, res) => {
+    
     try {
       const { id } = req.params;
       const worker = await Worker.findOne({

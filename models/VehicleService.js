@@ -1,15 +1,20 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
+const Category = require("./Category");
 
 const VehicleService = sequelize.define(
   "VehicleService",
   {
     ownerName: {
       type: DataTypes.STRING,
-      allowNull:false,
+      allowNull: false,
     },
     category: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
+      references: {
+        model: Category,
+        key: "id",
+      },
     },
     minFee: {
       type: DataTypes.DECIMAL(10, 2),
@@ -19,10 +24,10 @@ const VehicleService = sequelize.define(
       allowNull: false,
     },
     priority: {
-      type: DataTypes.ENUM("A","B","C"),
-      validate:{
-        isIn: [['A', 'B', 'C']]
-      }
+      type: DataTypes.ENUM("A", "B", "C"),
+      validate: {
+        isIn: [["A", "B", "C"]],
+      },
     },
     phone: {
       type: DataTypes.STRING,
@@ -62,5 +67,14 @@ const VehicleService = sequelize.define(
     timestamps: true,
   }
 );
+
+Category.hasMany(VehicleService, {
+  foreignKey: "category",
+  as: "taxiCategory",
+});
+VehicleService.belongsTo(Category, {
+  foreignKey: "category",
+  as: "taxiCategory",
+});
 
 module.exports = VehicleService;
