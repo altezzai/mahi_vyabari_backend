@@ -17,5 +17,7 @@ router.get("/vehicle-services", publicController.getVehicleServices);
 router.get("/vehicle-service/:id", publicController.getVehicleServiceById);
 router.get("/workers",publicController.getLocalWorkers);
 router.get("/worker/:id",publicController.getLocalWorkersById);
+router.get("/classifieds",publicController.getClassifieds);
+router.get("/classified/:id",publicController.getClassifiedById);
 
 module.exports = router;

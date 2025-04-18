@@ -13,11 +13,16 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       category: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
+        references: {
+          model: "categories",
+          key: "id",
+        },
+        onDelete: "CASCADE",
       },
       itemName: {
         type: Sequelize.STRING,
-        allowNull:false
+        allowNull: false,
       },
       price: {
         type: Sequelize.DECIMAL(10, 2),
@@ -26,7 +31,7 @@ module.exports = {
         type: Sequelize.STRING,
       },
       area: {
-         type: Sequelize.ENUM("mahe", "chokli", "palloor", "pandakkal"),
+        type: Sequelize.ENUM("mahe", "chokli", "palloor", "pandakkal"),
       },
       address: {
         type: Sequelize.TEXT,
@@ -35,7 +40,7 @@ module.exports = {
         type: Sequelize.TEXT,
       },
       priority: {
-        type: Sequelize.ENUM("A","B","C"),
+        type: Sequelize.ENUM("A", "B", "C"),
       },
       phone: {
         type: Sequelize.STRING,
@@ -61,7 +66,9 @@ module.exports = {
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        defaultValue: Sequelize.literal(
+          "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+        ),
       },
     });
   },

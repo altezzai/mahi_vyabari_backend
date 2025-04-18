@@ -545,7 +545,6 @@ module.exports = {
     }
   },
   getLocalWorkersById: async (req, res) => {
-    
     try {
       const { id } = req.params;
       const worker = await Worker.findOne({
@@ -565,12 +564,50 @@ module.exports = {
     }
   },
   getClassifieds: async (req, res) => {
+    const searchQuery = req.query.q || "";
+    const area = req.query.area || "";
+    const category = req.query.category || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    let whereCondition = { trash: false };
+    if (searchQuery) {
+      whereCondition = {
+        itemName: { [Op.like]: `%${searchQuery}%` },
+      };
+    }
+    if (area) {
+      whereCondition = {
+        area: area,
+      };
+    }
+    if (category) {
+      whereCondition = {
+        category: category,
+      };
+    }
     try {
-      const classifieds = await Classified.findAll({
+      const { count, rows: classifieds } = await Classified.findAndCountAll({
+        limit,
+        offset,
         attributes: ["itemName", "price", "image"],
-        where: { trash: false },
+        where: whereCondition,
+        include: [
+          {
+            model: Category,
+            as: "itemCategory",
+            attributes: ["id", "categoryName"],
+          },
+        ],
+        order: [["priority", "ASC"]],
       });
-      res.status(200).json({ success: true, classifieds });
+      const totalPages = Math.ceil(count / limit);
+      res.status(200).json({
+        success: true,
+        totalPages,
+        currentPage: page,
+        data: classifieds,
+      });
     } catch (error) {
       console.error(error);
       res
@@ -582,7 +619,12 @@ module.exports = {
     try {
       const { id } = req.params;
       const classified = await Classified.findOne({
-        where: { id, trash: false },
+        where: { id },
+        include:[{
+          model:Category,
+          as:"itemCategory",
+          attributes:["id","categoryName"]
+        }]
       });
       if (!classified) {
         return res

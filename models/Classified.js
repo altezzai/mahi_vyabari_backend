@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
+const Category = require("./Category");
 
 const ItemListing = sequelize.define(
   "Classified",
@@ -8,7 +9,11 @@ const ItemListing = sequelize.define(
       type: DataTypes.INTEGER,
     },
     category: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
+      references:{
+        model:Category,
+        key:"id"
+      }
     },
     itemName: {
       type: DataTypes.STRING,
@@ -67,5 +72,6 @@ const ItemListing = sequelize.define(
     tableName: "classifieds",
   }
 );
-
+Category.hasMany(ItemListing,{foreignKey:"category",as:"itemCategory"})
+ItemListing.belongsTo(Category,{foreignKey:"category",as:"itemCategory"})
 module.exports = ItemListing;
