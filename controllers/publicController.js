@@ -137,21 +137,29 @@ module.exports = {
           "closingTime",
           "workingDays",
           "priority",
-          "areas",
+          "area",
           [
-            Sequelize.fn("AVG", Sequelize.col("Feedbacks.rating")),
+            Sequelize.literal(`(
+              SELECT AVG(rating)
+              FROM feedbacks AS f
+              WHERE f.shopId = Shop.id
+            )`),
             "averageRating",
-          ],
+          ],      
         ],
+        where: { id },
         include: [
           {
             model: Feedback,
             attributes: [],
-            as: "Feedbacks",
+            as: "feedbacks",
+          },
+          {
+            model: Category,
+            attributes: ["id", "categoryName"],
+            through: { attributes: [] },
           },
         ],
-        where: { id, trash: false },
-        group: ["Shop.id"],
       });
       if (!shop) {
         return res
@@ -178,6 +186,7 @@ module.exports = {
     let whereCondition = { trash: false, category: "doctor" };
     if (searchQuery) {
       whereCondition = {
+        ...whereCondition,
         [Op.or]: [
           { name: { [Op.like]: `%${searchQuery}%` } },
           { "$categoryInfo.categoryName$": { [Op.like]: `%${searchQuery}%` } },
@@ -186,6 +195,7 @@ module.exports = {
     }
     if (area) {
       whereCondition = {
+        ...whereCondition,
         area: area,
       };
     }
