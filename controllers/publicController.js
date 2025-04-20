@@ -98,7 +98,7 @@ module.exports = {
       const { count, rows: shops } = await Shop.findAndCountAll({
         limit,
         offset,
-        attributes: ["id", "image", "shopName", "location", "priority", "area"],
+        attributes: ["id", "image", "shopName", "priority", "area","phone"],
         where: whereCondition,
         order: [["priority", "ASC"]],
       });
