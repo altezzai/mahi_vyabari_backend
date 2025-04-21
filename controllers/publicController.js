@@ -82,7 +82,6 @@ module.exports = {
           attributes: ["shopId"],
         });
         const shopIds = shopCategoryEntries.map((entry) => entry.shopId);
-        // If no matching shops for category, return empty result
         if (shopIds.length === 0) {
           return res.status(200).json({
             success: true,
@@ -113,7 +112,7 @@ module.exports = {
       console.error(error);
       res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
