@@ -3,6 +3,7 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const Tourism = require("../models/Tourism");
+const { Op } = require("sequelize");
 
 const uploadPath = path.join(__dirname, "../public/uploads/tourismImages");
 if (!fs.existsSync(uploadPath)) {
@@ -110,7 +111,7 @@ module.exports = {
     let whereCondition = {};
     if (search) {
       whereCondition = {
-        [Op.or]: [{ placeName: { [Op.like]: `%${search}%` } }],
+       placeName: { [Op.like]: `%${search}%` },
       };
     }
     try {
