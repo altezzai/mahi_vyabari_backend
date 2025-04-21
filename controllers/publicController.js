@@ -52,9 +52,7 @@ module.exports = {
       res.json({ success: true, data: shops });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getShops: async (req, res) => {
@@ -97,7 +95,7 @@ module.exports = {
       const { count, rows: shops } = await Shop.findAndCountAll({
         limit,
         offset,
-        attributes: ["id", "image", "shopName", "priority", "area","phone"],
+        attributes: ["id", "image", "shopName", "priority", "area", "phone"],
         where: whereCondition,
         order: [["priority", "ASC"]],
       });
@@ -144,7 +142,7 @@ module.exports = {
               WHERE f.shopId = Shop.id
             )`),
             "averageRating",
-          ],      
+          ],
         ],
         where: { id },
         include: [
@@ -171,9 +169,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getDocters: async (req, res) => {
@@ -222,9 +218,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getDocterById: async (req, res) => {
@@ -251,9 +245,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getBusSchedules: async (req, res) => {
@@ -288,9 +280,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getTrainSchedules: async (req, res) => {
@@ -325,9 +315,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getHospitals: async (req, res) => {
@@ -374,9 +362,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getHospitalsById: async (req, res) => {
@@ -393,9 +379,7 @@ module.exports = {
       res.json({ success: true, hospital });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getEmergencies: async (req, res) => {
@@ -417,9 +401,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getVehicleServices: async (req, res) => {
@@ -470,9 +452,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getVehicleServiceById: async (req, res) => {
@@ -496,9 +476,7 @@ module.exports = {
       res.status(200).json({ success: true, vehicleService });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getLocalWorkers: async (req, res) => {
@@ -549,9 +527,7 @@ module.exports = {
       res.json({ success: true, totalPages, currentPage: page, data: workers });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getLocalWorkersById: async (req, res) => {
@@ -568,9 +544,7 @@ module.exports = {
       res.status(200).json({ success: true, worker });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getClassifieds: async (req, res) => {
@@ -620,9 +594,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getClassifiedById: async (req, res) => {
@@ -646,9 +618,7 @@ module.exports = {
       res.status(200).json({ success: true, classified });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getTourism: async (req, res) => {
@@ -675,7 +645,7 @@ module.exports = {
         .json({ success: true, totalPages, currentPage: page, data: tourism });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ success: true, message: "Internal Server Error" });
+      res.status(500).json({ success: true, message: error.message });
     }
   },
   getTourismById: async (req, res) => {
@@ -690,9 +660,7 @@ module.exports = {
       res.status(200).json({ success: true, data: tourism });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
 };

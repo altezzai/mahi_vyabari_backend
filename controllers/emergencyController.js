@@ -39,7 +39,7 @@ module.exports = {
       console.log(error);
       res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -61,7 +61,7 @@ module.exports = {
             fs.unlinkSync(oldFilePath);
           }
         }
-        newFile = req.file.filename
+        newFile = req.file.filename;
       }
       await emergency.update({
         title: itemName || emergency.itemName,
@@ -78,7 +78,7 @@ module.exports = {
       console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -100,7 +100,7 @@ module.exports = {
       console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -153,9 +153,7 @@ module.exports = {
       return res.status(200).json({ success: true, data: emergencies });
     } catch (error) {
       console.error(error);
-      return res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
   getEmergencyById: async (req, res) => {
@@ -171,9 +169,7 @@ module.exports = {
       return res.status(200).json({ success: true, data: emergency });
     } catch (error) {
       console.error(error);
-      return res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
 };

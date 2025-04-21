@@ -16,7 +16,7 @@ module.exports = {
       console.log(error);
       res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -39,9 +39,7 @@ module.exports = {
       res.status(200).json({ success: true, shopCoupon });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   assignShopCoupon: async (req, res) => {
@@ -54,16 +52,11 @@ module.exports = {
       res.status(200).json({ success: true, shopCoupon });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
-  assignUserCoupon:async(req,res)=>{
+  assignUserCoupon: async (req, res) => {
     try {
-      
-    } catch (error) {
-      
-    }
-  }
+    } catch (error) {}
+  },
 };

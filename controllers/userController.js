@@ -5,11 +5,15 @@ const path = require("path");
 const bcrypt = require("bcrypt");
 const { deletefile, deletefilewithfoldername } = require("../utils/util");
 const createToken = require("../utils/createToken");
-const { hashPassword } = require("../utils/hashData");
+// const { hashPassword } = require("../utils/hashData");
 
 const User = require("../models/User");
 const Feedback = require("../models/Feedback");
 const Complaint = require("../models/Complaint");
+const UserOtp = require("../models/Otp");
+const { sendEmail } = require("../utils/nodemailer");
+const { hashData } = require("../utils/hashData");
+const { where } = require("sequelize");
 
 const uploadPath = path.join(__dirname, "../public/uploads/userImages");
 
@@ -29,21 +33,21 @@ const upload = multer({ storage });
 
 module.exports = {
   upload,
-  createUser: async (req, res) => {
+  registerUser: async (req, res) => {
     try {
-      const { email, password, phone } = req.body;
-      if (!email || !password || !phone) {
-        // await deletefilewithfoldername(uploadPath, req.file.filename);
+      const { userName, email, password, phone } = req.body;
+      if (!userName || !email || !password || !phone) {
+        await deletefilewithfoldername(uploadPath, req.file?.filename);
         res.status(400).json({
           success: false,
-          message: "data is missing for user uploading",
+          message: "Missing Details",
         });
       }
-      const existingUser = await User.findOne({
+      const user = await User.findOne({
         where: { email },
       });
-      if (existingUser) {
-        // await deletefilewithfoldername(uploadPath, req.file.filename);
+      if (user) {
+        await deletefilewithfoldername(uploadPath, req.file?.filename);
         res.status(409).json({
           success: false,
           message: "User is already existing",
@@ -52,9 +56,23 @@ module.exports = {
         const userData = {
           ...req.body,
           image: req.file ? req.file.filename : null,
-          password: await hashPassword(password),
+          password: await hashData(password),
         };
         const savedUser = await User.create(userData);
+        const tokenData = { userId: savedUser.id, email: savedUser.email };
+        const token = await createToken(tokenData);
+        if (!token) {
+          res.status(401).json({
+            success: false,
+            message: "An error occured while creating jwt Token",
+          });
+        }
+        res.cookie("jwt", token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+          maxAge: 1000 * 60 * 60 * 24 * 7,
+        });
         res.status(200).json({
           success: true,
           result: savedUser,
@@ -64,7 +82,7 @@ module.exports = {
       console.log(error);
       res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -72,7 +90,7 @@ module.exports = {
     try {
       const user = await User.findByPk(req.params.id);
       if (!user) {
-        // await deletefilewithfoldername(uploadPath, req.file.filename);
+        await deletefilewithfoldername(uploadPath, req.file?.filename);
         res.status(409).json({
           success: false,
           message: "user not found",
@@ -102,54 +120,61 @@ module.exports = {
         result: user,
       });
     } catch (error) {
-      // await deletefilewithfoldername(uploadPath, req.file.filename);
+      await deletefilewithfoldername(uploadPath, req.file?.filename);
       console.log(error);
       res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
   userLogin: async (req, res) => {
-    const { email, password } = req.body;
-    if (!email || !password) {
+    const { phone, password } = req.body;
+    if (!phone || !password) {
       res.status(409).json({
         success: false,
         message: "email and password is required..!!",
       });
     }
-    const user = await User.findOne({
-      where: { email },
-    });
-    if (!user) {
-      res.status(403).json({
-        success: false,
-        message: "invalid email or email is not registered..!",
+    try {
+      const user = await User.findOne({
+        where: { phone },
       });
-    }
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      res.status(401).json({
-        success: false,
-        message: "invalid password..!",
+      if (!user) {
+        res.status(403).json({
+          success: false,
+          message: "invalid email or email is not registered..!",
+        });
+      }
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        res.status(401).json({
+          success: false,
+          message: "invalid password..!",
+        });
+      }
+      const tokenData = { userId: user.id, email: user.email };
+      const token = await createToken(tokenData);
+      if (!token) {
+        res.status(401).json({
+          success: false,
+          message: "An error occured while creating jwt Token",
+        });
+      }
+      res.cookie("jwt", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+        maxAge: 1000 * 60 * 60 * 24 * 7,
       });
-    }
-    const tokenData = { userId: user._id, email: user.email };
-    const token = await createToken(tokenData);
-    if (!token) {
-      res.status(401).json({
-        success: false,
-        message: "An error occured while creating jwt Token",
+      res.status(200).json({
+        success: true,
+        result: user,
       });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ success: false, message: error.message });
     }
-    res.cookie("jwt", token, {
-      httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-    });
-    res.status(200).json({
-      success: true,
-      result: user,
-    });
   },
   geDashboard: async (req, res) => {
     console.log(req.body);
@@ -162,12 +187,10 @@ module.exports = {
     try {
       const { userId, shopId, rating } = req.body;
       if (!userId || !shopId || !rating) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "User ID, Event ID, and Rating are required!",
-          });
+        return res.status(400).json({
+          success: false,
+          message: "User ID, Event ID, and Rating are required!",
+        });
       }
       const feedback = await Feedback.create({
         userId,
@@ -177,9 +200,7 @@ module.exports = {
       res.status(201).json({ success: true, feedback });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   complaints: async (req, res) => {
@@ -194,9 +215,7 @@ module.exports = {
       res.status(201).json({ success: true, complaint });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getAllComplaints: async (req, res) => {
@@ -205,9 +224,7 @@ module.exports = {
       res.status(200).json({ success: true, complaints });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getComplaintsById: async (req, res) => {
@@ -218,9 +235,7 @@ module.exports = {
       res.status(200).json(complaints);
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   updateComplaints: async (req, res) => {
@@ -236,9 +251,7 @@ module.exports = {
       res.status(200).json({ success: true, complaint });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   deleteComplaints: async (req, res) => {
@@ -253,14 +266,220 @@ module.exports = {
       res.status(200).json({ success: true, complaint });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   Logout: async (req, res) => {
-    req.logout(() => {
-      res.json({ message: "Logged out successfully!" });
-    });
+    try {
+      // req.logout(() => {
+      //   res.json({ message: "Logged out successfully!" });
+      // });
+      res.clearCookie("jwt", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+      });
+      res
+        .status(200)
+        .json({ success: true, message: "Successfully Logged Out" });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ success: true, message: error.message });
+    }
+  },
+  sendVerifyOtp: async (req, res) => {
+    try {
+      const { userId } = req.body;
+      const user = await User.findByPk(userId);
+      if (user.verified) {
+        return res
+          .status(400)
+          .json({ success: false, message: "User already verified" });
+      }
+      const otp = String(Math.floor(100000 + Math.random() * 900000));
+      const userOtp = await UserOtp.create({
+        userId,
+        // otp: await hashData(otp),
+        otp,
+      });
+      const subject = "Email Verification OTP";
+      const message = `
+      <div style="font-family: Arial, sans-serif; padding: 20px;">
+        <h2>OTP Verification</h2>
+        <p>Hello <strong>${user.userName}</strong>,</p>
+        <p>Your OTP code is:</p>
+        <div style="
+          font-size: 24px;
+          font-weight: bold;
+          color: #007bff;
+          padding: 10px 0;
+        ">
+          ${otp}
+        </div>
+        <p>This OTP is valid for 10 minutes.</p>
+        <p>Please Verify Your Email.</p>
+        <br />
+        <p style="font-size: 14px; color: #999;">Mahe Vyapari</p>
+      </div>
+    `;
+      sendEmail(user.email, subject, message);
+      res
+        .status(200)
+        .json({ success: true, message: "Verification OTP Send on Email" });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  verifyAccount: async (req, res) => {
+    const { userId, otp } = req.body;
+    if (!userId || !otp) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Missing Details" });
+    }
+    try {
+      const user = await User.findByPk(userId);
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User Not Found",
+        });
+      }
+      // const isMatch = await bcrypt.compare(password, user.password);
+      const otpEntry = await UserOtp.findOne({
+        where: {
+          userId,
+          otp,
+        },
+      });
+      if (!otpEntry) {
+        return res.status(404).json({
+          success: false,
+          message: "Invalid OTP",
+        });
+      }
+      // if (UserOtp.otp !== otp) {
+      //   res.status(401).json({
+      //     success: false,
+      //     message: "Invalid OTP",
+      //   });
+      // }
+      if (UserOtp.expiresAt < Date.now()) {
+        return res.status(410).json({
+          success: false,
+          message: "OTP Expired",
+        });
+      }
+      user.verified = true;
+      await user.save();
+      await otpEntry.destroy();
+      return res.status(200).json({
+        success: true,
+        message: "User Account Verified Successfully",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  isAuthenticated: async (req, res) => {
+    try {
+      return res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  sendResetOtp: async (req, res) => {
+    const { email } = req.body;
+    if (!email) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Email is Required" });
+    }
+    try {
+      const user = await User.findOne({
+        where: { email },
+      });
+      if (!user) {
+        return res
+          .status(401)
+          .json({ success: false, message: "User Not Found" });
+      }
+      const otp = String(Math.floor(100000 + Math.random() * 900000));
+      await UserOtp.create({
+        userId: user.id,
+        // otp: await hashData(otp),
+        otp,
+      });
+      const subject = "Password Reset OTP";
+      const message = `
+      <div style="font-family: Arial, sans-serif; padding: 20px;">
+        <h2>OTP Verification</h2>
+        <p>Hello <strong>${user.userName}</strong>,</p>
+        <p>Your OTP code is:</p>
+        <div style="
+          font-size: 24px;
+          font-weight: bold;
+          color: #007bff;
+          padding: 10px 0;
+        ">
+          ${otp}
+        </div>
+        <p>This OTP is valid for 10 minutes.</p>
+        <p>Please Verify Your Email.</p>
+        <br />
+        <p style="font-size: 14px; color: #999;">Mahe Vyapari</p>
+      </div>
+    `;
+      sendEmail(user.email, subject, message);
+      return res.status(200).json({
+        success: true,
+        message: "sent password reset OTP to your Email",
+      });
+    } catch (error) {}
+  },
+  resetPassword: async (req, res) => {
+    const { email, otp, newPassword } = req.body;
+    if (!email || !otp || !newPassword) {
+      return res.status(410).json({
+        success: false,
+        message: "Email,OTP and new password are required",
+      });
+    }
+    try {
+      const user = await User.findOne({
+        where: { email },
+      });
+      if (!user) {
+        return res
+          .status(401)
+          .json({ success: false, message: "User Not Found" });
+      }
+      const otpEntry = await UserOtp.findOne({
+        where: {
+          userId: user.id,
+          otp,
+        },
+      });
+      if (!otpEntry) {
+        return res.status(401).json({ success: false, message: "Invalid OTP" });
+      }
+      if (otpEntry.expiresAt < Date.now()) {
+        return res
+          .status(401)
+          .json({ success: false, message: "OTP has expired" });
+      }
+      await user.update({
+        password: await hashData(newPassword),
+      });
+      await otpEntry.destroy();
+      return res
+        .status(200)
+        .json({ success: true, message: "Password Reset Successfully" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
   },
 };

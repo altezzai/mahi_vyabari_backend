@@ -40,12 +40,18 @@ module.exports = {
         result: savedMedicalDirectory,
       });
     } catch (error) {
-      await deletefilewithfoldername(uploadPath,req.files?.image?.[0]?.filename);
-      await deletefilewithfoldername(uploadPath,req.files?.icon?.[0]?.filename);
+      await deletefilewithfoldername(
+        uploadPath,
+        req.files?.image?.[0]?.filename
+      );
+      await deletefilewithfoldername(
+        uploadPath,
+        req.files?.icon?.[0]?.filename
+      );
       console.log(error);
       res.status(401).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -118,12 +124,18 @@ module.exports = {
         data: healthcareProvider,
       });
     } catch (error) {
-      await deletefilewithfoldername(uploadPath,req.files?.image?.[0]?.filename);
-      await deletefilewithfoldername(uploadPath,req.files?.icon?.[0]?.filename);
+      await deletefilewithfoldername(
+        uploadPath,
+        req.files?.image?.[0]?.filename
+      );
+      await deletefilewithfoldername(
+        uploadPath,
+        req.files?.icon?.[0]?.filename
+      );
       console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -145,7 +157,7 @@ module.exports = {
       console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -167,7 +179,7 @@ module.exports = {
       console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -196,7 +208,7 @@ module.exports = {
       console.error(error);
       res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -214,7 +226,7 @@ module.exports = {
       console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -224,7 +236,7 @@ module.exports = {
         where: {
           typeName: "medical",
         },
-        attributes:[],
+        attributes: [],
         include: {
           model: Category,
           attributes: ["id", "categoryName"],
@@ -233,9 +245,7 @@ module.exports = {
       return res.status(200).json({ success: true, data: medicalCategory });
     } catch (error) {
       console.log(error);
-      return res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
 };

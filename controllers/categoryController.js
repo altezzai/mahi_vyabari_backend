@@ -104,9 +104,7 @@ module.exports = {
       });
     } catch (error) {
       console.error("Error deleting category:", error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   restoreCategory: async (req, res) => {
@@ -125,9 +123,7 @@ module.exports = {
       });
     } catch (error) {
       console.error("Error deleting category:", error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getCategories: async (req, res) => {
@@ -157,9 +153,7 @@ module.exports = {
       res.status(200).json({ success: true, categories });
     } catch (error) {
       console.error("Error fetching categories:", error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getCategoryById: async (req, res) => {
@@ -174,7 +168,7 @@ module.exports = {
       res.status(200).json({ success: true, category });
     } catch (error) {
       console.error("Error fetching category:", error);
-      res.status(500).json({ message: "Internal Server Error" });
+      res.status(500).json({ message: error.message });
     }
   },
   addType: async (req, res) => {
@@ -184,9 +178,7 @@ module.exports = {
       res.status(201).json({ success: true, data: newType });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   deleteType: async (req, res) => {
@@ -201,9 +193,7 @@ module.exports = {
       res.json({ success: true, data: type });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   restoreType: async (req, res) => {
@@ -218,9 +208,7 @@ module.exports = {
       res.json({ success: true, data: type });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getTypes: async (req, res) => {
@@ -229,9 +217,7 @@ module.exports = {
       res.json({ success: true, types });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getTypeById: async (req, res) => {
@@ -248,9 +234,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
 };

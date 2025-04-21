@@ -45,7 +45,7 @@ module.exports = {
       console.log(error);
       res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -97,7 +97,7 @@ module.exports = {
       console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -119,7 +119,7 @@ module.exports = {
       console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -141,7 +141,7 @@ module.exports = {
       console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -174,8 +174,7 @@ module.exports = {
       console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error",
-        error,
+        message: error.message,
       });
     }
   },
@@ -193,7 +192,7 @@ module.exports = {
       console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -215,7 +214,7 @@ module.exports = {
       console.log(error);
       res.status(500).json({
         success: false,
-        message: "Intrnal Server Error",
+        message: error.message,
       });
     }
   },
@@ -296,7 +295,7 @@ module.exports = {
       console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -318,7 +317,7 @@ module.exports = {
       console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -340,7 +339,7 @@ module.exports = {
       console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -376,7 +375,7 @@ module.exports = {
       console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -397,7 +396,7 @@ module.exports = {
       console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -418,9 +417,7 @@ module.exports = {
       res.status(200).json({ success: true, vehicleServiceCategories });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
 };

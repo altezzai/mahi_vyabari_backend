@@ -28,9 +28,7 @@ module.exports = {
       return res.status(200).json({ success: true, customers });
     } catch (error) {
       console.log(error);
-      return res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
   getCustomerById: async (req, res) => {
@@ -45,9 +43,7 @@ module.exports = {
       res.status(201).json({ success: true, customer });
     } catch (error) {
       console.log(error);
-      return res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
   addCustomer: async (req, res) => {
@@ -70,14 +66,26 @@ module.exports = {
         email,
         password: await hashPassword(password),
       };
-      sendEmail(email, userName, password);
+      const subject = "Welcome to Mahe Vyapari!";
+      const message = `
+      <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4;">
+        <div style="max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px #ccc;">
+          <h2 style="color: #4CAF50;">Welcome, ${userName} 👋</h2>
+          <p>Your account has been created by the Admin.</p>
+          <p><strong>Login Email:</strong> ${email}</p>
+          <p><strong>Password:</strong><span style="font-weight:900;"> ${password}</span></p>
+          <p>Please login and change your password immediately for security reasons.</p>
+          <br/>
+          <p>Thanks,<br/>Team Mahe Vyapari</p>
+        </div>
+      </div>
+    `;
+      sendEmail(email, subject, message);
       const newCustomer = await Customer.create(userData);
       res.status(200).json({ success: true, newCustomer });
     } catch (error) {
       console.log(error);
-      return res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
   deleteCustomer: async (req, res) => {
@@ -95,9 +103,7 @@ module.exports = {
         .json({ success: true, message: "Customer deleted successfully" });
     } catch (error) {
       console.log(error);
-      return res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
   restoreCustomer: async (req, res) => {
@@ -115,9 +121,7 @@ module.exports = {
         .json({ success: true, message: "Customer restored successfully" });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
 };

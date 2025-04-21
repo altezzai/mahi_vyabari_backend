@@ -46,7 +46,7 @@ module.exports = {
       console.log(error);
       res.status(401).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -63,7 +63,7 @@ module.exports = {
       const { id } = req.params;
       let product = await Product.findByPk(id);
       if (!product) {
-        await deletefilewithfoldername(uploadPath,req.file.filename);
+        await deletefilewithfoldername(uploadPath, req.file.filename);
         return res
           .status(404)
           .json({ success: false, message: "Product not found" });
@@ -90,9 +90,7 @@ module.exports = {
       res.status(200).json({ success: true, product });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getProducts: async (req, res) => {
@@ -133,7 +131,7 @@ module.exports = {
       console.error(error);
       res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -141,14 +139,14 @@ module.exports = {
     try {
       const { id } = req.params;
       const product = await Product.findOne({
-        where:{id},
-        include:[
+        where: { id },
+        include: [
           {
-            model:Shop,
-            attributes:["shopName"],
-            as:"shop"
-          }
-        ]
+            model: Shop,
+            attributes: ["shopName"],
+            as: "shop",
+          },
+        ],
       });
       if (!product) {
         return res
@@ -158,9 +156,7 @@ module.exports = {
       res.status(200).json({ success: true, product });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   deleteProductById: async (req, res) => {
@@ -179,9 +175,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   restoreProductById: async (req, res) => {
@@ -200,9 +194,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getShopName: async (req, res) => {
@@ -226,9 +218,7 @@ module.exports = {
       res.status(200).json({ success: true, shops });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
 };

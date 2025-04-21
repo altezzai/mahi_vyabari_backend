@@ -8,6 +8,7 @@ const cors = require("cors");
 const session = require("express-session");
 const passport = require("passport");
 const helmet = require("helmet");
+const cookieParser = require('cookie-parser');
 const PORT = process.env.PORT || 3000;
 
 const shopRouter = require("./routes/shopRoute");
@@ -38,8 +39,9 @@ app.use(passport.session());
 app.use(bodyparser.json());
 app.use(express.json());
 app.use(bodyparser.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cors({credentials:true}));
 app.use(helmet());
 
 app.use("/api/shop", shopRouter);

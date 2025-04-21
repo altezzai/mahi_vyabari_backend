@@ -2,18 +2,26 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const userController = require("../controllers/userController");
+const userAuth = require("../middleware/auth");
 
 router.post(
-  "/create-user",
+  "/register-user",
   userController.upload.single("image"),
-  userController.createUser
+  userController.registerUser
 );
+router.post("/login-user", userController.userLogin);
+router.post("/logout", userController.Logout);
+router.post("/send-verify-otp",userAuth,userController.sendVerifyOtp);
+router.post("/verify-account",userAuth,userController.verifyAccount);
+router.post("/is-auth",userAuth,userController.isAuthenticated);
+router.post("/send-reset-otp",userController.sendResetOtp);
+router.post("/reset-password",userController.resetPassword);
+
 router.put(
   "/edit-user/:id",
   userController.upload.single("image"),
   userController.editUser
 );
-router.post("/user-login", userController.userLogin);
 router.get(
   "/auth/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
@@ -32,6 +40,5 @@ router.get("/get-complaints", userController.getAllComplaints);
 router.get("/get-complaints/:userId", userController.getComplaintsById);
 router.patch("/update-complaints/:id", userController.updateComplaints);
 router.get("/delete-complaints/:id", userController.deleteComplaints);
-router.get("/logout", userController.Logout);
 
 module.exports = router;

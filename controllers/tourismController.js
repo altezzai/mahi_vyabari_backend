@@ -31,9 +31,7 @@ module.exports = {
       res.status(201).json({ success: true, tourism });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   updateTouristPlace: async (req, res) => {
@@ -71,9 +69,7 @@ module.exports = {
       res.status(200).json({ success: true, updatedTourism });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   deleteTouristPlace: async (req, res) => {
@@ -88,9 +84,7 @@ module.exports = {
       await tourism.update({ trash: true });
       res.status(200).json({ success: true, tourism });
     } catch (error) {
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   restoreTouristPlace: async (req, res) => {
@@ -105,9 +99,7 @@ module.exports = {
       await tourism.update({ trash: false });
       res.status(200).json({ success: true, tourism });
     } catch (error) {
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getTouristPlaces: async (req, res) => {
@@ -132,9 +124,7 @@ module.exports = {
       res.status(200).json({ success: true, tourism });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getTouristPlaceById: async (req, res) => {
@@ -149,9 +139,7 @@ module.exports = {
       res.status(200).json({ success: true, tourism });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
 };

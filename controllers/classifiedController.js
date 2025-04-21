@@ -40,12 +40,18 @@ module.exports = {
         savedShop: savedClassified,
       });
     } catch (error) {
-      await deletefilewithfoldername(uploadPath, req.files?.image?.[0]?.filename);
-      await deletefilewithfoldername(uploadPath, req.files?.icon?.[0]?.filename);
+      await deletefilewithfoldername(
+        uploadPath,
+        req.files?.image?.[0]?.filename
+      );
+      await deletefilewithfoldername(
+        uploadPath,
+        req.files?.icon?.[0]?.filename
+      );
       console.log(error);
       res.status(401).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -66,8 +72,14 @@ module.exports = {
       const { id } = req.params;
       const item = await Classified.findByPk(id);
       if (!item) {
-        await deletefilewithfoldername(uploadPath, req.files?.image?.[0]?.filename);
-        await deletefilewithfoldername(uploadPath, req.files?.icon?.[0]?.filename);
+        await deletefilewithfoldername(
+          uploadPath,
+          req.files?.image?.[0]?.filename
+        );
+        await deletefilewithfoldername(
+          uploadPath,
+          req.files?.icon?.[0]?.filename
+        );
         return res
           .status(404)
           .json({ success: false, message: "Item not found" });
@@ -110,11 +122,15 @@ module.exports = {
       return res.status(200).json({ success: true, item });
     } catch (error) {
       console.log(error);
-      await deletefilewithfoldername(uploadPath, req.files?.image?.[0]?.filename);
-      await deletefilewithfoldername(uploadPath, req.files?.icon?.[0]?.filename);
-      return res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      await deletefilewithfoldername(
+        uploadPath,
+        req.files?.image?.[0]?.filename
+      );
+      await deletefilewithfoldername(
+        uploadPath,
+        req.files?.icon?.[0]?.filename
+      );
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
   deleteClassfied: async (req, res) => {
@@ -148,9 +164,7 @@ module.exports = {
       return res.status(200).json({ success: true, item });
     } catch (error) {
       console.log(error);
-      return res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
   getClassfieds: async (req, res) => {
@@ -169,7 +183,7 @@ module.exports = {
         limit,
         offset,
         where: whereCondition,
-        attributes: ["id","itemName", "category", "priority", "trash"],
+        attributes: ["id", "itemName", "category", "priority", "trash"],
         order: [["createdAt", "DESC"]],
       });
       if (!classifieds) {
@@ -181,9 +195,7 @@ module.exports = {
       return res.status(200).json({ success: true, data: classifieds });
     } catch (error) {
       console.log(error);
-      return res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
   getClassfiedById: async (req, res) => {
@@ -198,9 +210,7 @@ module.exports = {
       return res.status(200).json({ success: true, data: classified });
     } catch (error) {
       console.log(error);
-      return res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
   getClassfiedCategories: async (req, res) => {
@@ -218,7 +228,7 @@ module.exports = {
       console.log(error);
       res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },

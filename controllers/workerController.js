@@ -60,7 +60,7 @@ module.exports = {
       console.log(error);
       res.status(401).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -139,7 +139,7 @@ module.exports = {
       console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -161,7 +161,7 @@ module.exports = {
       console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -183,7 +183,7 @@ module.exports = {
       console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -203,7 +203,7 @@ module.exports = {
         limit,
         offset,
         where: whereCondition,
-        attributes: ["id", "workerName", "priority", "trash"],
+        attributes: ["id", "workerName", "priority", "trash", "createdAt"],
         include: [
           {
             model: Category,
@@ -211,6 +211,7 @@ module.exports = {
             through: { attributes: [] },
           },
         ],
+        order: [["createdAt", "DESC"]],
       });
       if (!workers) {
         return res
@@ -222,7 +223,7 @@ module.exports = {
       console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -240,7 +241,7 @@ module.exports = {
       console.error(error);
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -250,7 +251,7 @@ module.exports = {
         where: {
           typeName: "worker",
         },
-        attributes:[],
+        attributes: [],
         include: {
           model: Category,
           attributes: ["id", "categoryName"],
@@ -259,9 +260,7 @@ module.exports = {
       return res.status(200).json({ success: true, data: workerCategory });
     } catch (error) {
       console.log(error);
-      return res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
 };

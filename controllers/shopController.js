@@ -63,7 +63,7 @@ module.exports = {
       );
       res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: error.message,
       });
     }
   },
@@ -83,7 +83,7 @@ module.exports = {
         limit,
         offset,
         where: whereCondition,
-        attributes: ["id", "shopName", "priority", "trash","createdAt"],
+        attributes: ["id", "shopName", "priority", "trash", "createdAt"],
         include: [
           {
             model: Category,
@@ -96,9 +96,7 @@ module.exports = {
       res.status(200).json({ success: true, data: shops });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getShopById: async (req, res) => {
@@ -121,9 +119,7 @@ module.exports = {
       res.status(200).json({ success: true, data: shop });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   updateShop: async (req, res) => {
@@ -208,9 +204,7 @@ module.exports = {
         req.files?.icon?.[0]?.filename
       );
       console.error(error);
-      return res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
   deleteShop: async (req, res) => {
@@ -229,9 +223,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   restoreShop: async (req, res) => {
@@ -267,9 +259,7 @@ module.exports = {
       res.status(200).json({ success: true, shopCategories });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getShopFeedbacks: async (req, res) => {
@@ -315,9 +305,7 @@ module.exports = {
       res.status(200).json({ success: true, data: shops });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
   getShopComplaints: async (req, res) => {
@@ -357,9 +345,7 @@ module.exports = {
       res.status(200).json({ success: true, data: shops });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
 };
