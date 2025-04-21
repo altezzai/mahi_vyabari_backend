@@ -83,7 +83,7 @@ module.exports = {
         limit,
         offset,
         where: whereCondition,
-        attributes: ["id", "shopName", "priority", "trash"],
+        attributes: ["id", "shopName", "priority", "trash","createdAt"],
         include: [
           {
             model: Category,
