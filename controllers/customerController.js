@@ -1,7 +1,7 @@
 const { Op } = require("sequelize");
 const generatePassowrd = require("generate-password");
 const Customer = require("../models/User");
-const { hashPassword } = require("../utils/hashData");
+const  {hashData}  = require("../utils/hashData");
 const { sendEmail } = require("../utils/nodemailer");
 const { use } = require("passport");
 
@@ -64,7 +64,7 @@ module.exports = {
       const userData = {
         userName,
         email,
-        password: await hashPassword(password),
+        password: await hashData(password),
       };
       const subject = "Welcome to Mahe Vyapari!";
       const message = `
