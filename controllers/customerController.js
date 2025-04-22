@@ -34,7 +34,9 @@ module.exports = {
   getCustomerById: async (req, res) => {
     try {
       const { id } = req.params;
-      const customer = await Customer.findByPk(id);
+      const customer = await Customer.findByPk(id,{
+        attributes:{exclude:["password"]}
+      });
       if (!customer) {
         return res
           .status(404)
