@@ -33,7 +33,7 @@ module.exports = {
       area: {
         type: Sequelize.STRING,
       },
-      coupenCount: {
+      couponCount: {
         type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,

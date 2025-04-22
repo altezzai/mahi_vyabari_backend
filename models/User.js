@@ -42,7 +42,7 @@ const User = sequelize.define(
     area: {
       type: DataTypes.STRING,
     },
-    coupenCount: {
+    couponCount: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
     },

@@ -2,8 +2,8 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const Shop = require("./Shop");
 
-const ShopCoupen = sequelize.define(
-  "ShopCoupen",
+const ShopCoupon = sequelize.define(
+  "ShopCoupon",
   {
     shopId: {
       type: DataTypes.INTEGER,
@@ -38,7 +38,7 @@ const ShopCoupen = sequelize.define(
   }
 );
 
-Shop.hasMany(ShopCoupen,{foreignKey:"shopId",as:"coupen"});
-ShopCoupen.belongsTo(Shop,{foreignKey:"shopId"});
+Shop.hasMany(ShopCoupon,{foreignKey:"shopId",as:"coupen"});
+ShopCoupon.belongsTo(Shop,{foreignKey:"shopId"});
 
-module.exports = ShopCoupen;
+module.exports = ShopCoupon;

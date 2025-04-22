@@ -16,6 +16,7 @@ router.post("/verify-account",userAuth,userController.verifyAccount);
 router.post("/is-auth",userAuth,userController.isAuthenticated);
 router.post("/send-reset-otp",userController.sendResetOtp);
 router.post("/reset-password",userController.resetPassword);
+router.post("/send-login-otp",userController.sendLoginOtp);
 
 router.put(
   "/edit-user/:id",

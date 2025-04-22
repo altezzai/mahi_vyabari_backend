@@ -13,7 +13,8 @@ const Complaint = require("../models/Complaint");
 const UserOtp = require("../models/Otp");
 const { sendEmail } = require("../utils/nodemailer");
 const { hashData } = require("../utils/hashData");
-const { where } = require("sequelize");
+const { where, Op } = require("sequelize");
+const sendSMS = require("../utils/tiwilio");
 
 const uploadPath = path.join(__dirname, "../public/uploads/userImages");
 
@@ -38,7 +39,7 @@ module.exports = {
       const { userName, email, password, phone } = req.body;
       if (!userName || !email || !password || !phone) {
         await deletefilewithfoldername(uploadPath, req.file?.filename);
-        res.status(400).json({
+        return res.status(400).json({
           success: false,
           message: "Missing Details",
         });
@@ -48,7 +49,7 @@ module.exports = {
       });
       if (user) {
         await deletefilewithfoldername(uploadPath, req.file?.filename);
-        res.status(409).json({
+        return res.status(409).json({
           success: false,
           message: "User is already existing",
         });
@@ -62,7 +63,7 @@ module.exports = {
         const tokenData = { userId: savedUser.id, email: savedUser.email };
         const token = await createToken(tokenData);
         if (!token) {
-          res.status(401).json({
+          return res.status(401).json({
             success: false,
             message: "An error occured while creating jwt Token",
           });
@@ -73,14 +74,14 @@ module.exports = {
           sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
           maxAge: 1000 * 60 * 60 * 24 * 7,
         });
-        res.status(200).json({
+        return res.status(200).json({
           success: true,
           result: savedUser,
         });
       }
     } catch (error) {
       console.log(error);
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: error.message,
       });
@@ -129,8 +130,8 @@ module.exports = {
     }
   },
   userLogin: async (req, res) => {
-    const { phone, password } = req.body;
-    if (!phone || !password) {
+    const { userId, password, verificationMethod, otp } = req.body;
+    if (!(userId && password) && !(userId && otp)) {
       res.status(409).json({
         success: false,
         message: "email and password is required..!!",
@@ -138,39 +139,89 @@ module.exports = {
     }
     try {
       const user = await User.findOne({
-        where: { phone },
+        where: {
+          [Op.or]: [
+            {
+              email: userId,
+            },
+            {
+              phone: userId,
+            },
+          ],
+        },
       });
+
       if (!user) {
         res.status(403).json({
           success: false,
-          message: "invalid email or email is not registered..!",
+          message: "invalid email or phone, or account is not registered..!",
         });
       }
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        res.status(401).json({
-          success: false,
-          message: "invalid password..!",
+      if (verificationMethod === "password") {
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+          res.status(401).json({
+            success: false,
+            message: "invalid password..!",
+          });
+        }
+        const tokenData = { userId: user.id, email: user.email };
+        const token = await createToken(tokenData);
+        if (!token) {
+          res.status(401).json({
+            success: false,
+            message: "An error occured while creating jwt Token",
+          });
+        }
+        res.cookie("jwt", token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+          maxAge: 1000 * 60 * 60 * 24 * 7,
+        });
+        res.status(200).json({
+          success: true,
+          result: user,
+        });
+      } else {
+        const otpEntry = await UserOtp.findOne({
+          where: {
+            userId: user.id,
+            loginOTP: otp,
+          },
+        });
+        if (!otpEntry) {
+          return res.status(404).json({
+            success: false,
+            message: "Invalid OTP",
+          });
+        }
+        if (otpEntry.expiresAt < Date.now()) {
+          return res.status(410).json({
+            success: false,
+            message: "OTP Expired",
+          });
+        }
+        const tokenData = { userId: user.id, email: user.email };
+        const token = await createToken(tokenData);
+        if (!token) {
+          res.status(401).json({
+            success: false,
+            message: "An error occured while creating jwt Token",
+          });
+        }
+        res.cookie("jwt", token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+          maxAge: 1000 * 60 * 60 * 24 * 7,
+        });
+        await otpEntry.destroy();
+        res.status(200).json({
+          success: true,
+          result: user,
         });
       }
-      const tokenData = { userId: user.id, email: user.email };
-      const token = await createToken(tokenData);
-      if (!token) {
-        res.status(401).json({
-          success: false,
-          message: "An error occured while creating jwt Token",
-        });
-      }
-      res.cookie("jwt", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-        maxAge: 1000 * 60 * 60 * 24 * 7,
-      });
-      res.status(200).json({
-        success: true,
-        result: user,
-      });
     } catch (error) {
       console.log(error);
       res.status(500).json({ success: false, message: error.message });
@@ -271,9 +322,6 @@ module.exports = {
   },
   Logout: async (req, res) => {
     try {
-      // req.logout(() => {
-      //   res.json({ message: "Logged out successfully!" });
-      // });
       res.clearCookie("jwt", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
@@ -296,11 +344,13 @@ module.exports = {
           .status(400)
           .json({ success: false, message: "User already verified" });
       }
-      const otp = String(Math.floor(100000 + Math.random() * 900000));
-      const userOtp = await UserOtp.create({
+      const verificationOTP = String(
+        Math.floor(100000 + Math.random() * 900000)
+      );
+      await UserOtp.create({
         userId,
         // otp: await hashData(otp),
-        otp,
+        verificationOTP,
       });
       const subject = "Email Verification OTP";
       const message = `
@@ -314,7 +364,7 @@ module.exports = {
           color: #007bff;
           padding: 10px 0;
         ">
-          ${otp}
+          ${verificationOTP}
         </div>
         <p>This OTP is valid for 10 minutes.</p>
         <p>Please Verify Your Email.</p>
@@ -322,7 +372,7 @@ module.exports = {
         <p style="font-size: 14px; color: #999;">Mahe Vyapari</p>
       </div>
     `;
-      sendEmail(user.email, subject, message);
+      await sendEmail(user.email, subject, message);
       res
         .status(200)
         .json({ success: true, message: "Verification OTP Send on Email" });
@@ -332,8 +382,8 @@ module.exports = {
     }
   },
   verifyAccount: async (req, res) => {
-    const { userId, otp } = req.body;
-    if (!userId || !otp) {
+    const { userId, verificationOTP } = req.body;
+    if (!userId || !verificationOTP) {
       return res
         .status(404)
         .json({ success: false, message: "Missing Details" });
@@ -350,7 +400,7 @@ module.exports = {
       const otpEntry = await UserOtp.findOne({
         where: {
           userId,
-          otp,
+          verificationOTP,
         },
       });
       if (!otpEntry) {
@@ -359,12 +409,6 @@ module.exports = {
           message: "Invalid OTP",
         });
       }
-      // if (UserOtp.otp !== otp) {
-      //   res.status(401).json({
-      //     success: false,
-      //     message: "Invalid OTP",
-      //   });
-      // }
       if (UserOtp.expiresAt < Date.now()) {
         return res.status(410).json({
           success: false,
@@ -406,11 +450,11 @@ module.exports = {
           .status(401)
           .json({ success: false, message: "User Not Found" });
       }
-      const otp = String(Math.floor(100000 + Math.random() * 900000));
+      const resetOTP = String(Math.floor(100000 + Math.random() * 900000));
       await UserOtp.create({
         userId: user.id,
         // otp: await hashData(otp),
-        otp,
+        resetOTP,
       });
       const subject = "Password Reset OTP";
       const message = `
@@ -424,7 +468,7 @@ module.exports = {
           color: #007bff;
           padding: 10px 0;
         ">
-          ${otp}
+          ${resetOTP}
         </div>
         <p>This OTP is valid for 10 minutes.</p>
         <p>Please Verify Your Email.</p>
@@ -432,16 +476,19 @@ module.exports = {
         <p style="font-size: 14px; color: #999;">Mahe Vyapari</p>
       </div>
     `;
-      sendEmail(user.email, subject, message);
+      await sendEmail(user.email, subject, message);
       return res.status(200).json({
         success: true,
         message: "sent password reset OTP to your Email",
       });
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
   },
   resetPassword: async (req, res) => {
-    const { email, otp, newPassword } = req.body;
-    if (!email || !otp || !newPassword) {
+    const { email, resetOTP, newPassword } = req.body;
+    if (!email || !resetOTP || !newPassword) {
       return res.status(410).json({
         success: false,
         message: "Email,OTP and new password are required",
@@ -459,7 +506,7 @@ module.exports = {
       const otpEntry = await UserOtp.findOne({
         where: {
           userId: user.id,
-          otp,
+          resetOTP,
         },
       });
       if (!otpEntry) {
@@ -477,6 +524,70 @@ module.exports = {
       return res
         .status(200)
         .json({ success: true, message: "Password Reset Successfully" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  sendLoginOtp: async (req, res) => {
+    const { userId } = req.body;
+    if (!userId) {
+      return res.status(404).json({
+        success: false,
+        message: "Email is Required or phone is required",
+      });
+    }
+    try {
+      const user = await User.findOne({
+        where: { [Op.or]: [{ email: userId }, { phone: userId }] },
+      });
+      if (!user) {
+        return res
+          .status(401)
+          .json({ success: false, message: "User Not Found" });
+      }
+      const loginOTP = String(Math.floor(100000 + Math.random() * 900000));
+      await UserOtp.create({
+        userId: user.id,
+        // otp: await hashData(otp),
+        loginOTP,
+      });
+      const isValidPhone = (userId) =>
+        /^(\+91[\-\s]?)?[6-9]\d{9}$/.test(userId);
+      console.log(isValidPhone())
+      const subject = "Login OTP";
+      const message = `
+        <div style="font-family: Arial, sans-serif; padding: 20px;">
+          <h2>OTP Verification</h2>
+          <p>Hello <strong>${user.userName}</strong>,</p>
+          <p>Your OTP code is:</p>
+          <div style="
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+            padding: 10px 0;
+          ">
+            ${loginOTP}
+          </div>
+          <p>This OTP is valid for 10 minutes.</p>
+          <p>Please Verify Your account.</p>
+          <br />
+          <p style="font-size: 14px; color: #999;">Mahe Vyapari</p>
+        </div>
+      `;
+      if (!isValidPhone(userId)) {
+        await sendEmail(user.email, subject, message);
+        return res.status(200).json({
+          success: true,
+          message: "sent Login OTP to your Email",
+        });
+      } else {
+        await sendSMS(userId, `Your Login OTP is ${loginOTP}`);
+        return res.status(200).json({
+          success: true,
+          message: "sent Login OTP to your Phone",
+        });
+      }
     } catch (error) {
       console.log(error);
       return res.status(500).json({ success: false, message: error.message });

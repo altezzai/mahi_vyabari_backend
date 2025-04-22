@@ -13,22 +13,29 @@ const OTP = sequelize.define(
         key: "id",
       },
     },
-    otp: {
+  verificationOTP: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
-    expiresAt: {
+    verificationOTPexpires: {
       type: DataTypes.DATE,
-      allowNull: false,
       defaultValue: () => new Date(Date.now() + 10 * 60 * 1000),
     },
+    resetOTP:{
+      type:DataTypes.STRING,
+    },
+    resetOTPExpires:{
+      type: DataTypes.DATE,
+      defaultValue: () => new Date(Date.now() + 10 * 60 * 1000),
+    },
+    loginOTP:{
+      type:DataTypes.STRING,
+    },
+    loginOTPExpires:{
+      type: DataTypes.DATE,
+      defaultValue: () => new Date(Date.now() + 10 * 60 * 1000),
+    }
   },
   {
-    indexes: [
-      {
-        fields: ["expiresAt"],
-      },
-    ],
     timestamps: true,
     tableName: "otps",
   }

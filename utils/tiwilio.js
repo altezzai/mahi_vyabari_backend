@@ -6,9 +6,9 @@ const twilioClient = twilio(accountSid, authToken);
 const sendSMS = async (to, message) => {
   try {
     const sms = await twilioClient.messages.create({
+      body: message,
       from: process.env.PHONE_NUMBER,
       to,
-      body: message,
     });
     console.log(`Message sent to ${to} with SID: ${sms.sid}`);
   } catch (error) {

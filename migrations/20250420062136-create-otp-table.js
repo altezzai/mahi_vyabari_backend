@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('otps', {
+    await queryInterface.createTable("otps", {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -13,39 +13,43 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'users', // Make sure this matches your users table
-          key: 'id',
+          model: "users",
+          key: "id",
         },
-        onDelete: 'CASCADE',
+        onDelete: "CASCADE",
       },
-      otp: {
+      verificationOTP: {
         type: Sequelize.STRING,
-        allowNull: false,
       },
-      expiresAt: {
+      verificationOTPExpires: {
         type: Sequelize.DATE,
-        allowNull: false,
       },
-      used: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
+      resetOTP: {
+        type: Sequelize.STRING,
+      },
+      resetOTPExpires: {
+        type: Sequelize.DATE,
+      },
+      loginOTP: {
+        type: Sequelize.STRING,
+      },
+      loginOTPExpires: {
+        type: Sequelize.DATE,
       },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
     });
-
-    await queryInterface.addIndex('otps', ['expiresAt']);
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('otps');
+    await queryInterface.dropTable("otps");
   },
 };

@@ -115,7 +115,7 @@ module.exports = {
       };
     }
     try {
-      const tourism = await Tourism.findAndCountAll({
+      const tourism = await Tourism.findAndCuntAll({
         limit,
         offset,
         where: whereCondition,
@@ -125,7 +125,7 @@ module.exports = {
       res.status(200).json({ success: true, tourism });
     } catch (error) {
       console.log(error);
-      res.status(500).json({ success: false, message: error.message });
+      res.status(500).json({ success: false, message: error.message,name:error.name });
     }
   },
   getTouristPlaceById: async (req, res) => {
