@@ -4,6 +4,7 @@ const UserCoupon = require("../models/userCoupon");
 const sequelize = require("../config/database");
 const { Op } = require("sequelize");
 const User = require("../models/User");
+const Tourism = require("../models/Tourism");
 
 module.exports = {
   requestCoupen: async (req, res) => {
@@ -56,7 +57,7 @@ module.exports = {
     }
   },
   assignShopCoupon: async (req, res) => {
-    const { assignedCount ,shopId } = req.body;
+    const { assignedCount, shopId } = req.body;
     try {
       const lastAssigned = await ShopCoupon.findOne({
         order: [["couponIdTo", "DESC"]],
@@ -92,12 +93,10 @@ module.exports = {
       });
 
       if (!shopBatches.length) {
-        return res
-          .status(404)
-          .json({
-            success: false,
-            message: "No assigned coupon batches for this shop",
-          });
+        return res.status(404).json({
+          success: false,
+          message: "No assigned coupon batches for this shop",
+        });
       }
 
       let remaining = assignedCount;
@@ -136,31 +135,27 @@ module.exports = {
         remaining -= countFromThisBatch;
       }
       if (remaining > 0) {
-        return res
-          .status(404)
-          .json({
-            success: false,
-            message: "Not enough coupons available to fulfill the request",
-          });
+        return res.status(404).json({
+          success: false,
+          message: "Not enough coupons available to fulfill the request",
+        });
       }
       for (const data of assignments) {
         await UserCoupon.create(data, { transaction: t });
       }
       const totalAssigned = await UserCoupon.sum("assignedCount", {
         where: { userId },
-        transaction: t
+        transaction: t,
       });
       await User.update(
         { couponCount: totalAssigned },
         { where: { id: userId }, transaction: t }
       );
       await t.commit();
-      return res
-        .status(200)
-        .json({
-          success: true,
-          message: "Coupons successfully assigned to user",
-        });
+      return res.status(200).json({
+        success: true,
+        message: "Coupons successfully assigned to user",
+      });
     } catch (error) {
       await t.rollback();
       console.error(error);
@@ -207,11 +202,28 @@ module.exports = {
       return res.status(500).json({ success: false, message: error.message });
     }
   },
-  getCouponHistory:async(req,res)=>{
+  getCouponHistory: async (req, res) => {
     try {
-
+      const userCoupon = await UserCoupon.findAndCountAll({
+        attributes:["id","couponIdFrom","couponIdTo","assignedCount"],
+        include: [
+          {
+            model: Shop,
+            as: "shop",
+            attributes: ["id", "shopName"],
+          },
+          {
+            model: User,
+            as: "user",
+            attributes: ["id", "userName"],
+          },
+        ],
+        order: [["createdAt", "DESC"]],
+      });
+      res.status(200).json({ success: true, userCoupon });
     } catch (error) {
-      
+      console.log(error);
+      res.status(500).json({ success: false, message: error.message });
     }
-  }
+  },
 };

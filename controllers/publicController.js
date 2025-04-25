@@ -11,6 +11,7 @@ const WorkerCategory = require("../models/WorkerCategory");
 const Tourism = require("../models/Tourism");
 const { Sequelize, where, Op } = require("sequelize");
 const Category = require("../models/Category");
+const Product = require("../models/Product");
 
 module.exports = {
   homePage: async (req, res) => {
@@ -49,7 +50,12 @@ module.exports = {
         order: [[Sequelize.literal("averageRating"), "DESC"]],
         subQuery: false,
       });
-      res.json({ success: true, data: shops });
+      const tourism = await Tourism.findAll({
+        limit: 4,
+        attributes: ["id", "placeName", "image", "area"],
+        order: [["createdAt", "DESC"]],
+      });
+      res.json({ success: true, shops: shops, tourism: tourism });
     } catch (error) {
       console.log(error);
       res.status(500).json({ success: false, message: error.message });
@@ -97,6 +103,19 @@ module.exports = {
         offset,
         attributes: ["id", "image", "shopName", "priority", "area", "phone"],
         where: whereCondition,
+        include: [
+          {
+            model: Product,
+            as: "products",
+            attributes: [
+              "id",
+              "productName",
+              "image",
+              "originalPrice",
+              "offerPercentage",
+            ],
+          },
+        ],
         order: [["priority", "ASC"]],
       });
       const totalPages = Math.ceil(count / limit);

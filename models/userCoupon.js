@@ -41,7 +41,9 @@ const UserCoupen = sequelize.define(
   }
 );
 
-User.hasMany(UserCoupen, { foreignKey: "userId", as: "coupon" });
+User.hasMany(UserCoupen, { foreignKey: "userId", as: "coupons" });
 UserCoupen.belongsTo(User, { foreignKey: "userId", as: "user" });
+Shop.hasMany(UserCoupen, { foreignKey: "shopId", as: "coupons" });
+UserCoupen.belongsTo(Shop, { foreignKey: "shopId", as: "shop" });
 
 module.exports = UserCoupen;
