@@ -14,7 +14,7 @@ module.exports = {
         allowNull: false,
       },
       images: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT
       },
       phone: {
         type: Sequelize.STRING,

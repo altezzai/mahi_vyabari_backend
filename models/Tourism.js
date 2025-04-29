@@ -9,7 +9,14 @@ const Tourism = sequelize.define(
       allowNull: false,
     },
     images: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
+      get() {
+        const rawValue = this.getDataValue('images');
+        return rawValue ? JSON.parse(rawValue) : [];
+      },
+      set(value) {
+        this.setDataValue('images', JSON.stringify(value));
+      }
     },
     phone: {
       type: DataTypes.STRING,

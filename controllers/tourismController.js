@@ -26,7 +26,7 @@ module.exports = {
     try {
       const tourismData = {
         ...req.body,
-        images: JSON.stringify(req.files.map((file) => file.filename)),
+        images:req.files.map((file)=>file.filename)
       };
       const tourism = await Tourism.create(tourismData);
       res.status(201).json({ success: true, tourism });
