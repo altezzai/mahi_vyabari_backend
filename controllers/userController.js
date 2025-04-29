@@ -227,7 +227,7 @@ module.exports = {
       res.status(500).json({ success: false, message: error.message });
     }
   },
-  geDashboard: async (req, res) => {
+  getDashboard: async (req, res) => {
     console.log(req.body);
     res.status(200).json({
       success: true,
@@ -240,7 +240,20 @@ module.exports = {
       if (!userId || !shopId || !rating) {
         return res.status(400).json({
           success: false,
-          message: "User ID, Event ID, and Rating are required!",
+          message: "User ID, Shop ID, and Rating are required!",
+        });
+      }
+      const existingFeedback = await Feedback.findOne({
+        where: { userId, shopId },
+      });
+    
+      if (existingFeedback) {
+        existingFeedback.rating = rating;
+        await existingFeedback.save();
+        return res.status(200).json({
+          success: true,
+          message: "Rating updated successfully",
+          feedback: existingFeedback,
         });
       }
       const feedback = await Feedback.create({
@@ -248,7 +261,7 @@ module.exports = {
         shopId,
         rating,
       });
-      res.status(201).json({ success: true, feedback });
+      res.status(201).json({ success: true, message: "Rating submitted", feedback });
     } catch (error) {
       console.error(error);
       res.status(500).json({ success: false, message: error.message });

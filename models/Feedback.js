@@ -41,6 +41,12 @@ const Feedback = sequelize.define(
   {
     tableName: "feedbacks",
     timestamps: true,
+    indexes:[
+      {
+        unique:true,
+        fields:["userId","shopId"]
+      }
+    ]
   }
 );
 

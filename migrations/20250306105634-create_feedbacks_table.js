@@ -1,50 +1,54 @@
-"use strict";
+'use strict';
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("feedbacks", {
+    await queryInterface.createTable('feedbacks', {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true,
-        allowNull: false,
       },
       userId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: "users", 
-          key: "id",
+          model: 'users', 
+          key: 'id',
         },
-        onDelete: "CASCADE",
+        onDelete: 'CASCADE',
       },
       shopId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: "shops",
-          key: "id",
+          model: 'shops',
+          key: 'id',
         },
-        onDelete: "CASCADE",
+        onDelete: 'CASCADE',
       },
       rating: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
       createdAt: {
-        type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
       updatedAt: {
-        type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
+    });
+    await queryInterface.addConstraint('feedbacks', {
+      fields: ['userId', 'shopId'],
+      type: 'unique',
+      name: 'unique_user_shop_feedback', 
     });
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable("feedbacks");
-  },
+    await queryInterface.dropTable('feedbacks');
+  }
 };

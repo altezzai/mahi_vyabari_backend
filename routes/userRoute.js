@@ -34,7 +34,7 @@ router.get(
     failureRedirect: "/login",
   })
 );
-router.get("/dashboard", userController.geDashboard);
+router.get("/dashboard", userController.getDashboard);
 router.post("/feedback", userController.feedback);
 router.post("/create-complaints", userController.complaints);
 router.get("/get-complaints", userController.getAllComplaints);
