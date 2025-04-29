@@ -103,19 +103,6 @@ module.exports = {
         offset,
         attributes: ["id", "image", "shopName", "priority", "area", "phone"],
         where: whereCondition,
-        include: [
-          {
-            model: Product,
-            as: "products",
-            attributes: [
-              "id",
-              "productName",
-              "image",
-              "originalPrice",
-              "offerPercentage",
-            ],
-          },
-        ],
         order: [["priority", "ASC"]],
       });
       const totalPages = Math.ceil(count / limit);
@@ -175,8 +162,20 @@ module.exports = {
             attributes: ["id", "categoryName"],
             through: { attributes: [] },
           },
+          {
+            model: Product,
+            as: "products",
+            attributes: [
+              "id",
+              "productName",
+              "image",
+              "originalPrice",
+              "offerPercentage",
+            ],
+          },
         ],
       });
+      
       if (!shop) {
         return res
           .status(404)
