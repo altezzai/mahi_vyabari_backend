@@ -29,10 +29,6 @@ const Complaint = sequelize.define(
       },
       onDelete: "CASCADE",
     },
-    title: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     description: {
       type: DataTypes.TEXT,
     },

@@ -6,6 +6,7 @@ const publicController = require("../controllers/publicController");
 router.get("/", publicController.homePage);
 router.get("/shops", publicController.getShops);
 router.get("/shop/:id", publicController.getShopById);
+router.get("/product/:id",publicController.getProductById)
 router.get("/docters", publicController.getDocters);
 router.get("/docter/:id", publicController.getDocterById);
 router.get("/busSchedule", publicController.getBusSchedules);

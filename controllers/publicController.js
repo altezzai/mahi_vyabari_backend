@@ -171,11 +171,12 @@ module.exports = {
               "image",
               "originalPrice",
               "offerPercentage",
+              "offerPrice",
             ],
           },
         ],
       });
-      
+
       if (!shop) {
         return res
           .status(404)
@@ -189,6 +190,52 @@ module.exports = {
       console.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
+  },
+  getProductById: async (req, res) => {
+    const { id } = req.params;
+    try {
+      const product = await Product.findByPk(id, {
+        attributes: [
+          "id",
+          "image",
+          "productName",
+          "originalPrice",
+          "offerPrice",
+          "description",
+        ],
+        include: [
+          {
+            model: Shop,
+            as: "shop",
+            attributes: [
+              "id",
+              "icon",
+              "shopName",
+              "phone",
+              "whatsapp",
+              "website",
+              "location",
+            ],
+            include: [
+              {
+                model: Category,
+                attributes: ["id", "categoryName"],
+                through: { attributes: [] },
+              },
+            ],
+          },
+        ],
+      });
+      if (!product) {
+        res
+          .status(400)
+          .json({ success: false, message: "Product is not found" });
+      }
+      res.status(200).json({
+        success: true,
+        product,
+      });
+    } catch (error) {}
   },
   getDocters: async (req, res) => {
     const searchQuery = req.query.q || "";
