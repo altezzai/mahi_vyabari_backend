@@ -115,7 +115,7 @@ module.exports = {
       };
     }
     try {
-      const tourism = await Tourism.findAndCuntAll({
+      const tourism = await Tourism.findAndCountAll({
         limit,
         offset,
         where: whereCondition,
