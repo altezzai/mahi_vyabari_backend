@@ -10,16 +10,23 @@ const WorkerProfile = sequelize.define(
       },
     },
     categories: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
+      get() {
+        const rawValue = this.getDataValue("categories");
+        return rawValue ? JSON.parse(rawValue) : [];
+      },
+      set(value) {
+        this.setDataValue("images", JSON.stringify(value));
+      },
     },
     minWage: {
       type: DataTypes.DECIMAL(10, 2),
     },
     priority: {
-      type: DataTypes.ENUM("A","B","C"),
-      validate:{
-        isIn:[["A","B","C"]],
-      }
+      type: DataTypes.ENUM("A", "B", "C"),
+      validate: {
+        isIn: [["A", "B", "C"]],
+      },
     },
     area: {
       type: DataTypes.ENUM("mahe", "chokli", "palloor", "pandakkal"),

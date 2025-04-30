@@ -20,6 +20,16 @@ const Shop = sequelize.define(
     categories: {
       type: DataTypes.STRING,
     },
+    categories: {
+      type: DataTypes.TEXT,
+      get() {
+        const rawValue = this.getDataValue("categories");
+        return rawValue ? JSON.parse(rawValue) : [];
+      },
+      set(value) {
+        this.setDataValue("images", JSON.stringify(value));
+      },
+    },
     email: {
       type: DataTypes.STRING,
       validate: {
@@ -53,13 +63,13 @@ const Shop = sequelize.define(
       type: DataTypes.STRING,
     },
     workingDays: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
     },
     priority: {
-      type: DataTypes.ENUM("A","B","C"),
-      validate:{
-        isIn:[["A","B","C"]]
-      }
+      type: DataTypes.ENUM("A", "B", "C"),
+      validate: {
+        isIn: [["A", "B", "C"]],
+      },
     },
     area: {
       type: DataTypes.ENUM("mahe", "chokli", "palloor", "pandakkal"),
@@ -74,7 +84,7 @@ const Shop = sequelize.define(
   },
   {
     tableName: "shops",
-    timestamps:true
+    timestamps: true,
   }
 );
 
