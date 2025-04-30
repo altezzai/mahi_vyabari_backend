@@ -418,6 +418,7 @@ module.exports = {
     let whereCondition = { trash: false, category: "hospital" };
     if (searchQuery) {
       whereCondition = {
+        ...whereCondition,
         [Op.or]: [
           { name: { [Op.like]: `%${searchQuery}%` } },
           { "$categoryInfo.categoryName$": { [Op.like]: `%${searchQuery}%` } },
@@ -426,6 +427,7 @@ module.exports = {
     }
     if (area) {
       whereCondition = {
+        ...whereCondition,
         area: area,
       };
     }

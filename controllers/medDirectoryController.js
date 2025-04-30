@@ -107,8 +107,7 @@ module.exports = {
         category: category || healthcareProvider.category,
         name: name || healthcareProvider.name,
         phone: phone || healthcareProvider.phone,
-        subcategory:
-          subcategory || healthcareProvider.subcategory,
+        subcategory: subcategory || healthcareProvider.subcategory,
         whatsapp: whatsapp || healthcareProvider.whatsapp,
         website: website || healthcareProvider.website,
         location: location || healthcareProvider.location,
