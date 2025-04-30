@@ -72,6 +72,7 @@ module.exports = {
       priority,
       area,
     } = req.body;
+    console.log(req.body);
     try {
       const { id } = req.params;
       const healthcareProvider = await Medical.findByPk(id);
@@ -103,10 +104,10 @@ module.exports = {
       await healthcareProvider.update({
         image: newImage,
         icon: newIcon,
-        searchCategory: category || healthcareProvider.category,
+        category: category || healthcareProvider.category,
         name: name || healthcareProvider.name,
         phone: phone || healthcareProvider.phone,
-        searchSubcategory:
+        subcategory:
           subcategory || healthcareProvider.subcategory,
         whatsapp: whatsapp || healthcareProvider.whatsapp,
         website: website || healthcareProvider.website,
