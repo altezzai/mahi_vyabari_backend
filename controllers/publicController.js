@@ -101,8 +101,24 @@ module.exports = {
       const { count, rows: shops } = await Shop.findAndCountAll({
         limit,
         offset,
-        attributes: ["id", "image", "shopName", "priority", "area", "phone"],
+        attributes: [
+          "id",
+          "image",
+          "shopName",
+          "priority",
+          "area",
+          "phone",
+          "openingTime",
+          "closingTime",
+        ],
         where: whereCondition,
+        include: [
+          {
+            model: Category,
+            attributes: ["id", "categoryName"],
+            through: { attributes: [] },
+          },
+        ],
         order: [["priority", "ASC"]],
       });
       const totalPages = Math.ceil(count / limit);
@@ -263,7 +279,17 @@ module.exports = {
       const { count, rows: doctors } = await Medical.findAndCountAll({
         limit,
         offset,
-        attributes: ["id", "name", "image", "category", "trash", "area"],
+        attributes: [
+          "id",
+          "name",
+          "image",
+          "category",
+          "trash",
+          "area",
+          "openingTime",
+          "closingTime",
+          "phone",
+        ],
         where: whereCondition,
         include: [
           {

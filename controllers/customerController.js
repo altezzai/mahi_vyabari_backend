@@ -1,7 +1,7 @@
 const { Op } = require("sequelize");
 const generatePassowrd = require("generate-password");
 const Customer = require("../models/User");
-const  {hashData}  = require("../utils/hashData");
+const { hashData } = require("../utils/hashData");
 const { sendEmail } = require("../utils/nodemailer");
 const { use } = require("passport");
 
@@ -22,7 +22,14 @@ module.exports = {
         limit,
         offset,
         where: whereCondition,
-        attributes: ["id", "userName", "coupenCount", "trash", "status"],
+        attributes: [
+          "id",
+          "userName",
+          "phone",
+          "couponCount",
+          "trash",
+          "status",
+        ],
         order: [["createdAt", "DESC"]],
       });
       return res.status(200).json({ success: true, customers });
@@ -34,8 +41,8 @@ module.exports = {
   getCustomerById: async (req, res) => {
     try {
       const { id } = req.params;
-      const customer = await Customer.findByPk(id,{
-        attributes:{exclude:["password"]}
+      const customer = await Customer.findByPk(id, {
+        attributes: { exclude: ["password"] },
       });
       if (!customer) {
         return res
