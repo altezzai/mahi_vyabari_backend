@@ -57,10 +57,10 @@ module.exports = {
   },
   updateMedicalDirectory: async (req, res) => {
     const {
-      searchCategory,
+      category,
       name,
       phone,
-      searchSubcategory,
+      subcategory,
       whatsapp,
       website,
       location,
@@ -103,11 +103,11 @@ module.exports = {
       await healthcareProvider.update({
         image: newImage,
         icon: newIcon,
-        searchCategory: searchCategory || healthcareProvider.searchCategory,
+        searchCategory: category || healthcareProvider.category,
         name: name || healthcareProvider.name,
         phone: phone || healthcareProvider.phone,
         searchSubcategory:
-          searchSubcategory || healthcareProvider.searchSubcategory,
+          subcategory || healthcareProvider.subcategory,
         whatsapp: whatsapp || healthcareProvider.whatsapp,
         website: website || healthcareProvider.website,
         location: location || healthcareProvider.location,
