@@ -163,16 +163,26 @@ module.exports = {
     }
   },
   getCouponRequests: async (req, res) => {
+    const searchQuery = req.query.q || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    let whereCondition = { status: "pending" };
+    if (searchQuery) {
+      whereCondition = {
+        [Op.or]: [{ "$shop.shopName$": { [Op.like]: `%${searchQuery}%` } }],
+      };
+    }
     try {
       const coupenRequests = await ShopCoupon.findAll({
-        where: {
-          status: "pending",
-        },
+        limit,
+        offset,
+        where: whereCondition,
         include: [
           {
             model: Shop,
-            as: "coupon",
             attributes: ["id", "shopName"],
+            as: "shop",
           },
         ],
       });
@@ -183,16 +193,26 @@ module.exports = {
     }
   },
   getAssignedCoupon: async (req, res) => {
+    const searchQuery = req.query.q || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    let whereCondition = { status: "assigned" };
+    if (searchQuery) {
+      whereCondition = {
+        [Op.or]: [{ "$shop.shopName$": { [Op.like]: `%${searchQuery}%` } }],
+      };
+    }
     try {
       const assignedCoupons = await ShopCoupon.findAll({
-        where: {
-          status: "pending",
-        },
+        limit,
+        offset,
+        where: whereCondition,
         include: [
           {
             model: Shop,
-            as: "coupon",
             attributes: ["id", "shopName"],
+            as: "shop",
           },
         ],
       });
@@ -203,9 +223,25 @@ module.exports = {
     }
   },
   getCouponHistory: async (req, res) => {
+    const searchQuery = req.query.q || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    let whereCondition = { };
+    if (searchQuery) {
+      whereCondition = {
+        [Op.or]: [
+          { "$shop.shopName$": { [Op.like]: `%${searchQuery}%` } },
+          { "$user.userName$": { [Op.like]: `%${searchQuery}%` } },
+        ],
+      };
+    }
     try {
       const userCoupon = await UserCoupon.findAndCountAll({
-        attributes:["id","couponIdFrom","couponIdTo","assignedCount"],
+        limit,
+        offset,
+        where:whereCondition,
+        attributes: ["id", "couponIdFrom", "couponIdTo", "assignedCount"],
         include: [
           {
             model: Shop,
@@ -220,10 +256,10 @@ module.exports = {
         ],
         order: [["createdAt", "DESC"]],
       });
-      res.status(200).json({ success: true, userCoupon });
+      return res.status(200).json({ success: true, userCoupon });
     } catch (error) {
       console.log(error);
-      res.status(500).json({ success: false, message: error.message });
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
 };

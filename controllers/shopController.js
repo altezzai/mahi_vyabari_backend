@@ -324,28 +324,45 @@ module.exports = {
       };
     }
     try {
-      const shops = await Shop.findAll({
+      // const shops = await Shop.findAll({
+      //   limit,
+      //   offset,
+      //   where: whereCondition,
+      //   attributes: ["id", "shopName"],
+      //   include: [
+      //     {
+      //       model: Complaint,
+      //       as: "complaints",
+      //       attributes: ["description", "title"],
+      //       include: [
+      //         {
+      //           model: User,
+      //           as: "user",
+      //           attributes: ["userName", "email"],
+      //         },
+      //       ],
+      //     },
+      //   ],
+      //   subQuery: false,
+      // });
+      const complaints = await Complaint.findAll({
         limit,
         offset,
-        where: whereCondition,
-        attributes: ["id", "shopName"],
-        include: [
+        where:whereCondition,
+        include:[
           {
-            model: Complaint,
-            as: "complaints",
-            attributes: ["description", "title"],
-            include: [
-              {
-                model: User,
-                as: "user",
-                attributes: ["userName", "email"],
-              },
-            ],
+            model:User,
+            attributes:["id","userName"],
+            as:"user"
           },
-        ],
-        subQuery: false,
-      });
-      res.status(200).json({ success: true, data: shops });
+          {
+            model:Shop,
+            attributes:["id","shopName"],
+            as:"shop"
+          }
+        ]
+      })
+      res.status(200).json({ success: true, data: complaints });
     } catch (error) {
       console.log(error);
       res.status(500).json({ success: false, message: error.message });

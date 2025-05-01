@@ -8,7 +8,7 @@ router.put("/assign-shop-coupon-request/:id",coupenController.assignShopCouponRe
 router.post("/assign-shop-coupon",coupenController.assignShopCoupon);
 router.post("/assign-user-coupon",coupenController.assignUserCoupon)
 
-router.get("/get-coupen-requests",coupenController.getCouponRequests);
+router.get("/get-coupon-requests",coupenController.getCouponRequests);
 router.get("/get-assigned-coupons",coupenController.getAssignedCoupon);
 router.get("/get-coupon-history",coupenController.getCouponHistory);
 

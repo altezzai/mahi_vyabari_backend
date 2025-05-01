@@ -54,6 +54,6 @@ const Complaint = sequelize.define(
 User.hasMany(Complaint, { foreignKey: "userId"});
 Shop.hasMany(Complaint, { foreignKey: "shopId", as: "complaints" });
 Complaint.belongsTo(User, { foreignKey: "userId", as:"user"});
-Complaint.belongsTo(Shop, { foreignKey: "shopId" });
+Complaint.belongsTo(Shop, { foreignKey: "shopId",as:"shop" });
 
 module.exports = Complaint;
