@@ -38,7 +38,7 @@ module.exports = {
       const savedWorker = await Worker.create(workerData);
       if (savedWorker.categories && savedWorker.categories.length > 0) {
         await WorkerCategory.bulkCreate(
-          JSON.parse(savedWorker.categories).map((category) => ({
+          savedWorker.categories.map((category) => ({
             workerId: savedWorker.id,
             categoryId: category,
           }))

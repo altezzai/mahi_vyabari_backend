@@ -38,10 +38,11 @@ module.exports = {
         image: req.files?.image?.[0]?.filename || null,
         icon: req.files?.icon?.[0]?.filename || null,
       };
+      console.log(req.body.categories)
       const savedShop = await Shop.create(shopData);
       if (savedShop.categories && savedShop.categories.length > 0) {
         await ShopCategory.bulkCreate(
-          JSON.parse(savedShop.categories).map((category) => ({
+          savedShop.categories.map((category) => ({
             shopId: savedShop.id,
             categoryId: category,
           }))
@@ -111,6 +112,7 @@ module.exports = {
           },
         ],
       });
+      console.log(shop.categories)
       if (!shop) {
         return res
           .status(404)

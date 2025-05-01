@@ -13,10 +13,15 @@ const WorkerProfile = sequelize.define(
       type: DataTypes.TEXT,
       get() {
         const rawValue = this.getDataValue("categories");
-        return rawValue ? JSON.parse(rawValue) : [];
+        try {
+          const parsed = rawValue ? JSON.parse(rawValue) : [];
+          return Array.isArray(parsed) ? parsed.map(Number) : [];
+        } catch (e) {
+          return [];
+        }
       },
       set(value) {
-        this.setDataValue("images", JSON.stringify(value));
+        this.setDataValue("categories", JSON.stringify(value));
       },
     },
     minWage: {
