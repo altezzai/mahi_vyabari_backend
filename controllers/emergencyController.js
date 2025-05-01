@@ -44,9 +44,10 @@ module.exports = {
     }
   },
   updateEmergency: async (req, res) => {
+    const { emergencyName, phone, description } = req.body;
+    console.log(req.body);
     try {
       const { id } = req.params;
-      const { itemName, phone, description } = req.body;
       const emergency = await Emergency.findByPk(id);
       if (!emergency) {
         return res
@@ -64,7 +65,7 @@ module.exports = {
         newFile = req.file.filename;
       }
       await emergency.update({
-        title: itemName || emergency.itemName,
+        emergencyName: emergencyName || emergency.emergencyName,
         description: description || emergency.description,
         phone: phone || emergency.phone,
         icon: newFile,
@@ -131,14 +132,17 @@ module.exports = {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
-    const whereCondition = {};
+    let whereCondition = {};
     if (search) {
       whereCondition = {
-        [Op.or]: [{ emergencyName: { [Op.like]: `%${search}%` } }],
+        [Op.or]: [
+          { emergencyName: { [Op.like]: `%${search}%` } },
+          { phone: { [Op.like]: `%${search}%` } },
+        ],
       };
     }
     try {
-      const emergencies = await Emergency.findAndCountAll({
+      const { count, rows: emergencies } = await Emergency.findAndCountAll({
         limit,
         offset,
         where: whereCondition,
@@ -150,7 +154,13 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Emergency record not found" });
       }
-      return res.status(200).json({ success: true, data: emergencies });
+      const totalPages = Math.ceil(count / limit);
+      return res.status(200).json({
+        success: true,
+        totalPages,
+        currentPage: page,
+        data: emergencies,
+      });
     } catch (error) {
       console.error(error);
       return res.status(500).json({ success: false, message: error.message });

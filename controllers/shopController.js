@@ -38,7 +38,7 @@ module.exports = {
         image: req.files?.image?.[0]?.filename || null,
         icon: req.files?.icon?.[0]?.filename || null,
       };
-      console.log(req.body.categories)
+      console.log(req.body.categories);
       const savedShop = await Shop.create(shopData);
       if (savedShop.categories && savedShop.categories.length > 0) {
         await ShopCategory.bulkCreate(
@@ -76,11 +76,14 @@ module.exports = {
     let whereCondition = {};
     if (search) {
       whereCondition = {
-        [Op.or]: [{ shopName: { [Op.like]: `%${search}%` } }],
+        [Op.or]: [
+          { shopName: { [Op.like]: `%${search}%` } },
+          { "$categories.categoryName$": { [Op.like]: `%${search}%` } },
+        ],
       };
     }
     try {
-      const shops = await Shop.findAndCountAll({
+      const { count, rows: shops } = await Shop.findAndCountAll({
         limit,
         offset,
         where: whereCondition,
@@ -94,10 +97,13 @@ module.exports = {
         ],
         order: [["createdAt", "DESC"]],
       });
-      res.status(200).json({ success: true, data: shops });
+      const totalPages = Math.ceil(count / limit);
+      return res
+        .status(200)
+        .json({ success: true, totalPages, currentPage: page, data: shops });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ success: false, message: error.message });
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
   getShopById: async (req, res) => {
@@ -112,7 +118,7 @@ module.exports = {
           },
         ],
       });
-      console.log(shop.categories)
+      console.log(shop.categories);
       if (!shop) {
         return res
           .status(404)
@@ -278,7 +284,7 @@ module.exports = {
       };
     }
     try {
-      const shops = await Shop.findAll({
+      const { count, rows: shops } = await Shop.findAndCountAll({
         limit,
         offset,
         where: whereCondition,
@@ -305,10 +311,13 @@ module.exports = {
         order: [[Sequelize.literal("averageRating"), "DESC"]],
         subQuery: false,
       });
-      res.status(200).json({ success: true, data: shops });
+      const totalPages = Math.ceil(count / limit);
+      return res
+        .status(200)
+        .json({ success: true, totalPages, currentPage: page, data: shops });
     } catch (error) {
       console.log(error);
-      res.status(500).json({ success: false, message: error.message });
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
   getShopComplaints: async (req, res) => {
@@ -348,20 +357,20 @@ module.exports = {
       const complaints = await Complaint.findAll({
         limit,
         offset,
-        where:whereCondition,
-        include:[
+        where: whereCondition,
+        include: [
           {
-            model:User,
-            attributes:["id","userName"],
-            as:"user"
+            model: User,
+            attributes: ["id", "userName"],
+            as: "user",
           },
           {
-            model:Shop,
-            attributes:["id","shopName"],
-            as:"shop"
-          }
-        ]
-      })
+            model: Shop,
+            attributes: ["id", "shopName"],
+            as: "shop",
+          },
+        ],
+      });
       res.status(200).json({ success: true, data: complaints });
     } catch (error) {
       console.log(error);

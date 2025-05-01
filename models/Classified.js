@@ -57,10 +57,10 @@ const ItemListing = sequelize.define(
       type: DataTypes.STRING,
     },
     image: {
-      type: DataTypes.STRING, // Stores the image URL/path
+      type: DataTypes.STRING,
     },
     icon: {
-      type: DataTypes.STRING, // Stores the icon URL/path
+      type: DataTypes.STRING, 
     },
     trash: {
       type: DataTypes.BOOLEAN,

@@ -15,7 +15,7 @@ router.put(
 );
 router.patch("/delete-emergency/:id", emergencyController.deleteEmergency);
 router.patch("/restore-emergency/:id", emergencyController.restoreEmergency);
-router.get("/get-emergency", emergencyController.getEmergencies);
+router.get("/get-emergencies", emergencyController.getEmergencies);
 router.get("/get-emergency/:id", emergencyController.getEmergencyById);
 
 module.exports = router;

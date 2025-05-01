@@ -37,14 +37,14 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Can't Upload Product Data" });
       }
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         result: savedProduct,
       });
     } catch (error) {
       await deletefilewithfoldername(uploadPath, req.file?.filename);
       console.log(error);
-      res.status(401).json({
+      return res.status(401).json({
         success: false,
         message: error.message,
       });
@@ -87,10 +87,10 @@ module.exports = {
         description: description || product.description,
         image: newImage,
       });
-      res.status(200).json({ success: true, product });
+      return res.status(200).json({ success: true, product });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ success: false, message: error.message });
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
   getProducts: async (req, res) => {
@@ -101,11 +101,14 @@ module.exports = {
     let whereCondition = {};
     if (search) {
       whereCondition = {
-        productName: { [Op.like]: `%${search}%` },
+        [Op.or]: [
+          { productName: { [Op.like]: `%${search}%` } },
+          { "$shop.shopName$": { [Op.like]: `%${search}%` } },
+        ],
       };
     }
     try {
-      const products = await Product.findAndCountAll({
+      const { count, rows: products } = await Product.findAndCountAll({
         limit,
         offset,
         where: whereCondition,
@@ -125,11 +128,13 @@ module.exports = {
         ],
         order: [["createdAt", "DESC"]],
       });
-
-      res.status(200).json({ success: true, data: products });
+      const totalPages = Math.ceil(count / limit);
+      return res
+        .status(200)
+        .json({ success: true, totalPages, currentPage: page, data: products });
     } catch (error) {
       console.error(error);
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: error.message,
       });

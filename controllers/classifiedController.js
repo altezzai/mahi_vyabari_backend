@@ -6,6 +6,7 @@ const Classified = require("../models/Classified");
 const Type = require("../models/Type");
 const { deletefilewithfoldername } = require("../utils/util");
 const Category = require("../models/Category");
+const { Op } = require("sequelize");
 
 const uploadPath = path.join(__dirname, "../public/uploads/classified");
 
@@ -34,7 +35,8 @@ module.exports = {
         image: req.files?.image?.[0]?.filename || null,
         icon: req.files?.icon?.[0]?.filename || null,
       };
-      const savedClassified = await Classified.create(classifiedData);
+      // const savedClassified = await Classified.create(classifiedData);
+      const savedClassified = await Classified.bulkCreate(req.body);
       res.status(201).json({
         success: true,
         savedShop: savedClassified,
@@ -172,18 +174,28 @@ module.exports = {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
-    const whereCondition = {};
+    let whereCondition = {};
     if (search) {
       whereCondition = {
-        [Op.or]: [{ itemName: { [Op.like]: `%${search}%` } }],
+        [Op.or]: [
+          { itemName: { [Op.like]: `%${search}%` } },
+          { "$itemCategory.categoryName$": { [Op.like]: `%${search}%` } },
+        ],
       };
     }
     try {
-      const classifieds = await Classified.findAndCountAll({
+      const { count, rows: classifieds } = await Classified.findAndCountAll({
         limit,
         offset,
         where: whereCondition,
-        attributes: ["id", "itemName", "category", "priority", "trash"],
+        attributes: ["id", "itemName", "priority", "trash"],
+        include: [
+          {
+            model: Category,
+            attributes: ["id", "categoryName"],
+            as: "itemCategory",
+          },
+        ],
         order: [["createdAt", "DESC"]],
       });
       if (!classifieds) {
@@ -191,8 +203,15 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "No classifieds found" });
       }
-
-      return res.status(200).json({ success: true, data: classifieds });
+      const totalPages = Math.ceil(count / limit);
+      return res
+        .status(200)
+        .json({
+          success: true,
+          totalPages,
+          currentPage: page,
+          data: classifieds,
+        });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ success: false, message: error.message });
@@ -229,6 +248,7 @@ module.exports = {
         include: {
           model: Category,
           attributes: ["id", "categoryName"],
+          as:"category"
         },
       });
       res.status(200).json({ success: true, classifiedCategories });

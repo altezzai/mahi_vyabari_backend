@@ -5,6 +5,7 @@ const path = require("path");
 const Category = require("../models/Category");
 const Type = require("../models/Type");
 const { deletefilewithfoldername } = require("../utils/util");
+const { Op } = require("sequelize");
 
 const uploadPath = path.join(__dirname, "../public/uploads/categoryImages");
 if (!fs.existsSync(uploadPath)) {
@@ -31,7 +32,6 @@ module.exports = {
         ...req.body,
         icon: req.file ? req.file.filename : null,
       };
-
       const savedCategory = await Category.create(categoryData);
       if (!savedCategory) {
         await deletefilewithfoldername(uploadPath, req.file?.filename);
@@ -54,7 +54,7 @@ module.exports = {
     }
   },
   updateCategory: async (req, res) => {
-    const { userId, typeId, name, description } = req.body;
+    const { userId, typeId, categoryName, description } = req.body;
     try {
       const { id } = req.params;
       const category = await Category.findByPk(id);
@@ -74,7 +74,7 @@ module.exports = {
       await category.update({
         userId: userId || category.userId,
         typeId: typeId || category.typeId,
-        category: name || category.name,
+        categoryName: categoryName || category.categoryName,
         description: description || category.description,
         icon: newIcon,
       });
@@ -132,17 +132,27 @@ module.exports = {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
-    const whereCondition = {};
+    let whereCondition = {};
     if (search) {
       whereCondition = {
-        [Op.or]: [{ name: { [Op.like]: `%${search}%` } }],
+        [Op.or]: [
+          { categoryName: { [Op.like]: `%${search}%` } },
+          { "$type.typeName$": { [Op.like]: `%${search}%` } },
+        ],
       };
     }
     try {
-      const categories = await Category.findAndCountAll({
+      const { count, rows: categories } = await Category.findAndCountAll({
         limit,
         offset,
         where: whereCondition,
+        include: [
+          {
+            model: Type,
+            attributes: ["id", "typeName"],
+            as: "type",
+          },
+        ],
         order: [["createdAt", "DESC"]],
       });
       if (!categories) {
@@ -150,10 +160,17 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "No categories found" });
       }
-      res.status(200).json({ success: true, categories });
+      const totalPages = Math.ceil(count / limit);
+      console.log(count, totalPages);
+      return res.status(200).json({
+        success: true,
+        totalPages,
+        currentPage: page,
+        data: categories,
+      });
     } catch (error) {
       console.error("Error fetching categories:", error);
-      res.status(500).json({ success: false, message: error.message });
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
   getCategoryById: async (req, res) => {
@@ -165,10 +182,10 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Category not found" });
       }
-      res.status(200).json({ success: true, category });
+     return res.status(200).json({ success: true, category });
     } catch (error) {
       console.error("Error fetching category:", error);
-      res.status(500).json({ message: error.message });
+     return res.status(500).json({ message: error.message });
     }
   },
   addType: async (req, res) => {

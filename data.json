@@ -1,33 +1,1158 @@
+// sample data for categories table
 [
   {
-  "shopImage": "https://example.com/images/shop1.jpg",
-  "shopIconImage": "https://example.com/images/shop1-icon.jpg",
-  "shopName": "Tech Haven",
-  "category": "Electronics",
-  "phone": "+1234567890",
-  "whatsapp": "+1234567890",
-  "website": "https://techhaven.com",
-  "location": "37.7749,-122.4194",
-  "description": "A one-stop shop for all your tech needs. From smartphones to laptops, we have it all.",
-  "address": "123 Tech Street, San Francisco, CA 94103",
-  "openingTime": "09:00 AM",
-  "closingTime": "09:00 PM",
-  "workingDays": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-  "priority": "A",
-  "areas": ["Downtown", "Mission District", "SoMa"]
-},
-{
-  "shopId":"67a40ea7a1a0053a51588eac",
-  "productName":"sample",
-  "originalPrice":200,
-  "offerPrice":150,
-  "description":"Good"
-},
-{
-  "userId": 1,
-  "shopId": 2,
-  "title": "Delayed Order Delivery",
-  "description": "I ordered a product two weeks ago, but it hasn’t arrived yet.",
-  "status": "pending"
-}
+    "userId": 1,
+    "typeId": 1,
+    "categoryName": "Supermarket",
+    "description": "Shops that sell everyday groceries and essentials",
+    "trash": false
+  },
+  {
+    "userId": 1,
+    "typeId": 1,
+    "categoryName": "Electronics",
+    "description": "Retailers of electronic devices and accessories",
+    "trash": false
+  },
+
+  {
+    "userId": 1,
+    "typeId": 2,
+    "categoryName": "Hospitals",
+    "description": "General and specialty hospitals",
+    "trash": false
+  },
+  {
+    "userId": 1,
+    "typeId": 2,
+    "categoryName": "Pharmacy",
+    "description": "Medical shops and pharmacies",
+    "trash": false
+  },
+
+  {
+    "userId": 1,
+    "typeId": 3,
+    "categoryName": "Taxi Services",
+    "description": "Local taxi and ride-hailing services",
+    "trash": false
+  },
+  {
+    "userId": 1,
+    "typeId": 3,
+    "categoryName": "Car Rentals",
+    "description": "Rental car providers",
+    "trash": false
+  },
+
+  {
+    "userId": 1,
+    "typeId": 4,
+    "categoryName": "Plumber",
+    "description": "Professional plumbing services",
+    "trash": false
+  },
+  {
+    "userId": 1,
+    "typeId": 4,
+    "categoryName": "Electrician",
+    "description": "Certified electrical repair and installation services",
+    "trash": false
+  },
+
+  {
+    "userId": 1,
+    "typeId": 5,
+    "categoryName": "Jobs",
+    "description": "Classified job listings",
+    "trash": false
+  },
+  {
+    "userId": 1,
+    "typeId": 5,
+    "categoryName": "For Sale",
+    "description": "Used items for sale",
+    "trash": false
+  }
 ]
+
+//classified sample data
+[
+  {
+    "category": 1,
+    "itemName": "Used Refrigerator",
+    "price": 7500.00,
+    "homeTown": "Mahe",
+    "area": "mahe",
+    "address": "Main street, Mahe",
+    "description": "Double door fridge in working condition",
+    "priority": "A",
+    "phone": "9876543210",
+    "whatsapp": "9876543210",
+    "trash": false
+  },
+  {
+    "category": 1,
+    "itemName": "Second-hand Washing Machine",
+    "price": 5500.00,
+    "homeTown": "Chokli",
+    "area": "chokli",
+    "address": "Near Market Road",
+    "description": "6kg fully automatic washing machine",
+    "priority": "B",
+    "phone": "9988776655",
+    "whatsapp": "9988776655",
+    "trash": false
+  },
+  {
+    "category": 2,
+    "itemName": "Smartphone Redmi Note 10",
+    "price": 9000.00,
+    "homeTown": "Palloor",
+    "area": "palloor",
+    "address": "Green Park Colony",
+    "description": "Gently used smartphone, 64GB storage",
+    "priority": "A",
+    "phone": "9123456780",
+    "whatsapp": "9123456780",
+    "trash": false
+  },
+  {
+    "category": 2,
+    "itemName": "Dining Table - 6 Seater",
+    "price": 12000.00,
+    "homeTown": "Pandakkal",
+    "area": "pandakkal",
+    "address": "Behind ABC school",
+    "description": "Wooden dining table in excellent condition",
+    "priority": "B",
+    "phone": "9876501234",
+    "whatsapp": "9876501234",
+    "trash": false
+  },
+  {
+    "category": 3,
+    "itemName": "Hero Splendor Bike",
+    "price": 30000.00,
+    "homeTown": "Mahe",
+    "area": "mahe",
+    "address": "Bus stand road",
+    "description": "2016 model, well maintained, RC available",
+    "priority": "A",
+    "phone": "9012345678",
+    "whatsapp": "9012345678",
+    "trash": false
+  },
+  {
+    "category": 3,
+    "itemName": "Scooty Pep+",
+    "price": 22000.00,
+    "homeTown": "Chokli",
+    "area": "chokli",
+    "address": "Near City Centre",
+    "description": "2018 model, great condition",
+    "priority": "C",
+    "phone": "7890123456",
+    "whatsapp": "7890123456",
+    "trash": false
+  },
+  {
+    "category": 4,
+    "itemName": "Second-hand Laptop",
+    "price": 18500.00,
+    "homeTown": "Palloor",
+    "area": "palloor",
+    "address": "Tech Street",
+    "description": "Lenovo i5 8th gen with 8GB RAM, 256GB SSD",
+    "priority": "B",
+    "phone": "8123456789",
+    "whatsapp": "8123456789",
+    "trash": false
+  },
+  {
+    "category": 4,
+    "itemName": "Computer Table",
+    "price": 2000.00,
+    "homeTown": "Pandakkal",
+    "area": "pandakkal",
+    "address": "Near Hospital Road",
+    "description": "Used wooden computer desk",
+    "priority": "C",
+    "phone": "8123001122",
+    "whatsapp": "8123001122",
+    "trash": false
+  },
+  {
+    "category": 5,
+    "itemName": "Sofa Set 5 Seater",
+    "price": 10500.00,
+    "homeTown": "Mahe",
+    "area": "mahe",
+    "address": "Udaya Nagar",
+    "description": "Used sofa in good condition, washable covers",
+    "priority": "A",
+    "phone": "9345678901",
+    "whatsapp": "9345678901",
+    "trash": false
+  },
+  {
+    "category": 5,
+    "itemName": "Bookshelf",
+    "price": 1500.00,
+    "homeTown": "Chokli",
+    "area": "chokli",
+    "address": "Library Road",
+    "description": "Compact wooden shelf for books",
+    "priority": "B",
+    "phone": "9988001122",
+    "whatsapp": "9988001122",
+    "trash": false
+  }
+]
+
+//user sample data
+[
+  {
+    "userName": "Arjun Menon",
+    "email": "arjun@example.com",
+    "password": "12345678",
+    "phone": "+919876543210",
+    "area": "mahe",
+    "status": "active",
+    "verified": true,
+    "trash": false
+  },
+  {
+    "userName": "Sneha Rao",
+    "email": "sneha@gmail.com",
+    "password": "12345678",
+    "phone": "+919998887766",
+    "area": "palloor",
+    "status": "active",
+    "verified": true,
+    "trash": false
+  },
+  {
+    "userName": "Kiran Das",
+    "email": "kiran@example.com",
+    "password": "12345678",
+    "phone": "+919123456789",
+    "area": "chokli",
+    "status": "inactive",
+    "verified": false,
+    "trash": false
+  },
+  {
+    "userName": "Meera S",
+    "email": "meera@gmail.com",
+    "password": "12345678",
+    "phone": "+919812345678",
+    "area": "pandakkal",
+    "status": "active",
+    "verified": true,
+    "trash": false
+  },
+  {
+    "userName": "Rahul Nair",
+    "email": "rahul@example.com",
+    "password": "12345678",
+    "phone": "+919000112233",
+    "area": "mahe",
+    "status": "active",
+    "verified": true,
+    "trash": false
+  },
+  {
+    "userName": "Lakshmi R",
+    "email": "lakshmi@gmail.com",
+    "password": "12345678",
+    "phone": "+919955443322",
+    "area": "chokli",
+    "status": "active",
+    "verified": true,
+    "trash": false
+  },
+  {
+    "userName": "Vishnu P",
+    "email": "vishnu@example.com",
+    "password": "12345678",
+    "phone": "+919877665544",
+    "area": "palloor",
+    "status": "active",
+    "verified": false,
+    "trash": false
+  },
+  {
+    "userName": "Neha J",
+    "email": "neha@gmail.com",
+    "password": "12345678",
+    "phone": "+919766554433",
+    "area": "pandakkal",
+    "status": "active",
+    "verified": true,
+    "trash": false
+  },
+  {
+    "userName": "Ajay Kumar",
+    "email": "ajay@example.com",
+    "password": "12345678",
+    "phone": "+919988776655",
+    "area": "mahe",
+    "status": "inactive",
+    "verified": false,
+    "trash": true
+  },
+  {
+    "userName": "Divya N",
+    "email": "divya@example.com",
+    "password": "12345678",
+    "phone": "+919977665544",
+    "area": "chokli",
+    "status": "active",
+    "verified": true,
+    "trash": false
+  }
+]
+
+//sample emergency data
+[
+  {
+    "emergencyName": "Police Station",
+    "phone": "+91100",
+    "description": "For law enforcement and public safety assistance.",
+    "trash": false
+  },
+  {
+    "emergencyName": "Fire Department",
+    "phone": "+91101",
+    "description": "For fire emergencies and rescue operations.",
+    "trash": false
+  },
+  {
+    "emergencyName": "Ambulance",
+    "phone": "+91102",
+    "description": "Medical emergency ambulance services.",
+    "trash": false
+  },
+  {
+    "emergencyName": "Disaster Management",
+    "phone": "+91108",
+    "description": "For disaster response and management.",
+    "trash": false
+  },
+  {
+    "emergencyName": "Electricity Helpline",
+    "phone": "1912",
+    "description": "For power supply and outage complaints.",
+    "trash": false
+  },
+  {
+    "emergencyName": "Gas Leak Helpline",
+    "phone": "1906",
+    "description": "Emergency helpline for gas leakage.",
+    "trash": false
+  },
+  {
+    "emergencyName": "Child Helpline",
+    "phone": "1098",
+    "description": "Support for children in distress.",
+    "trash": false
+  },
+  {
+    "emergencyName": "Women Helpline",
+    "phone": "1091",
+    "description": "Support for women in emergency situations.",
+    "trash": false
+  },
+  {
+    "emergencyName": "Senior Citizen Helpline",
+    "phone": "1291",
+    "description": "Emergency support for elderly people.",
+    "trash": false
+  },
+  {
+    "emergencyName": "Road Accident Helpline",
+    "phone": "1073",
+    "description": "For reporting road accidents and getting emergency response.",
+    "trash": false
+  }
+]
+
+//sample medical datas
+
+[
+  {
+    "category": "doctor",
+    "name": "Dr. Arjun Menon",
+    "phone": "+919876543210",
+    "subCategory": 1,
+    "whatsapp": "+919876543210",
+    "website": "https://drmenonclinic.com",
+    "location": "Mahe Central",
+    "description": "Cardiologist with 10+ years of experience.",
+    "address": "12, MG Road, Mahe",
+    "openingTime": "09:00",
+    "closingTime": "17:00",
+    "workingDays": "Mon-Sat",
+    "priority": "A",
+    "area": "mahe",
+    "trash": false
+  },
+  {
+    "category": "hospital",
+    "name": "Palloor General Hospital",
+    "phone": "+919812345678",
+    "subCategory": 2,
+    "whatsapp": "+919812345678",
+    "website": "https://pghospital.com",
+    "location": "Palloor",
+    "description": "24x7 multi-specialty hospital.",
+    "address": "Main Rd, Palloor",
+    "openingTime": "00:00",
+    "closingTime": "23:59",
+    "workingDays": "All Days",
+    "priority": "B",
+    "area": "palloor",
+    "trash": false
+  },
+  {
+    "category": "doctor",
+    "name": "Dr. Meera Nair",
+    "phone": "+919812345670",
+    "subCategory": 3,
+    "whatsapp": "+919812345670",
+    "website": "https://drmeerahealth.com",
+    "location": "Chokli",
+    "description": "Pediatrician with a passion for child care.",
+    "address": "Park Street, Chokli",
+    "openingTime": "10:00",
+    "closingTime": "18:00",
+    "workingDays": "Mon-Fri",
+    "priority": "A",
+    "area": "chokli",
+    "trash": false
+  },
+  {
+    "category": "hospital",
+    "name": "Chokli Medical Center",
+    "phone": "+919812346789",
+    "subCategory": 2,
+    "whatsapp": "+919812346789",
+    "website": "https://choklimedcenter.com",
+    "location": "Chokli",
+    "description": "Specialized in orthopedics and surgery.",
+    "address": "Highway Road, Chokli",
+    "openingTime": "08:00",
+    "closingTime": "20:00",
+    "workingDays": "Mon-Sun",
+    "priority": "C",
+    "area": "chokli",
+    "trash": false
+  },
+  {
+    "category": "doctor",
+    "name": "Dr. Fathima Rahman",
+    "phone": "+919999999999",
+    "subCategory": 1,
+    "whatsapp": "+919999999999",
+    "website": "https://drrhealthcare.com",
+    "location": "Pandakkal",
+    "description": "Gynecologist with 15 years of experience.",
+    "address": "Clinic Road, Pandakkal",
+    "openingTime": "08:30",
+    "closingTime": "16:30",
+    "workingDays": "Mon-Sat",
+    "priority": "A",
+    "area": "pandakkal",
+    "trash": false
+  },
+  {
+    "category": "hospital",
+    "name": "Unity Hospital Mahe",
+    "phone": "+919898989898",
+    "subCategory": 2,
+    "whatsapp": "+919898989898",
+    "website": "https://unitymahe.com",
+    "location": "Mahe",
+    "description": "Multi-specialty hospital near the beach road.",
+    "address": "Beach Road, Mahe",
+    "openingTime": "06:00",
+    "closingTime": "22:00",
+    "workingDays": "All Days",
+    "priority": "B",
+    "area": "mahe",
+    "trash": false
+  },
+  {
+    "category": "doctor",
+    "name": "Dr. Rajeev Kumar",
+    "phone": "+919812301234",
+    "subCategory": 4,
+    "whatsapp": "+919812301234",
+    "website": "https://rajeevhealthcare.com",
+    "location": "Palloor",
+    "description": "ENT specialist treating all age groups.",
+    "address": "Main Market, Palloor",
+    "openingTime": "11:00",
+    "closingTime": "19:00",
+    "workingDays": "Tue-Sat",
+    "priority": "C",
+    "area": "palloor",
+    "trash": false
+  },
+  {
+    "category": "hospital",
+    "name": "Green Valley Hospital",
+    "phone": "+919812345690",
+    "subCategory": 2,
+    "whatsapp": "+919812345690",
+    "website": "https://greenvalleyhospital.com",
+    "location": "Pandakkal",
+    "description": "Famous for maternity and surgery departments.",
+    "address": "Main Street, Pandakkal",
+    "openingTime": "07:00",
+    "closingTime": "21:00",
+    "workingDays": "Mon-Sun",
+    "priority": "B",
+    "area": "pandakkal",
+    "trash": false
+  },
+  {
+    "category": "doctor",
+    "name": "Dr. Neha Varma",
+    "phone": "+919876543219",
+    "subCategory": 5,
+    "whatsapp": "+919876543219",
+    "website": "https://nehaclinic.com",
+    "location": "Mahe",
+    "description": "Dermatologist with modern treatment methods.",
+    "address": "Old Fort Road, Mahe",
+    "openingTime": "10:00",
+    "closingTime": "18:00",
+    "workingDays": "Mon-Fri",
+    "priority": "A",
+    "area": "mahe",
+    "trash": false
+  },
+  {
+    "category": "hospital",
+    "name": "LifeCare Hospital",
+    "phone": "+919812300000",
+    "subCategory": 2,
+    "whatsapp": "+919812300000",
+    "website": "https://lifecarehospital.com",
+    "location": "Chokli",
+    "description": "Emergency care and diagnostics under one roof.",
+    "address": "Bus Stand Road, Chokli",
+    "openingTime": "00:00",
+    "closingTime": "23:59",
+    "workingDays": "All Days",
+    "priority": "A",
+    "area": "chokli",
+    "trash": false
+  }
+]
+
+//sample product datas
+[
+  {
+    "shopId": 1,
+    "productName": "Organic Honey 500g",
+    "originalPrice": 250,
+    "offerPrice": 200,
+    "offerPercentage": 20,
+    "description": "Pure organic honey from local farms.",
+    "trash": false
+  },
+  {
+    "shopId": 2,
+    "productName": "Bluetooth Headphones",
+    "originalPrice": 1500,
+    "offerPrice": 1199,
+    "offerPercentage": 20,
+    "description": "Wireless over-ear headphones with noise cancellation.",
+    "trash": false
+  },
+  {
+    "shopId": 1,
+    "productName": "Bamboo Toothbrush (Pack of 2)",
+    "originalPrice": 150,
+    "offerPrice": 120,
+    "offerPercentage": 20,
+    "description": "Eco-friendly bamboo toothbrushes for daily use.",
+    "trash": false
+  },
+  {
+    "shopId": 3,
+    "productName": "Men's Cotton Shirt - Blue",
+    "originalPrice": 899,
+    "offerPrice": 699,
+    "offerPercentage": 22.25,
+    "description": "Casual wear shirt with premium cotton fabric.",
+    "trash": false
+  },
+  {
+    "shopId": 4,
+    "productName": "Electric Kettle 1.5L",
+    "originalPrice": 999,
+    "offerPrice": 749,
+    "offerPercentage": 25.02,
+    "description": "Fast-boil stainless steel electric kettle.",
+    "trash": false
+  },
+  {
+    "shopId": 2,
+    "productName": "Yoga Mat Non-Slip",
+    "originalPrice": 699,
+    "offerPrice": 599,
+    "offerPercentage": 14.3,
+    "description": "Comfortable mat for yoga and workouts.",
+    "trash": false
+  },
+  {
+    "shopId": 3,
+    "productName": "Kids Water Bottle 500ml",
+    "originalPrice": 250,
+    "offerPrice": 199,
+    "offerPercentage": 20.4,
+    "description": "Colorful BPA-free bottle with straw lid.",
+    "trash": false
+  },
+  {
+    "shopId": 5,
+    "productName": "LED Desk Lamp",
+    "originalPrice": 799,
+    "offerPrice": 699,
+    "offerPercentage": 12.5,
+    "description": "Adjustable brightness with touch controls.",
+    "trash": false
+  },
+  {
+    "shopId": 4,
+    "productName": "Green Tea Bags (100 Count)",
+    "originalPrice": 450,
+    "offerPrice": 375,
+    "offerPercentage": 16.67,
+    "description": "Refreshing and healthy green tea.",
+    "trash": false
+  },
+  {
+    "shopId": 5,
+    "productName": "Wireless Mouse",
+    "originalPrice": 499,
+    "offerPrice": 399,
+    "offerPercentage": 20.04,
+    "description": "Ergonomic design with long battery life.",
+    "trash": false
+  }
+]
+
+//sample toursim datas
+
+[
+  {
+    "placeName": "Mahe River Walk",
+    "images": ["https://example.com/images/mahe-river1.jpg", "https://example.com/images/mahe-river2.jpg"],
+    "phone": "+919876543210",
+    "area": "mahe",
+    "startTime": "06:00 AM",
+    "endTime": "08:00 PM",
+    "entryFee": "Free",
+    "trash": false
+  },
+  {
+    "placeName": "Chokli Beach",
+    "images": ["https://example.com/images/chokli-beach1.jpg", "https://example.com/images/chokli-beach2.jpg"],
+    "phone": "+918765432109",
+    "area": "chokli",
+    "startTime": "05:00 AM",
+    "endTime": "07:00 PM",
+    "entryFee": "Free",
+    "trash": false
+  },
+  {
+    "placeName": "Palloor Waterfall",
+    "images": ["https://example.com/images/palloor-falls1.jpg", "https://example.com/images/palloor-falls2.jpg"],
+    "phone": "+917654321098",
+    "area": "palloor",
+    "startTime": "07:00 AM",
+    "endTime": "06:00 PM",
+    "entryFee": "₹20",
+    "trash": false
+  },
+  {
+    "placeName": "Pandakkal View Point",
+    "images": ["https://example.com/images/pandakkal-view1.jpg", "https://example.com/images/pandakkal-view2.jpg"],
+    "phone": "+916543210987",
+    "area": "pandakkal",
+    "startTime": "06:30 AM",
+    "endTime": "07:30 PM",
+    "entryFee": "₹10",
+    "trash": false
+  },
+  {
+    "placeName": "Mahe Church",
+    "images": ["https://example.com/images/mahe-church1.jpg"],
+    "phone": "+918888888888",
+    "area": "mahe",
+    "startTime": "08:00 AM",
+    "endTime": "08:00 PM",
+    "entryFee": "Free",
+    "trash": false
+  },
+  {
+    "placeName": "Chokli Fort Ruins",
+    "images": ["https://example.com/images/chokli-fort1.jpg"],
+    "phone": "+917777777777",
+    "area": "chokli",
+    "startTime": "09:00 AM",
+    "endTime": "05:00 PM",
+    "entryFee": "₹15",
+    "trash": false
+  },
+  {
+    "placeName": "Palloor Lake",
+    "images": ["https://example.com/images/palloor-lake1.jpg", "https://example.com/images/palloor-lake2.jpg"],
+    "phone": "+916666666666",
+    "area": "palloor",
+    "startTime": "06:00 AM",
+    "endTime": "06:30 PM",
+    "entryFee": "Free",
+    "trash": false
+  },
+  {
+    "placeName": "Pandakkal Garden",
+    "images": ["https://example.com/images/pandakkal-garden1.jpg"],
+    "phone": "+915555555555",
+    "area": "pandakkal",
+    "startTime": "08:00 AM",
+    "endTime": "07:00 PM",
+    "entryFee": "₹30",
+    "trash": false
+  },
+  {
+    "placeName": "Mahe Lighthouse",
+    "images": ["https://example.com/images/lighthouse1.jpg"],
+    "phone": "+914444444444",
+    "area": "mahe",
+    "startTime": "07:00 AM",
+    "endTime": "06:00 PM",
+    "entryFee": "₹25",
+    "trash": false
+  },
+  {
+    "placeName": "Chokli Mangrove Trail",
+    "images": ["https://example.com/images/chokli-mangrove1.jpg"],
+    "phone": "+913333333333",
+    "area": "chokli",
+    "startTime": "06:00 AM",
+    "endTime": "07:00 PM",
+    "entryFee": "₹20",
+    "trash": false
+  }
+]
+
+//sample data of vehicle schedules
+
+[
+  {
+    "userId": 1,
+    "category": "train",
+    "vehicleName": "Mahe Express",
+    "vehicleNumber": "12601",
+    "via": "mahe",
+    "to": "Chennai",
+    "departureTime": "06:15:00",
+    "arrivalTime": "14:30:00",
+    "trash": false
+  },
+  {
+    "userId": 2,
+    "category": "train",
+    "vehicleName": "West Coast Express",
+    "vehicleNumber": "22638",
+    "via": "mahe",
+    "to": "Mangalore",
+    "departureTime": "08:00:00",
+    "arrivalTime": "13:45:00",
+    "trash": false
+  },
+  {
+    "userId": 3,
+    "category": "train",
+    "vehicleName": "Malabar Express",
+    "vehicleNumber": "16630",
+    "via": "mahe",
+    "to": "Trivandrum",
+    "departureTime": "10:25:00",
+    "arrivalTime": "18:55:00",
+    "trash": false
+  },
+  {
+    "userId": 4,
+    "category": "bus",
+    "vehicleName": "KSRTC Superfast",
+    "vehicleNumber": "KL58B1234",
+    "via": "mahe",
+    "to": "Kozhikode",
+    "departureTime": "09:00:00",
+    "arrivalTime": "11:30:00",
+    "trash": false
+  },
+  {
+    "userId": 5,
+    "category": "bus",
+    "vehicleName": "Private Coach",
+    "vehicleNumber": "PY01C9988",
+    "via": "mahe",
+    "to": "Kannur",
+    "departureTime": "07:15:00",
+    "arrivalTime": "09:00:00",
+    "trash": false
+  },
+  {
+    "userId": 6,
+    "category": "train",
+    "vehicleName": "Jan Shatabdi",
+    "vehicleNumber": "12082",
+    "via": "mahe",
+    "to": "Ernakulam",
+    "departureTime": "13:00:00",
+    "arrivalTime": "18:10:00",
+    "trash": false
+  },
+  {
+    "userId": 7,
+    "category": "bus",
+    "vehicleName": "Tourist Bus",
+    "vehicleNumber": "KL11Z5566",
+    "via": "mahe",
+    "to": "Palloor",
+    "departureTime": "14:30:00",
+    "arrivalTime": "15:15:00",
+    "trash": false
+  },
+  {
+    "userId": 8,
+    "category": "bus",
+    "vehicleName": "City Rider",
+    "vehicleNumber": "KL14T7887",
+    "via": "mahe",
+    "to": "Pandakkal",
+    "departureTime": "16:00:00",
+    "arrivalTime": "16:45:00",
+    "trash": false
+  },
+  {
+    "userId": 9,
+    "category": "train",
+    "vehicleName": "Intercity Express",
+    "vehicleNumber": "16306",
+    "via": "mahe",
+    "to": "Coimbatore",
+    "departureTime": "17:10:00",
+    "arrivalTime": "21:00:00",
+    "trash": false
+  },
+  {
+    "userId": 10,
+    "category": "bus",
+    "vehicleName": "Evening Express",
+    "vehicleNumber": "KL13M4321",
+    "via": "mahe",
+    "to": "Chokli",
+    "departureTime": "18:30:00",
+    "arrivalTime": "19:15:00",
+    "trash": false
+  }
+]
+
+//sample data of vehicle service
+[
+  {
+    "ownerName": "Ravi Kumar",
+    "category": 1,
+    "minFee": 150.00,
+    "vehicleNumber": "KL58A1234",
+    "priority": "A",
+    "phone": "9876543210",
+    "whatsapp": "9876543210",
+    "description": "Reliable taxi service covering Mahe and nearby areas.",
+    "area": "mahe",
+    "address": "Near Mahe Church",
+    "image": "images/taxi1.jpg",
+    "icon": "icons/taxi1.png",
+    "trash": false
+  },
+  {
+    "ownerName": "Suresh Nair",
+    "category": 2,
+    "minFee": 100.00,
+    "vehicleNumber": "KL13B5678",
+    "priority": "B",
+    "phone": "9123456780",
+    "whatsapp": "9123456780",
+    "description": "Quick auto-rickshaw rides available in Palloor.",
+    "area": "palloor",
+    "address": "Main Road, Palloor",
+    "image": "images/auto1.jpg",
+    "icon": "icons/auto1.png",
+    "trash": false
+  },
+  {
+    "ownerName": "Fatima Beevi",
+    "category": 1,
+    "minFee": 200.00,
+    "vehicleNumber": "KL11T9090",
+    "priority": "A",
+    "phone": "9870001122",
+    "whatsapp": "9870001122",
+    "description": "24/7 Taxi service for long distance travel.",
+    "area": "chokli",
+    "address": "Opposite Chokli Market",
+    "image": "images/taxi2.jpg",
+    "icon": "icons/taxi2.png",
+    "trash": false
+  },
+  {
+    "ownerName": "Arjun Das",
+    "category": 3,
+    "minFee": 80.00,
+    "vehicleNumber": "KL14X4444",
+    "priority": "C",
+    "phone": "9001234567",
+    "whatsapp": "9001234567",
+    "description": "Friendly driver, available daily from 6 AM to 10 PM.",
+    "area": "pandakkal",
+    "address": "Near Government School",
+    "image": "images/auto2.jpg",
+    "icon": "icons/auto2.png",
+    "trash": false
+  },
+  {
+    "ownerName": "John Mathew",
+    "category": 1,
+    "minFee": 180.00,
+    "vehicleNumber": "KL10N9988",
+    "priority": "B",
+    "phone": "9847001122",
+    "whatsapp": "9847001122",
+    "description": "Well-maintained sedan taxi with AC.",
+    "area": "mahe",
+    "address": "Mahe Beach Road",
+    "image": "images/taxi3.jpg",
+    "icon": "icons/taxi3.png",
+    "trash": false
+  },
+  {
+    "ownerName": "Najeeb",
+    "category": 2,
+    "minFee": 120.00,
+    "vehicleNumber": "KL12H1233",
+    "priority": "A",
+    "phone": "9933002211",
+    "whatsapp": "9933002211",
+    "description": "Affordable and fast service across Mahe town.",
+    "area": "mahe",
+    "address": "Near Old Bus Stand",
+    "image": "images/auto3.jpg",
+    "icon": "icons/auto3.png",
+    "trash": false
+  },
+  {
+    "ownerName": "Divya S",
+    "category": 1,
+    "minFee": 160.00,
+    "vehicleNumber": "KL16C2020",
+    "priority": "C",
+    "phone": "7012345678",
+    "whatsapp": "7012345678",
+    "description": "Ladies-only taxi service available on request.",
+    "area": "palloor",
+    "address": "Near Govt. Hospital",
+    "image": "images/taxi4.jpg",
+    "icon": "icons/taxi4.png",
+    "trash": false
+  },
+  {
+    "ownerName": "Murugan",
+    "category": 2,
+    "minFee": 90.00,
+    "vehicleNumber": "PY01E8800",
+    "priority": "B",
+    "phone": "8899007766",
+    "whatsapp": "8899007766",
+    "description": "Operates in Chokli and nearby villages.",
+    "area": "chokli",
+    "address": "Murugan Auto Stand",
+    "image": "images/auto4.jpg",
+    "icon": "icons/auto4.png",
+    "trash": false
+  },
+  {
+    "ownerName": "Rekha",
+    "category": 3,
+    "minFee": 140.00,
+    "vehicleNumber": "KL15F4545",
+    "priority": "A",
+    "phone": "9000000001",
+    "whatsapp": "9000000001",
+    "description": "Van service for school children and family trips.",
+    "area": "pandakkal",
+    "address": "Rekha Nagar",
+    "image": "images/van1.jpg",
+    "icon": "icons/van1.png",
+    "trash": false
+  },
+  {
+    "ownerName": "Mohammed Ali",
+    "category": 1,
+    "minFee": 170.00,
+    "vehicleNumber": "KL09Z3322",
+    "priority": "B",
+    "phone": "9888877766",
+    "whatsapp": "9888877766",
+    "description": "Comfortable taxi with experienced driver.",
+    "area": "mahe",
+    "address": "Taxi Stand No. 2",
+    "image": "images/taxi5.jpg",
+    "icon": "icons/taxi5.png",
+    "trash": false
+  }
+]
+
+//sample data of workers
+
+[
+  {
+    "workerName": "Rajeev Kumar",
+    "categories": [1, 3],
+    "minWage": 500.00,
+    "priority": "A",
+    "area": "mahe",
+    "phone": "9876543210",
+    "whatsapp": "9876543210",
+    "image": "images/worker1.jpg",
+    "icon": "icons/electrician.png",
+    "description": "Experienced electrician and plumber with 10 years in service.",
+    "trash": false
+  },
+  {
+    "workerName": "Anil Thomas",
+    "categories": [2],
+    "minWage": 450.00,
+    "priority": "B",
+    "area": "chokli",
+    "phone": "9123456780",
+    "whatsapp": "9123456780",
+    "image": "images/worker2.jpg",
+    "icon": "icons/plumber.png",
+    "description": "Quick and reliable plumbing services.",
+    "trash": false
+  },
+  {
+    "workerName": "Fathima Beevi",
+    "categories": [4],
+    "minWage": 400.00,
+    "priority": "C",
+    "area": "palloor",
+    "phone": "9000011122",
+    "whatsapp": "9000011122",
+    "image": "images/worker3.jpg",
+    "icon": "icons/cleaning.png",
+    "description": "Professional house cleaner, available for daily/weekly work.",
+    "trash": false
+  },
+  {
+    "workerName": "Manoj P",
+    "categories": [3],
+    "minWage": 600.00,
+    "priority": "A",
+    "area": "pandakkal",
+    "phone": "9988776655",
+    "whatsapp": "9988776655",
+    "image": "images/worker4.jpg",
+    "icon": "icons/carpenter.png",
+    "description": "Skilled carpenter, expert in furniture and fittings.",
+    "trash": false
+  },
+  {
+    "workerName": "Sini V",
+    "categories": [5],
+    "minWage": 300.00,
+    "priority": "B",
+    "area": "mahe",
+    "phone": "8877665544",
+    "whatsapp": "8877665544",
+    "image": "images/worker5.jpg",
+    "icon": "icons/babysitter.png",
+    "description": "Reliable babysitter, available during the day and night.",
+    "trash": false
+  },
+  {
+    "workerName": "Jose Mathew",
+    "categories": [6],
+    "minWage": 700.00,
+    "priority": "A",
+    "area": "chokli",
+    "phone": "8123456789",
+    "whatsapp": "8123456789",
+    "image": "images/worker6.jpg",
+    "icon": "icons/driver.png",
+    "description": "Driver with car available for hire by the day.",
+    "trash": false
+  },
+  {
+    "workerName": "Ramya K",
+    "categories": [7],
+    "minWage": 250.00,
+    "priority": "C",
+    "area": "palloor",
+    "phone": "9000001112",
+    "whatsapp": "9000001112",
+    "image": "images/worker7.jpg",
+    "icon": "icons/cook.png",
+    "description": "Home cook, expert in Kerala vegetarian dishes.",
+    "trash": false
+  },
+  {
+    "workerName": "Santhosh M",
+    "categories": [1, 2],
+    "minWage": 550.00,
+    "priority": "B",
+    "area": "mahe",
+    "phone": "9600112233",
+    "whatsapp": "9600112233",
+    "image": "images/worker8.jpg",
+    "icon": "icons/repair.png",
+    "description": "Multitasker: Electrical and plumbing work with full tools.",
+    "trash": false
+  },
+  {
+    "workerName": "Lakshmi R",
+    "categories": [8],
+    "minWage": 380.00,
+    "priority": "B",
+    "area": "pandakkal",
+    "phone": "7889900112",
+    "whatsapp": "7889900112",
+    "image": "images/worker9.jpg",
+    "icon": "icons/sewing.png",
+    "description": "Tailor available for ladies and kids' wear stitching.",
+    "trash": false
+  },
+  {
+    "workerName": "Mohammed Salman",
+    "categories": [9],
+    "minWage": 600.00,
+    "priority": "A",
+    "area": "chokli",
+    "phone": "9112233445",
+    "whatsapp": "9112233445",
+    "image": "images/worker10.jpg",
+    "icon": "icons/welder.png",
+    "description": "Professional welder for gates, grills, and structures.",
+    "trash": false
+  }
+]
+

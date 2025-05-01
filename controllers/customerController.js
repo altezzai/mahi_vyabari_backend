@@ -14,11 +14,14 @@ module.exports = {
     let whereCondition = {};
     if (search) {
       whereCondition = {
-        userName: { [Op.like]: `%${search}%` },
+        [Op.or]: [
+          { userName: { [Op.like]: `%${search}%` } },
+          { phone: { [Op.like]: `%${search}%` } },
+        ],
       };
     }
     try {
-      const customers = await Customer.findAndCountAll({
+      const { count, rows: customers } = await Customer.findAndCountAll({
         limit,
         offset,
         where: whereCondition,
@@ -32,7 +35,13 @@ module.exports = {
         ],
         order: [["createdAt", "DESC"]],
       });
-      return res.status(200).json({ success: true, customers });
+      const totalPages = Math.ceil(count / limit);
+      return res.status(200).json({
+        success: true,
+        totalPages,
+        currentPage: page,
+        data: customers,
+      });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ success: false, message: error.message });
@@ -107,9 +116,11 @@ module.exports = {
           .json({ success: true, message: "Customer Not Found" });
       }
       await customer.update({ trash: true });
-      res
-        .status(200)
-        .json({ success: true, message: "Customer deleted successfully" });
+      res.status(200).json({
+        success: true,
+        message: "Customer deleted successfully",
+        data: customer,
+      });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ success: false, message: error.message });
@@ -125,9 +136,11 @@ module.exports = {
           .json({ success: true, message: "Customer Not Found" });
       }
       await customer.update({ trash: false });
-      res
-        .status(200)
-        .json({ success: true, message: "Customer restored successfully" });
+      res.status(200).json({
+        success: true,
+        message: "Customer restored successfully",
+        data: customer,
+      });
     } catch (error) {
       console.log(error);
       res.status(500).json({ success: false, message: error.message });

@@ -22,7 +22,7 @@ router.patch(
   medDirectoryController.restoreMedicalDirectory
 );
 router.get(
-  "/get-medicalDirectory",
+  "/get-medicalDirectories",
   medDirectoryController.getMedicalDirectories
 );
 router.get(

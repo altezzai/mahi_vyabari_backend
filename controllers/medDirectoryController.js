@@ -60,7 +60,7 @@ module.exports = {
       category,
       name,
       phone,
-      subcategory,
+      subCategory,
       whatsapp,
       website,
       location,
@@ -72,7 +72,6 @@ module.exports = {
       priority,
       area,
     } = req.body;
-    console.log(req.body);
     try {
       const { id } = req.params;
       const healthcareProvider = await Medical.findByPk(id);
@@ -107,7 +106,7 @@ module.exports = {
         category: category || healthcareProvider.category,
         name: name || healthcareProvider.name,
         phone: phone || healthcareProvider.phone,
-        subcategory: subcategory || healthcareProvider.subcategory,
+        subCategory: subCategory || healthcareProvider.subCategory,
         whatsapp: whatsapp || healthcareProvider.whatsapp,
         website: website || healthcareProvider.website,
         location: location || healthcareProvider.location,
@@ -191,19 +190,24 @@ module.exports = {
     let whereCondition = {};
     if (search) {
       whereCondition = {
-        name: { [Op.like]: `%${search}%` },
+        [Op.or]: [
+          { name: { [Op.like]: `%${search}%` } },
+          { category: { [Op.like]: `%${search}%` } },
+        ],
       };
     }
     try {
-      const medical = await Medical.findAndCountAll({
+      const { count, rows: medical } = await Medical.findAndCountAll({
         limit,
         offset,
         attributes: ["id", "name", "priority", "category", "trash"],
         where: whereCondition,
         order: [["createdAt", "DESC"]],
       });
-
-      res.status(200).json({ success: true, data: medical });
+      const totalPages = Math.ceil(count / limit);
+      return res
+        .status(200)
+        .json({ success: true, totalPages, currentPage: page, data: medical });
     } catch (error) {
       console.error(error);
       res.status(500).json({
@@ -215,14 +219,14 @@ module.exports = {
   getMedicalDirectoryById: async (req, res) => {
     try {
       const { id } = req.params;
-      const healthcareProvider = await Medical.findByPk(id,{
-        include:[
+      const healthcareProvider = await Medical.findByPk(id, {
+        include: [
           {
-            model:Category,
-            attributes:["id","categoryName"],
-            as:"categoryInfo"
-          }
-        ]
+            model: Category,
+            attributes: ["id", "categoryName"],
+            as: "categoryInfo",
+          },
+        ],
       });
       if (!healthcareProvider) {
         return res
