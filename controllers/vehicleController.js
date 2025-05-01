@@ -382,7 +382,15 @@ module.exports = {
   getVehicleServiceProviderById: async (req, res) => {
     try {
       const { id } = req.params;
-      const vehicleService = await VehicleService.findByPk(id);
+      const vehicleService = await VehicleService.findByPk(id,{
+        include:[
+          {
+            model:Category,
+            attributes:["id","categoryName"],
+            as:"taxiCategory"
+          }
+        ]
+      });
       if (!vehicleService) {
         return res
           .status(404)

@@ -201,7 +201,15 @@ module.exports = {
   getClassfiedById: async (req, res) => {
     try {
       const { id } = req.params;
-      const classified = await Classified.findByPk(id);
+      const classified = await Classified.findByPk(id, {
+        include: [
+          {
+            model: Category,
+            attributes: ["id", "categoryName"],
+            as: "itemCategory",
+          },
+        ],
+      });
       if (!classified) {
         return res
           .status(404)

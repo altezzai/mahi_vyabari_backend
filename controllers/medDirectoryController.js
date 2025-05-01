@@ -215,7 +215,15 @@ module.exports = {
   getMedicalDirectoryById: async (req, res) => {
     try {
       const { id } = req.params;
-      const healthcareProvider = await Medical.findByPk(id);
+      const healthcareProvider = await Medical.findByPk(id,{
+        include:[
+          {
+            model:Category,
+            attributes:["id","categoryName"],
+            as:"categoryInfo"
+          }
+        ]
+      });
       if (!healthcareProvider) {
         return res
           .status(404)
