@@ -137,6 +137,7 @@ module.exports = {
       closingTime,
       workingDays,
       priority,
+      website,
       areas,
     } = req.body;
     try {

@@ -28,7 +28,6 @@ const Shop = sequelize.define(
           const parsed = rawValue ? JSON.parse(rawValue) : [];
           return Array.isArray(parsed) ? parsed.map(Number) : [];
         } catch (e) {
-          console.log(e)
           return [];
         }
       },
