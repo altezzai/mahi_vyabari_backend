@@ -12,6 +12,8 @@ const Tourism = require("../models/Tourism");
 const { Sequelize, where, Op } = require("sequelize");
 const Category = require("../models/Category");
 const Product = require("../models/Product");
+const Type = require("../models/Type");
+const { getWorkerCategory } = require("./workerController");
 
 module.exports = {
   homePage: async (req, res) => {
@@ -756,4 +758,58 @@ module.exports = {
       res.status(500).json({ success: false, message: error.message });
     }
   },
+  getShopCategories:async(req,res)=>{
+    try {
+      const shopCategories = await Type.findAll({
+        where:{typeName:"shop"},
+        attributes:[],
+        include:[
+          {
+            model:Category,
+            attributes:["id","categoryName","icon"],
+          }
+        ]
+      })
+      return res.status(200).json({success:true,shopCategories});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({success:false,message:error.message});
+    }
+  },
+  getWorkerCategory:async(req,res)=>{
+    try {
+      const workerCategory = await Type.findAll({
+        where:{typeName:"worker"},
+        attributes:[],
+        include:[
+          {
+            model:Category,
+            attributes:["id","categoryName","icon"]
+          }
+        ]
+      })
+      return res.status(200).json({success:true,workerCategory});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({success:false,message:error.message})
+    }
+  },
+  getClassifiedCategory:async(req,res)=>{
+    try {
+      const classifiedCategories = await Type.findAll({
+        where:{typeName:"classified"},
+        attributes:[],
+        include:[
+          {
+            model:Category,
+            attributes:["id","categoryName","icon"]
+          }
+        ]
+      })
+      return res.status(200).json({success:true,classifiedCategories});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({success:false,message:error.message});
+    }
+  }
 };

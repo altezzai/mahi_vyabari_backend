@@ -67,7 +67,7 @@ module.exports = {
   updateWorkerProfile: async (req, res) => {
     const {
       categories,
-      name,
+      workerName,
       minWage,
       priority,
       area,
@@ -113,7 +113,7 @@ module.exports = {
       }
       await worker.update({
         categories,
-        name,
+        workerName,
         minWage,
         priority,
         area,
