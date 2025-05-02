@@ -669,7 +669,7 @@ module.exports = {
       const { count, rows: classifieds } = await Classified.findAndCountAll({
         limit,
         offset,
-        attributes: ["itemName", "price", "image"],
+        attributes: ["id","itemName", "price", "image","phone"],
         where: whereCondition,
         include: [
           {
