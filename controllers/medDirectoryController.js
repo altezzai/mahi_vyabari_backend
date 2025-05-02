@@ -207,7 +207,13 @@ module.exports = {
       const totalPages = Math.ceil(count / limit);
       return res
         .status(200)
-        .json({ success: true, totalPages, currentPage: page, data: medical });
+        .json({
+          success: true,
+          count,
+          totalPages,
+          currentPage: page,
+          data: medical,
+        });
     } catch (error) {
       console.error(error);
       res.status(500).json({

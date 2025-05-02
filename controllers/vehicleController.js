@@ -28,7 +28,7 @@ const upload = multer({ storage });
 
 module.exports = {
   upload,
-  createVehicleSchedule: async (req, res) => {
+  addVehicleSchedule: async (req, res) => {
     try {
       const savedSchedule = await VehicleSchedule.create(req.body);
       if (!savedSchedule) {
@@ -150,26 +150,41 @@ module.exports = {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
-    const whereCondition = {};
+    let whereCondition = {};
     if (search) {
       whereCondition = {
-        vehicleName: { [Op.like]: `%${search}%` },
+        [Op.or]: [
+          { vehicleName: { [Op.like]: `%${search}%` } },
+          { category: { [Op.like]: `%${search}%` } },
+          { via: { [Op.like]: `%${search}%` } },
+          { to: { [Op.like]: `%${search}%` } },
+        ],
       };
     }
     try {
-      const vehicleSchedules = await VehicleSchedule.findAndCountAll({
-        limit,
-        offset,
-        where: whereCondition,
-        attributes: ["id", "vehicleName", "category", "via", "to", "trash"],
-        order: [["createdAt", "DESC"]],
-      });
+      const { count, rows: vehicleSchedules } =
+        await VehicleSchedule.findAndCountAll({
+          limit,
+          offset,
+          where: whereCondition,
+          attributes: ["id", "vehicleName", "category", "via", "to", "trash"],
+          order: [["createdAt", "DESC"]],
+        });
       if (!vehicleSchedules) {
         return res
           .status(404)
           .json({ success: false, message: "Vehicle Schedule not found" });
       }
-      return res.status(200).json({ success: true, data: vehicleSchedules });
+      const totalPages = Math.ceil(count / limit);
+      return res
+        .status(200)
+        .json({
+          success: true,
+          count,
+          totalPages,
+          currentPage: page,
+          data: vehicleSchedules,
+        });
     } catch (error) {
       console.error(error);
       return res.status(500).json({
@@ -382,14 +397,14 @@ module.exports = {
   getVehicleServiceProviderById: async (req, res) => {
     try {
       const { id } = req.params;
-      const vehicleService = await VehicleService.findByPk(id,{
-        include:[
+      const vehicleService = await VehicleService.findByPk(id, {
+        include: [
           {
-            model:Category,
-            attributes:["id","categoryName"],
-            as:"taxiCategory"
-          }
-        ]
+            model: Category,
+            attributes: ["id", "categoryName"],
+            as: "taxiCategory",
+          },
+        ],
       });
       if (!vehicleService) {
         return res

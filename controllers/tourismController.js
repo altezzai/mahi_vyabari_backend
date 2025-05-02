@@ -26,13 +26,13 @@ module.exports = {
     try {
       const tourismData = {
         ...req.body,
-        images:req.files.map((file)=>file.filename)
+        images: req.files.map((file) => file.filename),
       };
       const tourism = await Tourism.create(tourismData);
-      res.status(201).json({ success: true, tourism });
+      return res.status(201).json({ success: true, tourism });
     } catch (error) {
       console.log(error);
-      res.status(500).json({ success: false, message: error.message });
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
   updateTouristPlace: async (req, res) => {
@@ -48,7 +48,7 @@ module.exports = {
       let newImages = tourism.images;
       if (req.files) {
         if (tourism.images) {
-          await JSON.parse(tourism.images).forEach((imageName) => {
+          await tourism.images.forEach((imageName) => {
             if (!imageName || typeof imageName !== "string") return;
             const oldImagePath = path.join(uploadPath, imageName);
             if (fs.existsSync(oldImagePath)) {
@@ -56,7 +56,7 @@ module.exports = {
             }
           });
         }
-        newImages = JSON.stringify(req.files.map((file) => file.filename));
+        newImages = req.files.map((file) => file.filename);
       }
       const updatedTourism = await tourism.update({
         placeName,
@@ -67,10 +67,10 @@ module.exports = {
         entryFee,
         images: newImages,
       });
-      res.status(200).json({ success: true, updatedTourism });
+      return res.status(200).json({ success: true, updatedTourism });
     } catch (error) {
       console.log(error);
-      res.status(500).json({ success: false, message: error.message });
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
   deleteTouristPlace: async (req, res) => {
@@ -83,9 +83,9 @@ module.exports = {
           .json({ success: false, message: "Tourism not found" });
       }
       await tourism.update({ trash: true });
-      res.status(200).json({ success: true, tourism });
+      return res.status(200).json({ success: true, tourism });
     } catch (error) {
-      res.status(500).json({ success: false, message: error.message });
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
   restoreTouristPlace: async (req, res) => {
@@ -98,9 +98,9 @@ module.exports = {
           .json({ success: false, message: "Tourism not found" });
       }
       await tourism.update({ trash: false });
-      res.status(200).json({ success: true, tourism });
+      return res.status(200).json({ success: true, tourism });
     } catch (error) {
-      res.status(500).json({ success: false, message: error.message });
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
   getTouristPlaces: async (req, res) => {
@@ -111,21 +111,35 @@ module.exports = {
     let whereCondition = {};
     if (search) {
       whereCondition = {
-       placeName: { [Op.like]: `%${search}%` },
+        [Op.or]: [
+          { placeName: { [Op.like]: `%${search}%` } },
+          { area: { [Op.like]: `%${search}%` } },
+        ],
       };
     }
     try {
-      const tourism = await Tourism.findAndCountAll({
+      const { count, rows: tourism } = await Tourism.findAndCountAll({
         limit,
         offset,
         where: whereCondition,
         attributes: ["id", "placeName", "phone", "trash"],
         order: [["createdAt", "DESC"]],
       });
-      res.status(200).json({ success: true, tourism });
+      const totalPages = Math.ceil(count / limit);
+      return res
+        .status(200)
+        .json({
+          success: true,
+          count,
+          totalPages,
+          currentPage: page,
+          data: tourism,
+        });
     } catch (error) {
       console.log(error);
-      res.status(500).json({ success: false, message: error.message,name:error.name });
+      res
+        .status(500)
+        .json({ success: false, message: error.message, name: error.name });
     }
   },
   getTouristPlaceById: async (req, res) => {

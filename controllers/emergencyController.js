@@ -157,6 +157,7 @@ module.exports = {
       const totalPages = Math.ceil(count / limit);
       return res.status(200).json({
         success: true,
+        count,
         totalPages,
         currentPage: page,
         data: emergencies,

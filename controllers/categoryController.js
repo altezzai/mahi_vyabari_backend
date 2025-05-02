@@ -164,6 +164,7 @@ module.exports = {
       console.log(count, totalPages);
       return res.status(200).json({
         success: true,
+        count,
         totalPages,
         currentPage: page,
         data: categories,

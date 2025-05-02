@@ -131,7 +131,13 @@ module.exports = {
       const totalPages = Math.ceil(count / limit);
       return res
         .status(200)
-        .json({ success: true, totalPages, currentPage: page, data: products });
+        .json({
+          success: true,
+          count,
+          totalPages,
+          currentPage: page,
+          data: products,
+        });
     } catch (error) {
       console.error(error);
       return res.status(500).json({
