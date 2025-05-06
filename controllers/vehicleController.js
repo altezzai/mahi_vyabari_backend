@@ -449,6 +449,7 @@ module.exports = {
           {
             model: Category,
             attributes: ["id", "categoryName"],
+            as:"category"
           },
         ],
       });
