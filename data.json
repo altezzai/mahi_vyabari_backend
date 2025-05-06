@@ -860,8 +860,6 @@
     "description": "Reliable taxi service covering Mahe and nearby areas.",
     "area": "mahe",
     "address": "Near Mahe Church",
-    "image": "images/taxi1.jpg",
-    "icon": "icons/taxi1.png",
     "trash": false
   },
   {
@@ -875,8 +873,6 @@
     "description": "Quick auto-rickshaw rides available in Palloor.",
     "area": "palloor",
     "address": "Main Road, Palloor",
-    "image": "images/auto1.jpg",
-    "icon": "icons/auto1.png",
     "trash": false
   },
   {
@@ -890,8 +886,6 @@
     "description": "24/7 Taxi service for long distance travel.",
     "area": "chokli",
     "address": "Opposite Chokli Market",
-    "image": "images/taxi2.jpg",
-    "icon": "icons/taxi2.png",
     "trash": false
   },
   {
@@ -905,8 +899,6 @@
     "description": "Friendly driver, available daily from 6 AM to 10 PM.",
     "area": "pandakkal",
     "address": "Near Government School",
-    "image": "images/auto2.jpg",
-    "icon": "icons/auto2.png",
     "trash": false
   },
   {
@@ -920,8 +912,6 @@
     "description": "Well-maintained sedan taxi with AC.",
     "area": "mahe",
     "address": "Mahe Beach Road",
-    "image": "images/taxi3.jpg",
-    "icon": "icons/taxi3.png",
     "trash": false
   },
   {
@@ -935,8 +925,6 @@
     "description": "Affordable and fast service across Mahe town.",
     "area": "mahe",
     "address": "Near Old Bus Stand",
-    "image": "images/auto3.jpg",
-    "icon": "icons/auto3.png",
     "trash": false
   },
   {
@@ -950,8 +938,6 @@
     "description": "Ladies-only taxi service available on request.",
     "area": "palloor",
     "address": "Near Govt. Hospital",
-    "image": "images/taxi4.jpg",
-    "icon": "icons/taxi4.png",
     "trash": false
   },
   {
@@ -965,8 +951,6 @@
     "description": "Operates in Chokli and nearby villages.",
     "area": "chokli",
     "address": "Murugan Auto Stand",
-    "image": "images/auto4.jpg",
-    "icon": "icons/auto4.png",
     "trash": false
   },
   {
@@ -980,8 +964,6 @@
     "description": "Van service for school children and family trips.",
     "area": "pandakkal",
     "address": "Rekha Nagar",
-    "image": "images/van1.jpg",
-    "icon": "icons/van1.png",
     "trash": false
   },
   {
@@ -995,8 +977,6 @@
     "description": "Comfortable taxi with experienced driver.",
     "area": "mahe",
     "address": "Taxi Stand No. 2",
-    "image": "images/taxi5.jpg",
-    "icon": "icons/taxi5.png",
     "trash": false
   }
 ]
@@ -1005,6 +985,7 @@
 
 [
   {
+    "id":1,
     "workerName": "Rajeev Kumar",
     "categories": [1, 3],
     "minWage": 500.00,
@@ -1012,12 +993,11 @@
     "area": "mahe",
     "phone": "9876543210",
     "whatsapp": "9876543210",
-    "image": "images/worker1.jpg",
-    "icon": "icons/electrician.png",
     "description": "Experienced electrician and plumber with 10 years in service.",
     "trash": false
   },
   {
+    "id":2,
     "workerName": "Anil Thomas",
     "categories": [2],
     "minWage": 450.00,
@@ -1025,12 +1005,11 @@
     "area": "chokli",
     "phone": "9123456780",
     "whatsapp": "9123456780",
-    "image": "images/worker2.jpg",
-    "icon": "icons/plumber.png",
     "description": "Quick and reliable plumbing services.",
     "trash": false
   },
   {
+    "id":3,
     "workerName": "Fathima Beevi",
     "categories": [4],
     "minWage": 400.00,
@@ -1038,12 +1017,11 @@
     "area": "palloor",
     "phone": "9000011122",
     "whatsapp": "9000011122",
-    "image": "images/worker3.jpg",
-    "icon": "icons/cleaning.png",
     "description": "Professional house cleaner, available for daily/weekly work.",
     "trash": false
   },
   {
+    "id":4,
     "workerName": "Manoj P",
     "categories": [3],
     "minWage": 600.00,
@@ -1051,12 +1029,11 @@
     "area": "pandakkal",
     "phone": "9988776655",
     "whatsapp": "9988776655",
-    "image": "images/worker4.jpg",
-    "icon": "icons/carpenter.png",
     "description": "Skilled carpenter, expert in furniture and fittings.",
     "trash": false
   },
   {
+    "id":5,
     "workerName": "Sini V",
     "categories": [5],
     "minWage": 300.00,
@@ -1064,12 +1041,11 @@
     "area": "mahe",
     "phone": "8877665544",
     "whatsapp": "8877665544",
-    "image": "images/worker5.jpg",
-    "icon": "icons/babysitter.png",
     "description": "Reliable babysitter, available during the day and night.",
     "trash": false
   },
   {
+    "id":6,
     "workerName": "Jose Mathew",
     "categories": [6],
     "minWage": 700.00,
@@ -1077,12 +1053,11 @@
     "area": "chokli",
     "phone": "8123456789",
     "whatsapp": "8123456789",
-    "image": "images/worker6.jpg",
-    "icon": "icons/driver.png",
     "description": "Driver with car available for hire by the day.",
     "trash": false
   },
   {
+    "id":7,
     "workerName": "Ramya K",
     "categories": [7],
     "minWage": 250.00,
@@ -1090,12 +1065,11 @@
     "area": "palloor",
     "phone": "9000001112",
     "whatsapp": "9000001112",
-    "image": "images/worker7.jpg",
-    "icon": "icons/cook.png",
     "description": "Home cook, expert in Kerala vegetarian dishes.",
     "trash": false
   },
   {
+    "id":8,
     "workerName": "Santhosh M",
     "categories": [1, 2],
     "minWage": 550.00,
@@ -1103,12 +1077,11 @@
     "area": "mahe",
     "phone": "9600112233",
     "whatsapp": "9600112233",
-    "image": "images/worker8.jpg",
-    "icon": "icons/repair.png",
     "description": "Multitasker: Electrical and plumbing work with full tools.",
     "trash": false
   },
   {
+    "id":9,
     "workerName": "Lakshmi R",
     "categories": [8],
     "minWage": 380.00,
@@ -1116,12 +1089,11 @@
     "area": "pandakkal",
     "phone": "7889900112",
     "whatsapp": "7889900112",
-    "image": "images/worker9.jpg",
-    "icon": "icons/sewing.png",
     "description": "Tailor available for ladies and kids' wear stitching.",
     "trash": false
   },
   {
+    "id":10,
     "workerName": "Mohammed Salman",
     "categories": [9],
     "minWage": 600.00,
@@ -1129,10 +1101,532 @@
     "area": "chokli",
     "phone": "9112233445",
     "whatsapp": "9112233445",
-    "image": "images/worker10.jpg",
-    "icon": "icons/welder.png",
     "description": "Professional welder for gates, grills, and structures.",
     "trash": false
   }
 ]
 
+//sample shop datass
+
+[
+  {
+    "id":1,
+    "shopName": "Sunrise Groceries",
+    "categories": [1, 3],
+    "email": "contact@sunrisegroceries.com",
+    "phone": "9876543210",
+    "whatsapp": "9876543210",
+    "website": "https://sunrisegroceries.example.com",
+    "location": "123 Market Street",
+    "description": "Fresh fruits, vegetables and everyday staples.",
+    "address": "123 Market Street, Mahe",
+    "openingTime": "08:00",
+    "closingTime": "20:00",
+    "workingDays": "Mon-Sat",
+    "priority": "A",
+    "area": "mahe",
+    "trash": false
+  },
+  {
+    "id":2,
+    "shopName": "Tech Hub",
+    "categories": [2, 5],
+    "email": "support@techhub.com",
+    "phone": "9123456780",
+    "whatsapp": "9123456780",
+    "website": "https://techhub.example.com",
+    "location": "45 Silicon Avenue",
+    "description": "Latest gadgets and repair services.",
+    "address": "45 Silicon Avenue, Chokli",
+    "openingTime": "10:00",
+    "closingTime": "22:00",
+    "workingDays": "Everyday",
+    "priority": "B",
+    "area": "chokli",
+    "trash": false
+  },
+  {
+    "id":3,
+    "shopName": "Fashion Fiesta",
+    "categories": [4, 6],
+    "email": "hello@fashionfiesta.com",
+    "phone": "9988776655",
+    "whatsapp": "9988776655",
+    "website": "https://fashionfiesta.example.com",
+    "location": "78 Style Road",
+    "description": "Trendy clothing for men and women.",
+    "address": "78 Style Road, Palloor",
+    "openingTime": "11:00",
+    "closingTime": "21:00",
+    "workingDays": "Tue-Sun",
+    "priority": "A",
+    "area": "palloor",
+    "trash": false
+  },
+  {
+    "id":4,
+    "shopName": "Burger Barn",
+    "categories": [7],
+    "email": "order@burgerbarn.com",
+    "phone": "9012345678",
+    "whatsapp": "9012345678",
+    "website": "https://burgerbarn.example.com",
+    "location": "9 Food Court",
+    "description": "Juicy burgers and crispy fries.",
+    "address": "9 Food Court, Pandakkal",
+    "openingTime": "12:00",
+    "closingTime": "23:00",
+    "workingDays": "Everyday",
+    "priority": "C",
+    "area": "pandakkal",
+    "trash": false
+  },
+  {
+    "id":5,
+    "shopName": "Health Plus Pharmacy",
+    "categories": [8],
+    "email": "info@healthpluspharmacy.com",
+    "phone": "9090909090",
+    "whatsapp": "9090909090",
+    "website": "",
+    "location": "22 Wellness Blvd",
+    "description": "Medicines, supplements and health advice.",
+    "address": "22 Wellness Blvd, Mahe",
+    "openingTime": "09:00",
+    "closingTime": "21:00",
+    "workingDays": "Mon-Fri",
+    "priority": "B",
+    "area": "mahe",
+    "trash": false
+  },
+  {
+    "id":6,
+    "shopName": "Knowledge Nook",
+    "categories": [9, 3],
+    "email": "contact@knowledgenook.com",
+    "phone": "9234567812",
+    "whatsapp": "9234567812",
+    "website": "https://knowledgenook.example.com",
+    "location": "101 Library Lane",
+    "description": "Books, stationery and study materials.",
+    "address": "101 Library Lane, Chokli",
+    "openingTime": "10:00",
+    "closingTime": "19:00",
+    "workingDays": "Mon-Sat",
+    "priority": "A",
+    "area": "chokli",
+    "trash": false
+  },
+  {
+    "id":7,
+    "shopName": "Handy Mechanics",
+    "categories": [10],
+    "email": "service@handymechanics.com",
+    "phone": "9345678921",
+    "whatsapp": "9345678921",
+    "website": "",
+    "location": "7 Repair Road",
+    "description": "Automotive repair and maintenance.",
+    "address": "7 Repair Road, Palloor",
+    "openingTime": "08:30",
+    "closingTime": "18:30",
+    "workingDays": "Mon-Fri",
+    "priority": "B",
+    "area": "palloor",
+    "trash": false
+  },
+  {
+    "id":8,
+    "shopName": "Glamour Salon",
+    "categories": [3],
+    "email": "bookings@glamoursalon.com",
+    "phone": "9456789034",
+    "whatsapp": "9456789034",
+    "website": "https://glamoursalon.example.com",
+    "location": "55 Beauty Blvd",
+    "description": "Hair, nails, and spa treatments.",
+    "address": "55 Beauty Blvd, Pandakkal",
+    "openingTime": "09:30",
+    "closingTime": "20:00",
+    "workingDays": "Tue-Sun",
+    "priority": "A",
+    "area": "pandakkal",
+    "trash": false
+  },
+  {
+    "id":9,
+    "shopName": "Coffee Corner",
+    "categories": [2, 3],
+    "email": "hello@coffeecorner.com",
+    "phone": "9567890123",
+    "whatsapp": "9567890123",
+    "website": "https://coffeecorner.example.com",
+    "location": "12 Espresso Street",
+    "description": "Artisan coffee and light bites.",
+    "address": "12 Espresso Street, Mahe",
+    "openingTime": "07:00",
+    "closingTime": "19:00",
+    "workingDays": "Everyday",
+    "priority": "B",
+    "area": "mahe",
+    "trash": false
+  },
+  {
+    "id":10,
+    "shopName": "Home Fixers",
+    "categories": [8, 5],
+    "email": "contact@homefixers.com",
+    "phone": "9678901234",
+    "whatsapp": "9678901234",
+    "website": "",
+    "location": "33 Service Lane",
+    "description": "Electric, plumbing and carpentry services.",
+    "address": "33 Service Lane, Chokli",
+    "openingTime": "08:00",
+    "closingTime": "18:00",
+    "workingDays": "Mon-Sat",
+    "priority": "C",
+    "area": "chokli",
+    "trash": false
+  },
+  {
+    "id":11,
+    "shopName": "Artisan Crafts",
+    "categories": [10, 3],
+    "email": "hello@artisancrafts.com",
+    "phone": "9123001122",
+    "whatsapp": "9123001122",
+    "website": "https://artisancrafts.example.com",
+    "location": "15 Creative Court",
+    "description": "Handmade pottery, paintings, and home décor.",
+    "address": "15 Creative Court, Mahe",
+    "openingTime": "10:00",
+    "closingTime": "18:00",
+    "workingDays": "Wed-Sun",
+    "priority": "B",
+    "area": "mahe",
+    "trash": false
+  },
+  {
+    "id":12,
+    "shopName": "Melody Music Store",
+    "categories": [7],
+    "email": "sales@melodymusic.com",
+    "phone": "9234112233",
+    "whatsapp": "9234112233",
+    "website": "",
+    "location": "27 Harmony Lane",
+    "description": "Instruments, sheet music, and tuning services.",
+    "address": "27 Harmony Lane, Chokli",
+    "openingTime": "09:30",
+    "closingTime": "19:30",
+    "workingDays": "Mon-Sat",
+    "priority": "A",
+    "area": "chokli",
+    "trash": false
+  },
+  {
+    "id":13,
+    "shopName": "Sweet Tooth Bakery",
+    "categories": [7, 9],
+    "email": "order@sweettoothbakery.com",
+    "phone": "9345223344",
+    "whatsapp": "9345223344",
+    "website": "https://sweettoothbakery.example.com",
+    "location": "3 Dessert Drive",
+    "description": "Cakes, pastries, and custom celebration orders.",
+    "address": "3 Dessert Drive, Palloor",
+    "openingTime": "07:30",
+    "closingTime": "20:00",
+    "workingDays": "Everyday",
+    "priority": "A",
+    "area": "palloor",
+    "trash": false
+  },
+  {
+    "id":14,
+    "shopName": "Fitness Gear",
+    "categories": [10],
+    "email": "contact@fitnessgear.com",
+    "phone": "9456334455",
+    "whatsapp": "9456334455",
+    "website": "",
+    "location": "88 Muscle Blvd",
+    "description": "Gym equipment, apparel, and supplements.",
+    "address": "88 Muscle Blvd, Pandakkal",
+    "openingTime": "06:00",
+    "closingTime": "22:00",
+    "workingDays": "Mon-Sun",
+    "priority": "B",
+    "area": "pandakkal",
+    "trash": false
+  },
+  {
+    "id":15,
+    "shopName": "Gift Galore",
+    "categories": [1, 3],
+    "email": "support@giftgalore.com",
+    "phone": "9567445566",
+    "whatsapp": "9567445566",
+    "website": "https://giftgalore.example.com",
+    "location": "50 Celebration Street",
+    "description": "Gifts, cards, and party supplies.",
+    "address": "50 Celebration Street, Mahe",
+    "openingTime": "10:00",
+    "closingTime": "21:00",
+    "workingDays": "Tue-Sun",
+    "priority": "C",
+    "area": "mahe",
+    "trash": false
+  }
+]
+
+//sample feedback data
+
+[
+  { "id": 1,  "userId": 1,  "shopId": 1,  "rating": 5, "createdAt": "2025-04-20T10:15:30.000Z", "updatedAt": "2025-04-20T10:15:30.000Z" },
+  { "id": 2,  "userId": 2,  "shopId": 2,  "rating": 4, "createdAt": "2025-04-20T11:20:10.000Z", "updatedAt": "2025-04-20T11:20:10.000Z" },
+  { "id": 3,  "userId": 3,  "shopId": 3,  "rating": 3, "createdAt": "2025-04-21T08:30:10.000Z", "updatedAt": "2025-04-21T08:30:10.000Z" },
+  { "id": 4,  "userId": 4,  "shopId": 4,  "rating": 2, "createdAt": "2025-04-21T09:45:00.000Z", "updatedAt": "2025-04-21T09:45:00.000Z" },
+  { "id": 5,  "userId": 5,  "shopId": 5,  "rating": 5, "createdAt": "2025-04-22T07:20:15.000Z", "updatedAt": "2025-04-22T07:20:15.000Z" },
+  { "id": 6,  "userId": 6,  "shopId": 6,  "rating": 4, "createdAt": "2025-04-22T10:10:45.000Z", "updatedAt": "2025-04-22T10:10:45.000Z" },
+  { "id": 7,  "userId": 7,  "shopId": 7,  "rating": 1, "createdAt": "2025-04-23T12:00:00.000Z", "updatedAt": "2025-04-23T12:00:00.000Z" },
+  { "id": 8,  "userId": 8,  "shopId": 8,  "rating": 3, "createdAt": "2025-04-23T13:25:30.000Z", "updatedAt": "2025-04-23T13:25:30.000Z" },
+  { "id": 9,  "userId": 9,  "shopId": 9,  "rating": 2, "createdAt": "2025-04-24T07:55:20.000Z", "updatedAt": "2025-04-24T07:55:20.000Z" },
+  { "id": 10, "userId": 10, "shopId": 10, "rating": 5, "createdAt": "2025-04-24T08:40:05.000Z", "updatedAt": "2025-04-24T08:40:05.000Z" },
+  { "id": 11, "userId": 1,  "shopId": 2,  "rating": 4, "createdAt": "2025-04-25T09:15:00.000Z", "updatedAt": "2025-04-25T09:15:00.000Z" },
+  { "id": 12, "userId": 2,  "shopId": 3,  "rating": 5, "createdAt": "2025-04-25T11:45:25.000Z", "updatedAt": "2025-04-25T11:45:25.000Z" },
+  { "id": 13, "userId": 3,  "shopId": 4,  "rating": 2, "createdAt": "2025-04-26T14:30:10.000Z", "updatedAt": "2025-04-26T14:30:10.000Z" },
+  { "id": 14, "userId": 4,  "shopId": 5,  "rating": 3, "createdAt": "2025-04-26T17:05:50.000Z", "updatedAt": "2025-04-26T17:05:50.000Z" },
+  { "id": 15, "userId": 5,  "shopId": 6,  "rating": 1, "createdAt": "2025-04-27T08:20:15.000Z", "updatedAt": "2025-04-27T08:20:15.000Z" },
+  { "id": 16, "userId": 6,  "shopId": 7,  "rating": 5, "createdAt": "2025-04-27T10:55:40.000Z", "updatedAt": "2025-04-27T10:55:40.000Z" },
+  { "id": 17, "userId": 7,  "shopId": 8,  "rating": 4, "createdAt": "2025-04-28T13:35:05.000Z", "updatedAt": "2025-04-28T13:35:05.000Z" },
+  { "id": 18, "userId": 8,  "shopId": 9,  "rating": 2, "createdAt": "2025-04-28T16:10:30.000Z", "updatedAt": "2025-04-28T16:10:30.000Z" },
+  { "id": 19, "userId": 9,  "shopId": 10, "rating": 3, "createdAt": "2025-04-29T07:50:20.000Z", "updatedAt": "2025-04-29T07:50:20.000Z" },
+  { "id": 20, "userId": 10, "shopId": 1,  "rating": 5, "createdAt": "2025-04-29T09:25:55.000Z", "updatedAt": "2025-04-29T09:25:55.000Z" }
+]
+
+//sample complaints data 
+
+[
+  {
+    "id": 1,
+    "userId": 1,
+    "shopId": 1,
+    "description": "Order never arrived despite confirmation.",
+    "status": "pending",
+    "resolution": null,
+    "trash": false,
+    "createdAt": "2025-04-01T09:15:00.000Z",
+    "updatedAt": "2025-04-01T09:15:00.000Z"
+  },
+  {
+    "id": 2,
+    "userId": 2,
+    "shopId": 2,
+    "description": "Received wrong item; expected size M, got size L.",
+    "status": "resolved",
+    "resolution": "Replaced with correct size, shipped on 2025-04-05.",
+    "trash": false,
+    "createdAt": "2025-04-02T11:30:00.000Z",
+    "updatedAt": "2025-04-05T14:00:00.000Z"
+  },
+  {
+    "id": 3,
+    "userId": 3,
+    "shopId": 3,
+    "description": "Product packaging was damaged.",
+    "status": "resolved",
+    "resolution": "Issued full refund on 2025-04-06.",
+    "trash": false,
+    "createdAt": "2025-04-03T08:45:00.000Z",
+    "updatedAt": "2025-04-06T10:20:00.000Z"
+  },
+  {
+    "id": 4,
+    "userId": 4,
+    "shopId": 4,
+    "description": "Late delivery by 3 days.",
+    "status": "pending",
+    "resolution": null,
+    "trash": false,
+    "createdAt": "2025-04-04T13:10:00.000Z",
+    "updatedAt": "2025-04-04T13:10:00.000Z"
+  },
+  {
+    "id": 5,
+    "userId": 5,
+    "shopId": 5,
+    "description": "Item stopped working after one use.",
+    "status": "rejected",
+    "resolution": "Outside warranty period.",
+    "trash": false,
+    "createdAt": "2025-04-05T16:25:00.000Z",
+    "updatedAt": "2025-04-07T09:00:00.000Z"
+  },
+  {
+    "id": 6,
+    "userId": 6,
+    "shopId": 6,
+    "description": "Charged twice for one order.",
+    "status": "resolved",
+    "resolution": "Refunded duplicate charge on 2025-04-08.",
+    "trash": false,
+    "createdAt": "2025-04-06T10:50:00.000Z",
+    "updatedAt": "2025-04-08T12:30:00.000Z"
+  },
+  {
+    "id": 7,
+    "userId": 7,
+    "shopId": 7,
+    "description": "Customer support was unresponsive.",
+    "status": "pending",
+    "resolution": null,
+    "trash": false,
+    "createdAt": "2025-04-07T09:05:00.000Z",
+    "updatedAt": "2025-04-07T09:05:00.000Z"
+  },
+  {
+    "id": 8,
+    "userId": 8,
+    "shopId": 8,
+    "description": "Missing accessories in the package.",
+    "status": "resolved",
+    "resolution": "Sent missing accessories on 2025-04-10.",
+    "trash": false,
+    "createdAt": "2025-04-08T14:15:00.000Z",
+    "updatedAt": "2025-04-10T11:45:00.000Z"
+  },
+  {
+    "id": 9,
+    "userId": 9,
+    "shopId": 9,
+    "description": "Website crashed during checkout.",
+    "status": "resolved",
+    "resolution": "Fixed bug; provided 10% discount code.",
+    "trash": false,
+    "createdAt": "2025-04-09T12:00:00.000Z",
+    "updatedAt": "2025-04-11T08:30:00.000Z"
+  },
+  {
+    "id": 10,
+    "userId": 10,
+    "shopId": 10,
+    "description": "Received counterfeit product.",
+    "status": "pending",
+    "resolution": null,
+    "trash": false,
+    "createdAt": "2025-04-10T15:40:00.000Z",
+    "updatedAt": "2025-04-10T15:40:00.000Z"
+  },
+  {
+    "id": 11,
+    "userId": 1,
+    "shopId": 2,
+    "description": "Quality not as described.",
+    "status": "rejected",
+    "resolution": "Product matched description; claim denied.",
+    "trash": false,
+    "createdAt": "2025-04-11T10:20:00.000Z",
+    "updatedAt": "2025-04-12T09:00:00.000Z"
+  },
+  {
+    "id": 12,
+    "userId": 2,
+    "shopId": 4,
+    "description": "Overcharged shipping fee.",
+    "status": "resolved",
+    "resolution": "Refunded extra shipping on 2025-04-13.",
+    "trash": false,
+    "createdAt": "2025-04-12T11:55:00.000Z",
+    "updatedAt": "2025-04-13T14:10:00.000Z"
+  },
+  {
+    "id": 13,
+    "userId": 3,
+    "shopId": 6,
+    "description": "Color variant not available.",
+    "status": "pending",
+    "resolution": null,
+    "trash": false,
+    "createdAt": "2025-04-13T08:35:00.000Z",
+    "updatedAt": "2025-04-13T08:35:00.000Z"
+  },
+  {
+    "id": 14,
+    "userId": 4,
+    "shopId": 8,
+    "description": "Incorrect billing address used.",
+    "status": "resolved",
+    "resolution": "Corrected address and resent package.",
+    "trash": false,
+    "createdAt": "2025-04-14T13:50:00.000Z",
+    "updatedAt": "2025-04-15T10:25:00.000Z"
+  },
+  {
+    "id": 15,
+    "userId": 5,
+    "shopId": 10,
+    "description": "Coupon code not applied.",
+    "status": "resolved",
+    "resolution": "Applied 20% discount retroactively.",
+    "trash": false,
+    "createdAt": "2025-04-15T09:10:00.000Z",
+    "updatedAt": "2025-04-16T12:00:00.000Z"
+  },
+  {
+    "id": 16,
+    "userId": 6,
+    "shopId": 1,
+    "description": "Received expired product.",
+    "status": "rejected",
+    "resolution": "Shelf-life within acceptable range.",
+    "trash": false,
+    "createdAt": "2025-04-16T14:05:00.000Z",
+    "updatedAt": "2025-04-17T09:30:00.000Z"
+  },
+  {
+    "id": 17,
+    "userId": 7,
+    "shopId": 3,
+    "description": "Unable to apply loyalty points.",
+    "status": "pending",
+    "resolution": null,
+    "trash": false,
+    "createdAt": "2025-04-17T10:45:00.000Z",
+    "updatedAt": "2025-04-17T10:45:00.000Z"
+  },
+  {
+    "id": 18,
+    "userId": 8,
+    "shopId": 5,
+    "description": "Received duplicate items.",
+    "status": "resolved",
+    "resolution": "Collected duplicates; issued refund.",
+    "trash": false,
+    "createdAt": "2025-04-18T12:30:00.000Z",
+    "updatedAt": "2025-04-19T08:15:00.000Z"
+  },
+  {
+    "id": 19,
+    "userId": 9,
+    "shopId": 7,
+    "description": "Inaccurate order tracking updates.",
+    "status": "resolved",
+    "resolution": "Provided updated tracking info.",
+    "trash": false,
+    "createdAt": "2025-04-19T09:55:00.000Z",
+    "updatedAt": "2025-04-20T11:40:00.000Z"
+  },
+  {
+    "id": 20,
+    "userId": 10,
+    "shopId": 9,
+    "description": "Item returned but no refund received.",
+    "status": "pending",
+    "resolution": null,
+    "trash": false,
+    "createdAt": "2025-04-20T11:00:00.000Z",
+    "updatedAt": "2025-04-20T11:00:00.000Z"
+  }
+]

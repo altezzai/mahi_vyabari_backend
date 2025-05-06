@@ -669,7 +669,7 @@ module.exports = {
       const { count, rows: classifieds } = await Classified.findAndCountAll({
         limit,
         offset,
-        attributes: ["id","itemName", "price", "image","phone"],
+        attributes: ["id", "itemName", "price", "image", "phone"],
         where: whereCondition,
         include: [
           {
@@ -758,58 +758,61 @@ module.exports = {
       res.status(500).json({ success: false, message: error.message });
     }
   },
-  getShopCategories:async(req,res)=>{
+  getShopCategories: async (req, res) => {
     try {
       const shopCategories = await Type.findAll({
-        where:{typeName:"shop"},
-        attributes:[],
-        include:[
+        where: { typeName: "shop" },
+        attributes: [],
+        include: [
           {
-            model:Category,
-            attributes:["id","categoryName","icon"],
-          }
-        ]
-      })
-      return res.status(200).json({success:true,shopCategories});
+            model: Category,
+            attributes: ["id", "categoryName", "icon"],
+            as: "category",
+          },
+        ],
+      });
+      return res.status(200).json({ success: true, shopCategories });
     } catch (error) {
       console.log(error);
-      return res.status(500).json({success:false,message:error.message});
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
-  getWorkerCategory:async(req,res)=>{
+  getWorkerCategory: async (req, res) => {
     try {
       const workerCategory = await Type.findAll({
-        where:{typeName:"worker"},
-        attributes:[],
-        include:[
+        where: { typeName: "worker" },
+        attributes: [],
+        include: [
           {
-            model:Category,
-            attributes:["id","categoryName","icon"]
-          }
-        ]
-      })
-      return res.status(200).json({success:true,workerCategory});
+            model: Category,
+            attributes: ["id", "categoryName", "icon"],
+            as: "category",
+          },
+        ],
+      });
+      return res.status(200).json({ success: true, workerCategory });
     } catch (error) {
       console.log(error);
-      return res.status(500).json({success:false,message:error.message})
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
-  getClassifiedCategory:async(req,res)=>{
+  getClassifiedCategory: async (req, res) => {
     try {
       const classifiedCategories = await Type.findAll({
-        where:{typeName:"classified"},
-        attributes:[],
-        include:[
+        where: { typeName: "classified" },
+        attributes: [],
+        include: [
           {
-            model:Category,
-            attributes:["id","categoryName","icon"]
-          }
-        ]
-      })
-      return res.status(200).json({success:true,classifiedCategories});
+            model: Category,
+            attributes: ["id", "categoryName", "icon"],
+            as: "category",
+          },
+        ],
+      });
+      return res.status(200).json({ success: true, classifiedCategories });
     } catch (error) {
       console.log(error);
-      return res.status(500).json({success:false,message:error.message});
+      return res.status(500).json({ success: false, message: error.message });
     }
-  }
+  },
 };

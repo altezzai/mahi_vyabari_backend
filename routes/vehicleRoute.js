@@ -26,7 +26,7 @@ router.get(
 router.post(
   "/add-vehicle-Service",
   vehicleController.upload.fields([{ name: "image" }, { name: "icon" }]),
-  vehicleController.CreateVehicleServiceProvider
+  vehicleController.addVehicleServiceProvider
 );
 router.put(
   "/update-vehicle-Service/:id",

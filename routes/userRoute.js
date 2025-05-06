@@ -35,8 +35,8 @@ router.get(
   })
 );
 router.get("/dashboard", userController.getDashboard);
-router.post("/feedback", userController.feedback);
-router.post("/create-complaints", userController.complaints);
+router.post("/add-feedback", userController.feedback);
+router.post("/add-complaints", userController.complaints);
 router.get("/get-complaints", userController.getAllComplaints);
 router.get("/get-complaints/:userId", userController.getComplaintsById);
 router.patch("/update-complaints/:id", userController.updateComplaints);

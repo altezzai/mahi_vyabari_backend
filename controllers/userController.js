@@ -261,6 +261,7 @@ module.exports = {
         shopId,
         rating,
       });
+    // const feedback = await Feedback.bulkCreate(req.body,{validate:true})
       res.status(201).json({ success: true, message: "Rating submitted", feedback });
     } catch (error) {
       console.error(error);
@@ -276,6 +277,7 @@ module.exports = {
         title,
         description,
       });
+      // const complaint = await Complaint.bulkCreate(req.body,{validate:true});
       res.status(201).json({ success: true, complaint });
     } catch (error) {
       console.error(error);

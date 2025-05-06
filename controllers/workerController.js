@@ -5,7 +5,7 @@ const path = require("path");
 const Worker = require("../models/Worker");
 const WorkerCategory = require("../models/WorkerCategory");
 const { deletefilewithfoldername } = require("../utils/util");
-const { Op } = require("sequelize");
+const { Op, where, col } = require("sequelize");
 const Type = require("../models/Type");
 const Category = require("../models/Category");
 
@@ -44,6 +44,17 @@ module.exports = {
           }))
         );
       }
+      // const savedWorker = await Worker.bulkCreate(req.body, { validate: true });
+      // savedWorker.forEach(async (data) => {
+      //   if (data.categories && data.categories.length > 0) {
+      //     await WorkerCategory.bulkCreate(
+      //       data.categories.map((category) => ({
+      //         workerId: data.id,
+      //         categoryId: category,
+      //       }))
+      //     );
+      //   }
+      // });
       res.status(201).json({
         success: true,
         result: savedWorker,
@@ -192,14 +203,14 @@ module.exports = {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
-    const whereCondition = {};
+    let whereCondition = {};
     if (search) {
       whereCondition = {
-        [Op.or]: [{ name: { [Op.like]: `%${search}%` } }],
+        [Op.or]: [{ workerName: { [Op.like]: `%${search}%` } }],
       };
     }
     try {
-      const workers = await Worker.findAndCountAll({
+      const { count, rows: workers } = await Worker.findAndCountAll({
         limit,
         offset,
         where: whereCondition,
@@ -218,7 +229,14 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Worker profile not found" });
       }
-      return res.status(200).json({ success: true, data: workers });
+      const totalPages = Math.ceil(count / limit);
+      return res.status(200).json({
+        success: true,
+        count,
+        totalPages,
+        currentPage: page,
+        data: workers,
+      });
     } catch (error) {
       console.error(error);
       return res.status(500).json({

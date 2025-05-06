@@ -6,11 +6,12 @@ const Shop = require("../models/Shop");
 const Category = require("../models/Category");
 const ShopCategory = require("../models/ShopCategory");
 const { deletefilewithfoldername } = require("../utils/util");
-const { Op, Sequelize, literal } = require("sequelize");
+const { Op, Sequelize, literal, where, col } = require("sequelize");
 const Type = require("../models/Type");
 const Complaint = require("../models/Complaint");
 const Feedback = require("../models/Feedback");
 const User = require("../models/User");
+const { count } = require("console");
 
 const uploadPath = path.join(__dirname, "../public/uploads/shopImages");
 if (!fs.existsSync(uploadPath)) {
@@ -38,7 +39,6 @@ module.exports = {
         image: req.files?.image?.[0]?.filename || null,
         icon: req.files?.icon?.[0]?.filename || null,
       };
-      console.log(req.body.categories);
       const savedShop = await Shop.create(shopData);
       if (savedShop.categories && savedShop.categories.length > 0) {
         await ShopCategory.bulkCreate(
@@ -48,6 +48,18 @@ module.exports = {
           }))
         );
       }
+      // const savedShop = await Shop.bulkCreate(req.body, { validate: true });
+      // savedShop.forEach(async (data) => {
+      //   console.log(data)
+      //   if (data.categories && data.categories.length > 0) {
+      //     await ShopCategory.bulkCreate(
+      //       data.categories.map((category) => ({
+      //         shopId: data.id,
+      //         categoryId: category,
+      //       }))
+      //     );
+      //   }
+      // });
       res.status(201).json({
         success: true,
         savedShop: savedShop,
@@ -76,10 +88,7 @@ module.exports = {
     let whereCondition = {};
     if (search) {
       whereCondition = {
-        [Op.or]: [
-          { shopName: { [Op.like]: `%${search}%` } },
-          { "$categories.categoryName$": { [Op.like]: `%${search}%` } },
-        ],
+        [Op.or]: [{ shopName: { [Op.like]: `%${search}%` } }],
       };
     }
     try {
@@ -333,28 +342,7 @@ module.exports = {
       };
     }
     try {
-      // const shops = await Shop.findAll({
-      //   limit,
-      //   offset,
-      //   where: whereCondition,
-      //   attributes: ["id", "shopName"],
-      //   include: [
-      //     {
-      //       model: Complaint,
-      //       as: "complaints",
-      //       attributes: ["description", "title"],
-      //       include: [
-      //         {
-      //           model: User,
-      //           as: "user",
-      //           attributes: ["userName", "email"],
-      //         },
-      //       ],
-      //     },
-      //   ],
-      //   subQuery: false,
-      // });
-      const complaints = await Complaint.findAll({
+      const { count, rows: complaints } = await Complaint.findAndCountAll({
         limit,
         offset,
         where: whereCondition,
@@ -371,10 +359,19 @@ module.exports = {
           },
         ],
       });
-      res.status(200).json({ success: true, data: complaints });
+      const totalPages = Math.ceil(count / limit);
+      return res
+        .status(200)
+        .json({
+          success: true,
+          count,
+          totalPages,
+          currentPage: page,
+          data: complaints,
+        });
     } catch (error) {
       console.log(error);
-      res.status(500).json({ success: false, message: error.message });
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
 };

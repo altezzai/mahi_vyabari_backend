@@ -176,15 +176,13 @@ module.exports = {
           .json({ success: false, message: "Vehicle Schedule not found" });
       }
       const totalPages = Math.ceil(count / limit);
-      return res
-        .status(200)
-        .json({
-          success: true,
-          count,
-          totalPages,
-          currentPage: page,
-          data: vehicleSchedules,
-        });
+      return res.status(200).json({
+        success: true,
+        count,
+        totalPages,
+        currentPage: page,
+        data: vehicleSchedules,
+      });
     } catch (error) {
       console.error(error);
       return res.status(500).json({
@@ -211,7 +209,7 @@ module.exports = {
       });
     }
   },
-  CreateVehicleServiceProvider: async (req, res) => {
+  addVehicleServiceProvider: async (req, res) => {
     try {
       const vehicleServiceData = {
         ...req.body,
@@ -235,7 +233,8 @@ module.exports = {
   },
   updateVehicleServiceProvider: async (req, res) => {
     const {
-      selectCategory,
+      ownerName,
+      category,
       minFee,
       vehicleNumber,
       priority,
@@ -282,7 +281,8 @@ module.exports = {
         newIcon = req.files.icon[0].filename;
       }
       await vehicleService.update({
-        selectCategory,
+        ownerName,
+        category,
         minFee,
         vehicleNumber,
         priority,
@@ -363,27 +363,42 @@ module.exports = {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
-    const whereCondition = {};
+    let whereCondition = {};
     if (search) {
       whereCondition = {
-        [Op.or]: [{ ownerName: { [Op.like]: `%${search}%` } }],
+        [Op.or]: [
+          { ownerName: { [Op.like]: `%${search}%` } },
+          { "$taxiCategory.categoryName$": { [Op.like]: `%${search}%` } },
+        ],
       };
     }
     try {
-      const vehicleServices = await VehicleService.findAndCountAll({
-        limit,
-        offset,
-        where: whereCondition,
-        attributes: ["id", "ownerName", "category", "priority", "trash"],
-        order: [["createdAt", "DESC"]],
-      });
+      const { count, rows: vehicleServices } =
+        await VehicleService.findAndCountAll({
+          limit,
+          offset,
+          where: whereCondition,
+          attributes: ["id", "ownerName", "category", "priority", "trash"],
+          include: [
+            {
+              model: Category,
+              attributes: ["id", "categoryName"],
+              as: "taxiCategory",
+            },
+          ],
+          order: [["createdAt", "DESC"]],
+        });
       if (!vehicleServices) {
         return res
           .status(404)
           .json({ success: false, message: "Vehicle Service not found" });
       }
+      const totalPages = Math.ceil(count / limit);
       return res.status(200).json({
         success: true,
+        count,
+        totalPages,
+        currentPage: page,
         data: vehicleServices,
       });
     } catch (error) {
