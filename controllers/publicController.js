@@ -731,7 +731,14 @@ module.exports = {
       const { count, rows: tourism } = await Tourism.findAndCountAll({
         limit,
         offset,
-        attributes: ["id", "placeName", "images"],
+        attributes: [
+          "id",
+          "placeName",
+          [
+            Sequelize.literal(`JSON_UNQUOTE(JSON_EXTRACT(images, '$[0]'))`),
+            "image"
+          ]  
+        ],
         where: whereCondition,
       });
       const totalPages = Math.ceil(count / limit);
