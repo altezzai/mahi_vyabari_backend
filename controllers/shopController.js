@@ -272,6 +272,7 @@ module.exports = {
         include: {
           model: Category,
           attributes: ["id", "categoryName"],
+          as:"category"
         },
       });
       res.status(200).json({ success: true, shopCategories });

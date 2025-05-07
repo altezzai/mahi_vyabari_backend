@@ -258,6 +258,7 @@ module.exports = {
         include: {
           model: Category,
           attributes: ["id", "categoryName"],
+          as:"category"
         },
       });
       return res.status(200).json({ success: true, data: medicalCategory });
