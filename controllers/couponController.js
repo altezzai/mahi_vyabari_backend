@@ -73,6 +73,7 @@ module.exports = {
         couponIdTo: nextCouponIdFrom + assignedCount - 1,
         status: "assigned",
       });
+      // const shopCoupon = await ShopCoupon.bulkCreate(req.body,{validate:true});
       res.status(200).json({ success: true, shopCoupon });
     } catch (error) {
       console.log(error);
@@ -152,6 +153,7 @@ module.exports = {
         { where: { id: userId }, transaction: t }
       );
       await t.commit();
+      // await UserCoupon.bulkCreate(req.body,{validate:true});
       return res.status(200).json({
         success: true,
         message: "Coupons successfully assigned to user",
@@ -174,7 +176,7 @@ module.exports = {
       };
     }
     try {
-      const coupenRequests = await ShopCoupon.findAll({
+      const { count, rows: coupenRequests } = await ShopCoupon.findAndCountAll({
         limit,
         offset,
         where: whereCondition,
@@ -186,7 +188,14 @@ module.exports = {
           },
         ],
       });
-      return res.status(200).json({ success: true, coupenRequests });
+      const totalPages = Math.ceil(count / limit);
+      return res.status(200).json({
+        success: true,
+        count,
+        totalPages,
+        currentPage: page,
+        coupenRequests,
+      });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ success: false, message: error.message });
@@ -204,19 +213,28 @@ module.exports = {
       };
     }
     try {
-      const assignedCoupons = await ShopCoupon.findAll({
-        limit,
-        offset,
-        where: whereCondition,
-        include: [
-          {
-            model: Shop,
-            attributes: ["id", "shopName"],
-            as: "shop",
-          },
-        ],
+      const { count, rows: assignedCoupons } = await ShopCoupon.findAndCountAll(
+        {
+          limit,
+          offset,
+          where: whereCondition,
+          include: [
+            {
+              model: Shop,
+              attributes: ["id", "shopName"],
+              as: "shop",
+            },
+          ],
+        }
+      );
+      const totalPages = Math.ceil(count / limit);
+      return res.status(200).json({
+        success: true,
+        count,
+        totalPages,
+        currentPage: page,
+        assignedCoupons,
       });
-      return res.status(200).json({ success: true, assignedCoupons });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ success: false, message: error.message });
@@ -227,7 +245,7 @@ module.exports = {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
-    let whereCondition = { };
+    let whereCondition = {};
     if (searchQuery) {
       whereCondition = {
         [Op.or]: [
@@ -237,10 +255,10 @@ module.exports = {
       };
     }
     try {
-      const userCoupon = await UserCoupon.findAndCountAll({
+      const { count, rows: CouponHistory } = await UserCoupon.findAndCountAll({
         limit,
         offset,
-        where:whereCondition,
+        where: whereCondition,
         attributes: ["id", "couponIdFrom", "couponIdTo", "assignedCount"],
         include: [
           {
@@ -256,7 +274,16 @@ module.exports = {
         ],
         order: [["createdAt", "DESC"]],
       });
-      return res.status(200).json({ success: true, userCoupon });
+      const totalPages = Math.ceil(count / limit);
+      return res
+        .status(200)
+        .json({
+          success: true,
+          count,
+          totalPages,
+          currentPage: page,
+          CouponHistory,
+        });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ success: false, message: error.message });
