@@ -38,7 +38,6 @@ module.exports = {
     try {
       const { userName, email, password, phone } = req.body;
       if (!userName || !email || !password || !phone) {
-        await deletefilewithfoldername(uploadPath, req.file?.filename);
         return res.status(400).json({
           success: false,
           message: "Missing Details",
@@ -48,7 +47,6 @@ module.exports = {
         where: { email },
       });
       if (user) {
-        await deletefilewithfoldername(uploadPath, req.file?.filename);
         return res.status(409).json({
           success: false,
           message: "User is already existing",
@@ -56,7 +54,6 @@ module.exports = {
       } else {
         const userData = {
           ...req.body,
-          image: req.file ? req.file.filename : null,
           password: await hashData(password),
         };
         const savedUser = await User.create(userData);
@@ -246,7 +243,7 @@ module.exports = {
       const existingFeedback = await Feedback.findOne({
         where: { userId, shopId },
       });
-    
+
       if (existingFeedback) {
         existingFeedback.rating = rating;
         await existingFeedback.save();
@@ -261,8 +258,10 @@ module.exports = {
         shopId,
         rating,
       });
-    // const feedback = await Feedback.bulkCreate(req.body,{validate:true})
-      res.status(201).json({ success: true, message: "Rating submitted", feedback });
+      // const feedback = await Feedback.bulkCreate(req.body,{validate:true})
+      res
+        .status(201)
+        .json({ success: true, message: "Rating submitted", feedback });
     } catch (error) {
       console.error(error);
       res.status(500).json({ success: false, message: error.message });
@@ -569,7 +568,7 @@ module.exports = {
       });
       const isValidPhone = (userId) =>
         /^(\+91[\-\s]?)?[6-9]\d{9}$/.test(userId);
-      console.log(isValidPhone())
+      console.log(isValidPhone());
       const subject = "Login OTP";
       const message = `
         <div style="font-family: Arial, sans-serif; padding: 20px;">

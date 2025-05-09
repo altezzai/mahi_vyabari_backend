@@ -6,7 +6,6 @@ const userAuth = require("../middleware/auth");
 
 router.post(
   "/register-user",
-  userController.upload.single("image"),
   userController.registerUser
 );
 router.post("/login-user", userController.userLogin);
