@@ -1630,3 +1630,90 @@
     "updatedAt": "2025-04-20T11:00:00.000Z"
   }
 ]
+
+//sample data of shopCoupon
+
+[
+  {
+    "shopId": 1,
+    "requestedCount": 100,
+    "assignedCount": 80,
+    "couponIdFrom": 1000,
+    "couponIdTo": 1079,
+    "status": "assigned"
+  },
+  {
+    "shopId": 2,
+    "requestedCount": 200,
+    "assignedCount": 150,
+    "couponIdFrom": 2000,
+    "couponIdTo": 2149,
+    "status": "assigned"
+  },
+  {
+    "shopId": 3,
+    "requestedCount": 50,
+    "assignedCount": 0,
+    "couponIdFrom": null,
+    "couponIdTo": null,
+    "status": "pending"
+  },
+  {
+    "shopId": 4,
+    "requestedCount": 300,
+    "assignedCount": 300,
+    "couponIdFrom": 3000,
+    "couponIdTo": 3299,
+    "status": "assigned"
+  },
+  {
+    "shopId": 5,
+    "requestedCount": 150,
+    "assignedCount": 0,
+    "couponIdFrom": null,
+    "couponIdTo": null,
+    "status": "pending"
+  },
+  {
+    "shopId": 6,
+    "requestedCount": 75,
+    "assignedCount": 50,
+    "couponIdFrom": 4000,
+    "couponIdTo": 4049,
+    "status": "assigned"
+  },
+  {
+    "shopId": 7,
+    "requestedCount": 120,
+    "assignedCount": 120,
+    "couponIdFrom": 5000,
+    "couponIdTo": 5119,
+    "status": "assigned"
+  },
+  {
+    "shopId": 8,
+    "requestedCount": 90,
+    "assignedCount": 90,
+    "couponIdFrom": 6000,
+    "couponIdTo": 6089,
+    "status": "assigned"
+  },
+  {
+    "shopId": 9,
+    "requestedCount": 110,
+    "assignedCount": 0,
+    "couponIdFrom": null,
+    "couponIdTo": null,
+    "status": "pending"
+  },
+  {
+    "shopId": 10,
+    "requestedCount": 200,
+    "assignedCount": 180,
+    "couponIdFrom": 7000,
+    "couponIdTo": 7179,
+    "status": "assigned"
+  }
+]
+
+//sample data of user Coupon
