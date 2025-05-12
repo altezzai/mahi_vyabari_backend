@@ -2,7 +2,7 @@ const Shop = require("../models/Shop");
 const ShopCoupon = require("../models/shopCoupon");
 const UserCoupon = require("../models/userCoupon");
 const sequelize = require("../config/database");
-const { Op } = require("sequelize");
+const { Op, Sequelize } = require("sequelize");
 const User = require("../models/User");
 const Tourism = require("../models/Tourism");
 
@@ -176,7 +176,70 @@ module.exports = {
       };
     }
     try {
-      const { count, rows: coupenRequests } = await ShopCoupon.findAndCountAll({
+      // const { count, rows: coupenRequests } = await ShopCoupon.findAndCountAll({
+      //   limit,
+      //   offset,
+      //   where: whereCondition,
+      //   attributes: ["id", "requestedCount"],
+      //   include: [
+      //     {
+      //       model: Shop,
+      //       attributes: ["id", "shopName"],
+      //       as: "shop",
+      //     },
+      //     {
+      //       model: UserCoupon,
+      //       attributes: [
+      //         [
+      //           Sequelize.fn("SUM", Sequelize.col("assignedCount")),
+      //           "distributedCount",
+      //         ],
+      //       ],
+      //       as: "userCoupons",
+      //       required: false,
+      //     },
+      //   ],
+      //   group: ["ShopCoupon.id", "shop.id"],
+      //   attributes: {
+      //     include: [
+      //       [
+      //         Sequelize.literal(
+      //           "assignedCount - COALESCE(SUM(userCoupons.assignedCount), 0)"
+      //         ),
+      //         "remainingCount",
+      //       ],
+      //     ],
+      //   },
+      // });
+      // const { count, rows: couponRequests } = await ShopCoupon.findAndCountAll({
+      //   limit,
+      //   offset,
+      //   where: whereCondition,
+      //   include: [
+      //     {
+      //       model: Shop,
+      //       attributes: ["id", "shopName"],
+      //       as: "shop",
+      //     },
+      //     {
+      //       model: UserCoupon,
+      //       as: "userCoupons",
+      //       attributes: [],
+      //     },
+      //   ],
+      //   attributes: {
+      //     include: [
+      //       [
+      //         Sequelize.literal(
+      //           "assignedCount - COALESCE((SELECT SUM(uc.assignedCount) FROM usercoupons uc WHERE uc.shopId = ShopCoupon.shopId), 0)"
+      //         ),
+      //         "remainingCount",
+      //       ],
+      //     ],
+      //   },
+      //   group: ["ShopCoupon.id", "shop.id"],
+      // });
+      const { count, rows: couponRequests } = await ShopCoupon.findAndCountAll({
         limit,
         offset,
         where: whereCondition,
@@ -187,14 +250,59 @@ module.exports = {
             as: "shop",
           },
         ],
+        attributes: {
+          include: [
+            [
+              Sequelize.literal(
+                `(SELECT COALESCE(SUM(uc.assignedCount), 0) 
+                FROM usercoupons uc 
+                WHERE uc.shopId = ShopCoupon.shopId
+              )`
+              ),
+              "distributedCount",
+            ],
+            [
+              Sequelize.literal(
+                `(SELECT COALESCE(SUM(sc.assignedCount), 0) 
+                FROM shopcoupons sc 
+                WHERE sc.shopId = ShopCoupon.shopId
+              )`
+              ),
+              "totalAssignedCount",
+            ],
+            [
+              Sequelize.literal(
+                `((SELECT COALESCE(SUM(sc.assignedCount),0) 
+                FROM ShopCoupons sc
+                WHERE sc.shopId = ShopCoupon.shopId
+                 ) -
+              (SELECT COALESCE(SUM(uc.assignedCount), 0) 
+                FROM usercoupons uc 
+                WHERE uc.shopId = ShopCoupon.shopId
+              ))`
+              ),
+              "remainingCount",
+            ],
+          ],
+          exclude: [
+            "couponIdFrom",
+            "couponIdTo",
+            "status",
+            "createdAt",
+            "updatedAt",
+            "assignedCount",
+          ],
+        },
+        order: [["createdAt", "DESC"]],
       });
+
       const totalPages = Math.ceil(count / limit);
       return res.status(200).json({
         success: true,
         count,
         totalPages,
         currentPage: page,
-        coupenRequests,
+        couponRequests,
       });
     } catch (error) {
       console.log(error);
@@ -275,18 +383,40 @@ module.exports = {
         order: [["createdAt", "DESC"]],
       });
       const totalPages = Math.ceil(count / limit);
-      return res
-        .status(200)
-        .json({
-          success: true,
-          count,
-          totalPages,
-          currentPage: page,
-          CouponHistory,
-        });
+      return res.status(200).json({
+        success: true,
+        count,
+        totalPages,
+        currentPage: page,
+        CouponHistory,
+      });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  getShops: async (req, res) => {
+    const search = req.query.search || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const offset = (page - 1) * limit;
+    let whereCondition = {};
+    if (search) {
+      whereCondition = {
+        shopName: { [Op.like]: `%${search}%` },
+      };
+    }
+    try {
+      const shops = await Shop.findAll({
+        limit,
+        offset,
+        where: whereCondition,
+        attributes: ["id", "shopName"],
+      });
+      res.status(200).json({ success: true, shops });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ success: false, message: error.message });
     }
   },
 };

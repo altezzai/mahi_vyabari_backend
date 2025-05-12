@@ -2,6 +2,7 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const Shop = require("./Shop");
 const User = require("./User");
+const ShopCoupon = require("./shopCoupon");
 
 const UserCoupen = sequelize.define(
   "UserCoupen",
@@ -41,9 +42,12 @@ const UserCoupen = sequelize.define(
   }
 );
 
-User.hasMany(UserCoupen, { foreignKey: "userId", as: "coupons" });
+User.hasMany(UserCoupen, { foreignKey: "userId", as: "userCoupons" });
 UserCoupen.belongsTo(User, { foreignKey: "userId", as: "user" });
-Shop.hasMany(UserCoupen, { foreignKey: "shopId", as: "coupons" });
+Shop.hasMany(UserCoupen, { foreignKey: "shopId", as: "userCoupons" });
 UserCoupen.belongsTo(Shop, { foreignKey: "shopId", as: "shop" });
+
+ShopCoupon.hasMany(UserCoupen, { foreignKey: "shopId", as: "userCoupons" });
+UserCoupen.belongsTo(ShopCoupon, { foreignKey: "shopId", targetKey: "shopId", as: "shopCoupon" });
 
 module.exports = UserCoupen;
