@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('users', {
+    await queryInterface.createTable("users", {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
@@ -13,13 +13,13 @@ module.exports = {
         type: Sequelize.STRING,
         unique: true,
       },
-      userName:{
-        type:Sequelize.STRING
+      userName: {
+        type: Sequelize.STRING,
       },
       email: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique:true
+        unique: true,
       },
       password: {
         type: Sequelize.STRING,
@@ -40,11 +40,14 @@ module.exports = {
       },
       status: {
         type: Sequelize.STRING,
-        defaultValue: 'active',
+        defaultValue: "active",
       },
-      verified:{
-        type:Sequelize.BOOLEAN,
-        defaultValue:false
+      verified: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
+      role: {
+        type: Sequelize.ENUM("user", "shop", "admin"),
       },
       trash: {
         type: Sequelize.BOOLEAN,
@@ -53,17 +56,19 @@ module.exports = {
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
+        defaultValue: Sequelize.literal(
+          "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+        ),
       },
     });
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('users');
+    await queryInterface.dropTable("users");
   },
 };

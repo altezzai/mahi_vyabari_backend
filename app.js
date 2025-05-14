@@ -9,6 +9,7 @@ const session = require("express-session");
 const passport = require("passport");
 const helmet = require("helmet");
 const cookieParser = require('cookie-parser');
+const compression = require("compression");
 const { errorMiddleware } = require("./middleware/error");
 const PORT = process.env.PORT || 3000;
 
@@ -44,6 +45,7 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(helmet());
+app.use(compression());
 app.use(errorMiddleware);
 
 app.use("/api/shop", shopRouter);

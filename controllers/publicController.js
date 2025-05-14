@@ -736,8 +736,8 @@ module.exports = {
           "placeName",
           [
             Sequelize.literal(`JSON_UNQUOTE(JSON_EXTRACT(images, '$[0]'))`),
-            "image"
-          ]  
+            "image",
+          ],
         ],
         where: whereCondition,
       });

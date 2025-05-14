@@ -126,15 +126,13 @@ module.exports = {
         order: [["createdAt", "DESC"]],
       });
       const totalPages = Math.ceil(count / limit);
-      return res
-        .status(200)
-        .json({
-          success: true,
-          count,
-          totalPages,
-          currentPage: page,
-          data: tourism,
-        });
+      return res.status(200).json({
+        success: true,
+        count,
+        totalPages,
+        currentPage: page,
+        data: tourism,
+      });
     } catch (error) {
       console.log(error);
       res

@@ -49,6 +49,9 @@ router.get(
   "/get-vehicle-Service/:id",
   vehicleController.getVehicleServiceProviderById
 );
-router.get("/get-vehicle-service-categories",vehicleController.getVehicleServiceCategories)
+router.get(
+  "/get-vehicle-service-categories",
+  vehicleController.getVehicleServiceCategories
+);
 
 module.exports = router;

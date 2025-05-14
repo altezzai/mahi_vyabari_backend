@@ -1717,3 +1717,75 @@
 ]
 
 //sample data of user Coupon
+[
+  {
+    "shopId": 1,
+    "userId": 1,
+    "assignedCount": 5,
+    "couponIdFrom": 1000,
+    "couponIdTo": 1004
+  },
+  {
+    "shopId": 1,
+    "userId": 2,
+    "assignedCount": 3,
+    "couponIdFrom": 1005,
+    "couponIdTo": 1007
+  },
+  {
+    "shopId": 2,
+    "userId": 3,
+    "assignedCount": 4,
+    "couponIdFrom": 2000,
+    "couponIdTo": 2003
+  },
+  {
+    "shopId": 2,
+    "userId": 4,
+    "assignedCount": 6,
+    "couponIdFrom": 2004,
+    "couponIdTo": 2009
+  },
+  {
+    "shopId": 3,
+    "userId": 5,
+    "assignedCount": 2,
+    "couponIdFrom": 3000,
+    "couponIdTo": 3001
+  },
+  {
+    "shopId": 3,
+    "userId": 6,
+    "assignedCount": 5,
+    "couponIdFrom": 3002,
+    "couponIdTo": 3006
+  },
+  {
+    "shopId": 4,
+    "userId": 7,
+    "assignedCount": 10,
+    "couponIdFrom": 4000,
+    "couponIdTo": 4009
+  },
+  {
+    "shopId": 4,
+    "userId": 8,
+    "assignedCount": 8,
+    "couponIdFrom": 4010,
+    "couponIdTo": 4017
+  },
+  {
+    "shopId": 5,
+    "userId": 9,
+    "assignedCount": 1,
+    "couponIdFrom": 5000,
+    "couponIdTo": 5000
+  },
+  {
+    "shopId": 5,
+    "userId": 10,
+    "assignedCount": 3,
+    "couponIdFrom": 5001,
+    "couponIdTo": 5003
+  }
+]

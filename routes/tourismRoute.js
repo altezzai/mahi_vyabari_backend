@@ -13,8 +13,11 @@ router.put(
   tourismController.upload.array("images", 4),
   tourismController.updateTouristPlace
 );
-router.patch("/delete-tourist-place/:id",tourismController.deleteTouristPlace);
-router.patch("/restore-tourist-place/:id",tourismController.restoreTouristPlace);
-router.get("/get-tourist-places",tourismController.getTouristPlaces)
-router.get("/get-tourist-place/:id",tourismController.getTouristPlaceById)
+router.patch("/delete-tourist-place/:id", tourismController.deleteTouristPlace);
+router.patch(
+  "/restore-tourist-place/:id",
+  tourismController.restoreTouristPlace
+);
+router.get("/get-tourist-places", tourismController.getTouristPlaces);
+router.get("/get-tourist-place/:id", tourismController.getTouristPlaceById);
 module.exports = router;

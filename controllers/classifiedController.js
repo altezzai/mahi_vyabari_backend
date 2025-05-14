@@ -204,15 +204,13 @@ module.exports = {
           .json({ success: false, message: "No classifieds found" });
       }
       const totalPages = Math.ceil(count / limit);
-      return res
-        .status(200)
-        .json({
-          success: true,
-          count,
-          totalPages,
-          currentPage: page,
-          data: classifieds,
-        });
+      return res.status(200).json({
+        success: true,
+        count,
+        totalPages,
+        currentPage: page,
+        data: classifieds,
+      });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ success: false, message: error.message });
@@ -249,7 +247,7 @@ module.exports = {
         include: {
           model: Category,
           attributes: ["id", "categoryName"],
-          as:"category"
+          as: "category",
         },
       });
       res.status(200).json({ success: true, classifiedCategories });

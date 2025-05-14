@@ -4,18 +4,15 @@ const passport = require("passport");
 const userController = require("../controllers/userController");
 const userAuth = require("../middleware/auth");
 
-router.post(
-  "/register-user",
-  userController.registerUser
-);
+router.post("/register-user", userController.registerUser);
 router.post("/login-user", userController.userLogin);
 router.post("/logout", userController.Logout);
-router.post("/send-verify-otp",userAuth,userController.sendVerifyOtp);
-router.post("/verify-account",userAuth,userController.verifyAccount);
-router.post("/is-auth",userAuth,userController.isAuthenticated);
-router.post("/send-reset-otp",userController.sendResetOtp);
-router.post("/reset-password",userController.resetPassword);
-router.post("/send-login-otp",userController.sendLoginOtp);
+router.post("/send-verify-otp", userAuth, userController.sendVerifyOtp);
+router.post("/verify-account", userAuth, userController.verifyAccount);
+router.post("/is-auth", userAuth, userController.isAuthenticated);
+router.post("/send-reset-otp", userController.sendResetOtp);
+router.post("/reset-password", userController.resetPassword);
+router.post("/send-login-otp", userController.sendLoginOtp);
 
 router.put(
   "/edit-user/:id",

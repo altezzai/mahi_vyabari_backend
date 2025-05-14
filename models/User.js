@@ -12,12 +12,12 @@ const User = sequelize.define(
     },
     email: {
       type: DataTypes.STRING,
-      allowNull:false,
+      allowNull: false,
       validate: {
         isEmail: true,
         notEmpty: true,
       },
-      unique:true
+      unique: true,
     },
     password: {
       type: DataTypes.STRING,
@@ -50,9 +50,15 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       defaultValue: "active",
     },
-    verified:{
-       type:DataTypes.BOOLEAN,
-       defaultValue:false
+    role: {
+      type: DataTypes.ENUM("user", "shop", "admin"),
+      validate: {
+        isIn: [["user", "shop", "admin"]],
+      },
+    },
+    verified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     },
     trash: {
       type: DataTypes.BOOLEAN,

@@ -205,15 +205,13 @@ module.exports = {
         order: [["createdAt", "DESC"]],
       });
       const totalPages = Math.ceil(count / limit);
-      return res
-        .status(200)
-        .json({
-          success: true,
-          count,
-          totalPages,
-          currentPage: page,
-          data: medical,
-        });
+      return res.status(200).json({
+        success: true,
+        count,
+        totalPages,
+        currentPage: page,
+        data: medical,
+      });
     } catch (error) {
       console.error(error);
       res.status(500).json({
@@ -258,7 +256,7 @@ module.exports = {
         include: {
           model: Category,
           attributes: ["id", "categoryName"],
-          as:"category"
+          as: "category",
         },
       });
       return res.status(200).json({ success: true, data: medicalCategory });

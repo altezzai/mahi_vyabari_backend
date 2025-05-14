@@ -2,7 +2,7 @@ const Shop = require("../models/Shop");
 const ShopCoupon = require("../models/shopCoupon");
 const UserCoupon = require("../models/userCoupon");
 const sequelize = require("../config/database");
-const { Op, Sequelize } = require("sequelize");
+const { Op, Sequelize, literal } = require("sequelize");
 const User = require("../models/User");
 const Tourism = require("../models/Tourism");
 
@@ -176,69 +176,6 @@ module.exports = {
       };
     }
     try {
-      // const { count, rows: coupenRequests } = await ShopCoupon.findAndCountAll({
-      //   limit,
-      //   offset,
-      //   where: whereCondition,
-      //   attributes: ["id", "requestedCount"],
-      //   include: [
-      //     {
-      //       model: Shop,
-      //       attributes: ["id", "shopName"],
-      //       as: "shop",
-      //     },
-      //     {
-      //       model: UserCoupon,
-      //       attributes: [
-      //         [
-      //           Sequelize.fn("SUM", Sequelize.col("assignedCount")),
-      //           "distributedCount",
-      //         ],
-      //       ],
-      //       as: "userCoupons",
-      //       required: false,
-      //     },
-      //   ],
-      //   group: ["ShopCoupon.id", "shop.id"],
-      //   attributes: {
-      //     include: [
-      //       [
-      //         Sequelize.literal(
-      //           "assignedCount - COALESCE(SUM(userCoupons.assignedCount), 0)"
-      //         ),
-      //         "remainingCount",
-      //       ],
-      //     ],
-      //   },
-      // });
-      // const { count, rows: couponRequests } = await ShopCoupon.findAndCountAll({
-      //   limit,
-      //   offset,
-      //   where: whereCondition,
-      //   include: [
-      //     {
-      //       model: Shop,
-      //       attributes: ["id", "shopName"],
-      //       as: "shop",
-      //     },
-      //     {
-      //       model: UserCoupon,
-      //       as: "userCoupons",
-      //       attributes: [],
-      //     },
-      //   ],
-      //   attributes: {
-      //     include: [
-      //       [
-      //         Sequelize.literal(
-      //           "assignedCount - COALESCE((SELECT SUM(uc.assignedCount) FROM usercoupons uc WHERE uc.shopId = ShopCoupon.shopId), 0)"
-      //         ),
-      //         "remainingCount",
-      //       ],
-      //     ],
-      //   },
-      //   group: ["ShopCoupon.id", "shop.id"],
-      // });
       const { count, rows: couponRequests } = await ShopCoupon.findAndCountAll({
         limit,
         offset,
@@ -414,6 +351,151 @@ module.exports = {
         attributes: ["id", "shopName"],
       });
       res.status(200).json({ success: true, shops });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  getUsers: async (req, res) => {
+    const search = req.query.search || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    let whereCondition = { role: "user" };
+    if (search) {
+      whereCondition = {
+        ...whereCondition,
+        userName: { [Op.like]: `%${search}%` },
+      };
+    }
+    try {
+      const { count, rows: customers } = await Customer.findAndCountAll({
+        limit,
+        offset,
+        where: whereCondition,
+        attributes: ["id", "userName"],
+        order: [["createdAt", "DESC"]],
+      });
+      const totalPages = Math.ceil(count / limit);
+      return res.status(200).json({
+        success: true,
+        count,
+        totalPages,
+        currentPage: page,
+        data: customers,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  getRecentUserCoupons: async (req, res) => {
+    try {
+      const couponHistory = await UserCoupon.findAndCountAll({
+        limit: 20,
+        attributes: ["id", "couponIdFrom", "couponIdTo"],
+        include: [
+          {
+            model: User,
+            attributes: ["id", "userName", "image"],
+            as: "user",
+          },
+        ],
+      });
+      res.status(200).json({
+        success: true,
+        couponHistory,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  getCurrentShopCouponStatus: async (req, res) => {
+    const { shopId } = req.body;
+    try {
+      const couponStatus = await ShopCoupon.findAll({
+        where: shopId,
+        attributes: {
+          include: [
+            [
+              Sequelize.literal(
+                `(SELECT COALESCE(SUM(sc.assignedCount),0) 
+                FROM shopcoupons sc 
+                WHERE sc.shopId = ShopCoupon.shopId)`
+              ),
+              "totalCoupon",
+            ],
+            [
+              Sequelize.literal(
+                `((SELECT COALESCE(SUM(sc.assignedCount),0) 
+                FROM ShopCoupons sc 
+                WHERE sc.shopId = ShopCoupon.shopId)
+                -
+                (SELECT COALEsCE(SUM(uc.assignedCount),0) 
+                FROM usercoupons uc 
+                WHERE uc.shopId = ShopCoupon.shopId))`
+              ),
+              "remainigCoupon",
+            ],
+          ],
+          exclude: [
+            "requestedCount",
+            "assignedCount",
+            "status",
+            "couponIdFrom",
+            "couponIdTo",
+            "createdAt",
+            "updatedAt",
+          ],
+        },
+      });
+      res.status(200).json({ success: true, couponStatus });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  getPendingCoupons: async (req, res) => {
+    const { shopId } = req.body;
+    try {
+      const pendingCoupons = await ShopCoupon.sum("requestedCount", {
+        where: { status: "pending", shopId },
+      });
+      res.status(200).json({ success: true, pendingCoupons });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  getUserCouponStatus: async (req, res) => {
+    const { userId } = req.body;
+    try {
+      const userCouponStatus = await UserCoupon.findAll({
+        where: { userId },
+        attributes: [
+          "id",
+          "couponIdFrom",
+          "couponIdTo",
+          "assignedCount",
+          "createdAt",
+          [
+            literal(
+              `(SELECT couponCount FROM users WHERE users.id = ${userId})`
+            ),
+            "totalCouponCount",
+          ],
+        ],
+        include: [
+          {
+            model: Shop,
+            attributes: ["id", "shopName", "image"],
+            as: "shop",
+          },
+        ],
+        order: [["createdAt", "DESC"]],
+      });
+      res.status(200).json({ success: true, userCouponStatus });
     } catch (error) {
       console.log(error);
       res.status(500).json({ success: false, message: error.message });
