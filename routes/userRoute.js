@@ -7,7 +7,7 @@ const userAuth = require("../middleware/auth");
 router.post("/register-user", userController.registerUser);
 router.post("/login-user", userController.userLogin);
 router.post("/logout", userController.Logout);
-router.post("/send-verify-otp", userAuth, userController.sendVerifyOtp);
+router.post("/send-register-otp",userController.sendVerifyOtp);
 router.post("/verify-account", userAuth, userController.verifyAccount);
 router.post("/is-auth", userAuth, userController.isAuthenticated);
 router.post("/send-reset-otp", userController.sendResetOtp);

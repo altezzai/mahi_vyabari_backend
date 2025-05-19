@@ -36,7 +36,7 @@ module.exports = {
   upload,
   registerUser: async (req, res) => {
     try {
-      const { userName, email, password, phone } = req.body;
+      const { userName, email, password, phone, otp } = req.body;
       if (!userName || !email || !password || !phone) {
         return res.status(400).json({
           success: false,
@@ -52,10 +52,30 @@ module.exports = {
           message: "User is already existing",
         });
       } else {
+        const otpEntry = await UserOtp.findOne({
+          where: {
+            email,
+            // otp: await hashData(otp),
+            otp,
+          },
+        });
+        if (!otpEntry) {
+          return res.status(404).json({
+            success: false,
+            message: "Invalid OTP",
+          });
+        }
+        if (UserOtp.expiresAt < Date.now()) {
+          return res.status(410).json({
+            success: false,
+            message: "OTP Expired",
+          });
+        }
         const userData = {
           ...req.body,
           password: await hashData(password),
         };
+        await otpEntry.destroy();
         const savedUser = await User.create(userData);
         const tokenData = { userId: savedUser.id, email: savedUser.email };
         const token = await createToken(tokenData);
@@ -127,8 +147,8 @@ module.exports = {
     }
   },
   userLogin: async (req, res) => {
-    const { userId, password, verificationMethod, otp } = req.body;
-    if (!(userId && password) && !(userId && otp)) {
+    const { email, password, otp } = req.body;
+    if (!email || !password || !otp) {
       res.status(409).json({
         success: false,
         message: "email and password is required..!!",
@@ -136,16 +156,7 @@ module.exports = {
     }
     try {
       const user = await User.findOne({
-        where: {
-          [Op.or]: [
-            {
-              email: userId,
-            },
-            {
-              phone: userId,
-            },
-          ],
-        },
+        where: { email },
       });
 
       if (!user) {
@@ -154,71 +165,115 @@ module.exports = {
           message: "invalid email or phone, or account is not registered..!",
         });
       }
-      if (verificationMethod === "password") {
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-          res.status(401).json({
-            success: false,
-            message: "invalid password..!",
-          });
-        }
-        const tokenData = { userId: user.id, email: user.email };
-        const token = await createToken(tokenData);
-        if (!token) {
-          res.status(401).json({
-            success: false,
-            message: "An error occured while creating jwt Token",
-          });
-        }
-        res.cookie("jwt", token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-          maxAge: 1000 * 60 * 60 * 24 * 7,
-        });
-        res.status(200).json({
-          success: true,
-          result: user,
-        });
-      } else {
-        const otpEntry = await UserOtp.findOne({
-          where: {
-            userId: user.id,
-            loginOTP: otp,
-          },
-        });
-        if (!otpEntry) {
-          return res.status(404).json({
-            success: false,
-            message: "Invalid OTP",
-          });
-        }
-        if (otpEntry.expiresAt < Date.now()) {
-          return res.status(410).json({
-            success: false,
-            message: "OTP Expired",
-          });
-        }
-        const tokenData = { userId: user.id, email: user.email };
-        const token = await createToken(tokenData);
-        if (!token) {
-          res.status(401).json({
-            success: false,
-            message: "An error occured while creating jwt Token",
-          });
-        }
-        res.cookie("jwt", token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-          maxAge: 1000 * 60 * 60 * 24 * 7,
-        });
-        await otpEntry.destroy();
-        res.status(200).json({
-          success: true,
-          result: user,
+      // if (verificationMethod === "password") {
+      //   const isMatch = await bcrypt.compare(password, user.password);
+      //   if (!isMatch) {
+      //     res.status(401).json({
+      //       success: false,
+      //       message: "invalid password..!",
+      //     });
+      //   }
+      //   const tokenData = { userId: user.id, email: user.email };
+      //   const token = await createToken(tokenData);
+      //   if (!token) {
+      //     res.status(401).json({
+      //       success: false,
+      //       message: "An error occured while creating jwt Token",
+      //     });
+      //   }
+      //   res.cookie("jwt", token, {
+      //     httpOnly: true,
+      //     secure: process.env.NODE_ENV === "production",
+      //     sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+      //     maxAge: 1000 * 60 * 60 * 24 * 7,
+      //   });
+      //   res.status(200).json({
+      //     success: true,
+      //     result: user,
+      //   });
+      // } else {
+      //   const otpEntry = await UserOtp.findOne({
+      //     where: {
+      //       userId: user.id,
+      //       loginOTP: otp,
+      //     },
+      //   });
+      //   if (!otpEntry) {
+      //     return res.status(404).json({
+      //       success: false,
+      //       message: "Invalid OTP",
+      //     });
+      //   }
+      //   if (otpEntry.expiresAt < Date.now()) {
+      //     return res.status(410).json({
+      //       success: false,
+      //       message: "OTP Expired",
+      //     });
+      //   }
+      //   const tokenData = { userId: user.id, email: user.email };
+      //   const token = await createToken(tokenData);
+      //   if (!token) {
+      //     res.status(401).json({
+      //       success: false,
+      //       message: "An error occured while creating jwt Token",
+      //     });
+      //   }
+      //   res.cookie("jwt", token, {
+      //     httpOnly: true,
+      //     secure: process.env.NODE_ENV === "production",
+      //     sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+      //     maxAge: 1000 * 60 * 60 * 24 * 7,
+      //   });
+      //   await otpEntry.destroy();
+      //   res.status(200).json({
+      //     success: true,
+      //     result: user,
+      //   });
+      // }
+      const otpEntry = await UserOtp.findOne({
+        where: {
+          email,
+          otp,
+        },
+      });
+      if (!otpEntry) {
+        return res.status(404).json({
+          success: false,
+          message: "Invalid OTP",
         });
       }
+      if (otpEntry.expiresAt < Date.now()) {
+        return res.status(410).json({
+          success: false,
+          message: "OTP Expired",
+        });
+      }
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        res.status(401).json({
+          success: false,
+          message: "invalid password..!",
+        });
+      }
+      const tokenData = { userId: user.id, email: user.email };
+      const token = await createToken(tokenData);
+      if (!token) {
+        res.status(401).json({
+          success: false,
+          message: "An error occured while creating jwt Token",
+        });
+      }
+      res.cookie("jwt", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+      });
+      await otpEntry.destroy();
+      res.status(200).json({
+        success: true,
+        result: user,
+      });
     } catch (error) {
       console.log(error);
       res.status(500).json({ success: false, message: error.message });
@@ -351,26 +406,24 @@ module.exports = {
   },
   sendVerifyOtp: async (req, res) => {
     try {
-      const { userId } = req.body;
-      const user = await User.findByPk(userId);
-      if (user.verified) {
+      const { email } = req.body;
+      console.log(email);
+      const user = await User.findOne({ where: { email } });
+      if (user) {
         return res
           .status(400)
-          .json({ success: false, message: "User already verified" });
+          .json({ success: false, message: "User already registered...!" });
       }
-      const verificationOTP = String(
-        Math.floor(100000 + Math.random() * 900000)
-      );
+      const otp = String(Math.floor(100000 + Math.random() * 900000));
       await UserOtp.create({
-        userId,
+        email,
         // otp: await hashData(otp),
-        verificationOTP,
+        otp,
       });
       const subject = "Email Verification OTP";
       const message = `
       <div style="font-family: Arial, sans-serif; padding: 20px;">
         <h2>OTP Verification</h2>
-        <p>Hello <strong>${user.userName}</strong>,</p>
         <p>Your OTP code is:</p>
         <div style="
           font-size: 24px;
@@ -378,7 +431,7 @@ module.exports = {
           color: #007bff;
           padding: 10px 0;
         ">
-          ${verificationOTP}
+          ${otp}
         </div>
         <p>This OTP is valid for 10 minutes.</p>
         <p>Please Verify Your Email.</p>
@@ -386,7 +439,7 @@ module.exports = {
         <p style="font-size: 14px; color: #999;">Mahe Vyapari</p>
       </div>
     `;
-      await sendEmail(user.email, subject, message);
+      await sendEmail(email, subject, message);
       res
         .status(200)
         .json({ success: true, message: "Verification OTP Send on Email" });
@@ -544,8 +597,8 @@ module.exports = {
     }
   },
   sendLoginOtp: async (req, res) => {
-    const { userId } = req.body;
-    if (!userId) {
+    const { email } = req.body;
+    if (!email) {
       return res.status(404).json({
         success: false,
         message: "Email is Required or phone is required",
@@ -553,7 +606,7 @@ module.exports = {
     }
     try {
       const user = await User.findOne({
-        where: { [Op.or]: [{ email: userId }, { phone: userId }] },
+        where: { email },
       });
       if (!user) {
         return res
@@ -562,18 +615,17 @@ module.exports = {
       }
       const loginOTP = String(Math.floor(100000 + Math.random() * 900000));
       await UserOtp.create({
-        userId: user.id,
+        email,
         // otp: await hashData(otp),
-        loginOTP,
+        otp: loginOTP,
       });
-      const isValidPhone = (userId) =>
-        /^(\+91[\-\s]?)?[6-9]\d{9}$/.test(userId);
-      console.log(isValidPhone());
+      // const isValidPhone = (userId) =>
+      //   /^(\+91[\-\s]?)?[6-9]\d{9}$/.test(userId);
+      // console.log(isValidPhone());
       const subject = "Login OTP";
       const message = `
         <div style="font-family: Arial, sans-serif; padding: 20px;">
           <h2>OTP Verification</h2>
-          <p>Hello <strong>${user.userName}</strong>,</p>
           <p>Your OTP code is:</p>
           <div style="
             font-size: 24px;
@@ -589,19 +641,24 @@ module.exports = {
           <p style="font-size: 14px; color: #999;">Mahe Vyapari</p>
         </div>
       `;
-      if (!isValidPhone(userId)) {
-        await sendEmail(user.email, subject, message);
-        return res.status(200).json({
-          success: true,
-          message: "sent Login OTP to your Email",
-        });
-      } else {
-        await sendSMS(userId, `Your Login OTP is ${loginOTP}`);
-        return res.status(200).json({
-          success: true,
-          message: "sent Login OTP to your Phone",
-        });
-      }
+      // if (!isValidPhone(userId)) {
+      //   await sendEmail(user.email, subject, message);
+      //   return res.status(200).json({
+      //     success: true,
+      //     message: "sent Login OTP to your Email",
+      //   });
+      // } else {
+      //   await sendSMS(userId, `Your Login OTP is ${loginOTP}`);
+      //   return res.status(200).json({
+      //     success: true,
+      //     message: "sent Login OTP to your Phone",
+      //   });
+      // }
+      await sendEmail(email, subject, message);
+      return res.status(200).json({
+        success: true,
+        message: "sent Login OTP to your Email",
+      });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ success: false, message: error.message });

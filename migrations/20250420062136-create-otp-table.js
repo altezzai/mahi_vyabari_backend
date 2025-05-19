@@ -9,33 +9,29 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      userId: {
-        type: Sequelize.INTEGER,
+      email: {
+        type: Sequelize.STRING,
         allowNull: false,
-        references: {
-          model: "users",
-          key: "id",
-        },
         onDelete: "CASCADE",
       },
-      verificationOTP: {
+      otp: {
         type: Sequelize.STRING,
       },
-      verificationOTPExpires: {
+      expiresAt: {
         type: Sequelize.DATE,
       },
-      resetOTP: {
-        type: Sequelize.STRING,
-      },
-      resetOTPExpires: {
-        type: Sequelize.DATE,
-      },
-      loginOTP: {
-        type: Sequelize.STRING,
-      },
-      loginOTPExpires: {
-        type: Sequelize.DATE,
-      },
+      // resetOTP: {
+      //   type: Sequelize.STRING,
+      // },
+      // resetOTPExpires: {
+      //   type: Sequelize.DATE,
+      // },
+      // loginOTP: {
+      //   type: Sequelize.STRING,
+      // },
+      // loginOTPExpires: {
+      //   type: Sequelize.DATE,
+      // },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

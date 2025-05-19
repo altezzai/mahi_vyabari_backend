@@ -5,35 +5,36 @@ const User = require("./User");
 const OTP = sequelize.define(
   "otps",
   {
-    userId: {
-      type: DataTypes.INTEGER,
+    email: {
+      type: DataTypes.STRING,
       allowNull: false,
-      references: {
-        model: User,
-        key: "id",
+      validate: {
+        isEmail: true,
+        notEmpty: true,
       },
+      unique: true,
     },
-  verificationOTP: {
+    otp: {
       type: DataTypes.STRING,
     },
-    verificationOTPexpires: {
+    expiresAt: {
       type: DataTypes.DATE,
       defaultValue: () => new Date(Date.now() + 10 * 60 * 1000),
     },
-    resetOTP:{
-      type:DataTypes.STRING,
-    },
-    resetOTPExpires:{
-      type: DataTypes.DATE,
-      defaultValue: () => new Date(Date.now() + 10 * 60 * 1000),
-    },
-    loginOTP:{
-      type:DataTypes.STRING,
-    },
-    loginOTPExpires:{
-      type: DataTypes.DATE,
-      defaultValue: () => new Date(Date.now() + 10 * 60 * 1000),
-    }
+    // resetOTP: {
+    //   type: DataTypes.STRING,
+    // },
+    // resetOTPExpires: {
+    //   type: DataTypes.DATE,
+    //   defaultValue: () => new Date(Date.now() + 10 * 60 * 1000),
+    // },
+    // loginOTP: {
+    //   type: DataTypes.STRING,
+    // },
+    // loginOTPExpires: {
+    //   type: DataTypes.DATE,
+    //   defaultValue: () => new Date(Date.now() + 10 * 60 * 1000),
+    // },
   },
   {
     timestamps: true,
