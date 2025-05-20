@@ -91,6 +91,7 @@ module.exports = {
         res.cookie("token", token, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
+          sameSite:"none",
           // sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
           maxAge: 1000 * 60 * 60 * 24 * 7,
         });
@@ -270,6 +271,7 @@ module.exports = {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         // sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+        sameSite: "none",
         maxAge: 1000 * 60 * 60 * 24 * 7,
       });
       res.status(200).json({
