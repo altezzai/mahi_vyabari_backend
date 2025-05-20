@@ -369,7 +369,7 @@ module.exports = {
       };
     }
     try {
-      const { count, rows: customers } = await Customer.findAndCountAll({
+      const { count, rows: customers } = await User.findAndCountAll({
         limit,
         offset,
         where: whereCondition,
