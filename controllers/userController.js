@@ -58,6 +58,7 @@ module.exports = {
             // otp: await hashData(otp),
             // otp,
           },
+          order: [["createdAt", "DESC"]],
         });
         const otpMatch = await bcrypt.compare(otp, otpEntry.otp);
         console.log(otpEntry);
@@ -91,8 +92,7 @@ module.exports = {
         res.cookie("token", token, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
-          sameSite:"none",
-          // sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
           maxAge: 1000 * 60 * 60 * 24 * 7,
         });
         return res.status(200).json({
@@ -270,8 +270,7 @@ module.exports = {
       res.cookie("jwt", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        // sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-        sameSite: "none",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
         maxAge: 1000 * 60 * 60 * 24 * 7,
       });
       res.status(200).json({

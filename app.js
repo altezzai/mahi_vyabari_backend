@@ -11,6 +11,7 @@ const helmet = require("helmet");
 const cookieParser = require('cookie-parser');
 const compression = require("compression");
 const { errorMiddleware } = require("./middleware/error");
+const allowOrings = [process.env.CLIENT_URL];
 const PORT = process.env.PORT || 3000;
 
 const shopRouter = require("./routes/shopRoute");
@@ -43,7 +44,7 @@ app.use(express.json());
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({credentials:true, origin: process.env.CLIENT_URL}));
+app.use(cors({credentials:true, origin: allowOrings}));
 app.use(helmet());
 app.use(compression());
 app.use(errorMiddleware);

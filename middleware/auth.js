@@ -6,7 +6,7 @@ const userAuth = async (req, res, next) => {
     req.body.token ||
     req.query.token ||
     req.headers["x-access-token"] ||
-    req.cookies.jwt;
+    req.cookies.token;
   if (!token) {
     return res
       .status(403)
