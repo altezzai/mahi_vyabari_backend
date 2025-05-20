@@ -148,8 +148,8 @@ module.exports = {
   },
   userLogin: async (req, res) => {
     const { email, password } = req.body;
-    if (!email || !password || !otp) {
-      res.status(409).json({
+    if (!email || !password ) {
+      return res.status(409).json({
         success: false,
         message: "email and password is required..!!",
       });
@@ -160,7 +160,7 @@ module.exports = {
       });
 
       if (!user) {
-        res.status(403).json({
+       return res.status(403).json({
           success: false,
           message: "invalid email or phone, or account is not registered..!",
         });
@@ -250,7 +250,7 @@ module.exports = {
       // }
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
-        res.status(401).json({
+       return res.status(401).json({
           success: false,
           message: "invalid password..!",
         });
@@ -258,7 +258,7 @@ module.exports = {
       const tokenData = { userId: user.id, email: user.email };
       const token = await createToken(tokenData);
       if (!token) {
-        res.status(401).json({
+       return res.status(401).json({
           success: false,
           message: "An error occured while creating jwt Token",
         });
@@ -269,7 +269,6 @@ module.exports = {
         sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
         maxAge: 1000 * 60 * 60 * 24 * 7,
       });
-      await otpEntry.destroy();
       res.status(200).json({
         success: true,
         result: user,
