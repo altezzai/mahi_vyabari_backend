@@ -33,20 +33,21 @@ const upload = multer({ storage });
 module.exports = {
   upload,
   addshop: async (req, res) => {
+    const { shopName, phone, areas } = req.body;
+    const t = await sequelize.transaction();
     try {
       const shopData = {
         ...req.body,
         image: req.files?.image?.[0]?.filename || null,
         icon: req.files?.icon?.[0]?.filename || null,
       };
-      const savedShop = await Shop.create(shopData);
+      const savedShop = await Shop.create(shopData, { transaction: t });
       if (savedShop.categories && savedShop.categories.length > 0) {
-        await ShopCategory.bulkCreate(
-          savedShop.categories.map((category) => ({
-            shopId: savedShop.id,
-            categoryId: category,
-          }))
-        );
+        const categoriesToCreate = savedShop.categories.map((category) => ({
+          shopId: savedShop.id,
+          categoryId: category,
+        }));
+        await ShopCategory.bulkCreate(categoriesToCreate, { transaction: t });
       }
       // const savedShop = await Shop.bulkCreate(req.body, { validate: true });
       // savedShop.forEach(async (data) => {
@@ -60,11 +61,23 @@ module.exports = {
       //     );
       //   }
       // });
+      await User.create(
+        {
+          userName: shopName,
+          phone,
+          areas,
+          role: "shop",
+          image: req.files?.image?.[0]?.filename || null,
+        },
+        { transaction: t }
+      );
+      await t.commit();
       res.status(201).json({
         success: true,
         savedShop: savedShop,
       });
     } catch (error) {
+      await t.rollback();
       console.log(error);
       await deletefilewithfoldername(
         uploadPath,

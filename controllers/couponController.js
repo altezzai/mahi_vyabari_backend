@@ -401,6 +401,7 @@ module.exports = {
             as: "user",
           },
         ],
+        order:[["createdAt","DESC"]]
       });
       res.status(200).json({
         success: true,
@@ -471,6 +472,9 @@ module.exports = {
   getUserCouponStatus: async (req, res) => {
     const { userId } = req.body;
     try {
+      const totalCouponCount = await User.findByPk(userId,{
+        attributes: ["couponCount"],
+      });
       const userCouponStatus = await UserCoupon.findAll({
         where: { userId },
         attributes: [
@@ -479,12 +483,12 @@ module.exports = {
           "couponIdTo",
           "assignedCount",
           "createdAt",
-          [
-            literal(
-              `(SELECT couponCount FROM users WHERE users.id = ${userId})`
-            ),
-            "totalCouponCount",
-          ],
+          // [
+          //   literal(
+          //     `(SELECT couponCount FROM users WHERE users.id = ${userId})`
+          //   ),
+          //   "totalCouponCount",
+          // ],
         ],
         include: [
           {
@@ -495,7 +499,7 @@ module.exports = {
         ],
         order: [["createdAt", "DESC"]],
       });
-      res.status(200).json({ success: true, userCouponStatus });
+      res.status(200).json({ success: true, data:{totalCouponCount,userCouponStatus} });
     } catch (error) {
       console.log(error);
       res.status(500).json({ success: false, message: error.message });
