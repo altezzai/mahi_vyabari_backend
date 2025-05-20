@@ -147,7 +147,7 @@ module.exports = {
     }
   },
   userLogin: async (req, res) => {
-    const { email, password, otp } = req.body;
+    const { email, password } = req.body;
     if (!email || !password || !otp) {
       res.status(409).json({
         success: false,
@@ -230,24 +230,24 @@ module.exports = {
       //     result: user,
       //   });
       // }
-      const otpEntry = await UserOtp.findOne({
-        where: {
-          email,
-          otp,
-        },
-      });
-      if (!otpEntry) {
-        return res.status(404).json({
-          success: false,
-          message: "Invalid OTP",
-        });
-      }
-      if (otpEntry.expiresAt < Date.now()) {
-        return res.status(410).json({
-          success: false,
-          message: "OTP Expired",
-        });
-      }
+      // const otpEntry = await UserOtp.findOne({
+      //   where: {
+      //     email,
+      //     otp,
+      //   },
+      // });
+      // if (!otpEntry) {
+      //   return res.status(404).json({
+      //     success: false,
+      //     message: "Invalid OTP",
+      //   });
+      // }
+      // if (otpEntry.expiresAt < Date.now()) {
+      //   return res.status(410).json({
+      //     success: false,
+      //     message: "OTP Expired",
+      //   });
+      // }
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         res.status(401).json({
