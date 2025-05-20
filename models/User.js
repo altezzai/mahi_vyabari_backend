@@ -21,6 +21,7 @@ const User = sequelize.define(
     },
     password: {
       type: DataTypes.STRING,
+      allowNull: false,
       validate: {
         notEmpty: function (value) {
           if (!this.googleId && !value) {
@@ -55,6 +56,8 @@ const User = sequelize.define(
       validate: {
         isIn: [["user", "shop", "admin"]],
       },
+      allowNull: false,
+      defaultValue: "user",
     },
     verified: {
       type: DataTypes.BOOLEAN,

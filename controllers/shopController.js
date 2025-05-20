@@ -2,6 +2,7 @@ require("../config/database");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
+const sequelize = require("../config/database");
 const Shop = require("../models/Shop");
 const Category = require("../models/Category");
 const ShopCategory = require("../models/ShopCategory");
@@ -11,7 +12,8 @@ const Type = require("../models/Type");
 const Complaint = require("../models/Complaint");
 const Feedback = require("../models/Feedback");
 const User = require("../models/User");
-const { count } = require("console");
+const { hashData } = require("../utils/hashData");
+const {sendEmail} = require("../utils/nodemailer");
 
 const uploadPath = path.join(__dirname, "../public/uploads/shopImages");
 if (!fs.existsSync(uploadPath)) {
@@ -29,11 +31,10 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
-
 module.exports = {
   upload,
   addshop: async (req, res) => {
-    const { shopName, phone, areas } = req.body;
+    const { shopName, phone, areas, email } = req.body;
     const t = await sequelize.transaction();
     try {
       const shopData = {
@@ -41,12 +42,15 @@ module.exports = {
         image: req.files?.image?.[0]?.filename || null,
         icon: req.files?.icon?.[0]?.filename || null,
       };
+      console.log(req.body);
       const savedShop = await Shop.create(shopData, { transaction: t });
       if (savedShop.categories && savedShop.categories.length > 0) {
-        const categoriesToCreate = savedShop.categories.map((category) => ({
-          shopId: savedShop.id,
-          categoryId: category,
-        }));
+        const categoriesToCreate = await savedShop.categories.map(
+          (category) => ({
+            shopId: savedShop.id,
+            categoryId: category,
+          })
+        );
         await ShopCategory.bulkCreate(categoriesToCreate, { transaction: t });
       }
       // const savedShop = await Shop.bulkCreate(req.body, { validate: true });
@@ -64,13 +68,30 @@ module.exports = {
       await User.create(
         {
           userName: shopName,
+          email,
           phone,
           areas,
+          password: await hashData(phone),
           role: "shop",
           image: req.files?.image?.[0]?.filename || null,
         },
         { transaction: t }
       );
+      const subject = "Welcome to Mahe Vyapari!";
+      const message = `
+      <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4;">
+        <div style="max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px #ccc;">
+          <h2 style="color: #4CAF50;">Welcome, ${shopName} 👋</h2>
+          <p>Your account has been created by the Admin.</p>
+          <p><strong>Login Email:</strong> ${email}</p>
+          <p><strong>Password:</strong><span style="font-weight:900;"> ${phone}</span></p>
+          <p>Please login and change your password immediately for security reasons.</p>
+          <br/>
+          <p>Thanks,<br/>Team Mahe Vyapari</p>
+        </div>
+      </div>
+    `;
+      sendEmail(email, subject, message);
       await t.commit();
       res.status(201).json({
         success: true,

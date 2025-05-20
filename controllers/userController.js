@@ -96,7 +96,7 @@ module.exports = {
         });
         return res.status(200).json({
           success: true,
-          result: savedUser,
+          message: "User Registered Successfully",
         });
       }
     } catch (error) {
@@ -138,7 +138,7 @@ module.exports = {
       await user.update(updatedUserData);
       res.status(200).json({
         success: true,
-        result: user,
+        message: "User updated successfully",
       });
     } catch (error) {
       await deletefilewithfoldername(uploadPath, req.file?.filename);
@@ -274,7 +274,7 @@ module.exports = {
       });
       res.status(200).json({
         success: true,
-        result: user,
+        message: "User Logged In Successfully",
       });
     } catch (error) {
       console.log(error);
