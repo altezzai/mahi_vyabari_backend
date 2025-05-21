@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const coupenController = require("../controllers/couponController");
-const userAuth = require("../middleware/auth");
+const userAuth = require("../middleware/authMiddleware");
 
 router.post("/request-coupon", coupenController.requestCoupen);
 router.put(

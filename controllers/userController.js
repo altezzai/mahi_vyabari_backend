@@ -81,7 +81,7 @@ module.exports = {
         };
         await otpEntry.destroy();
         const savedUser = await User.create(userData);
-        const tokenData = { userId: savedUser.id, email: savedUser.email };
+        const tokenData = { id: user.id, email: user.email, role: user.role };
         const token = await createToken(tokenData);
         if (!token) {
           return res.status(401).json({
@@ -259,7 +259,7 @@ module.exports = {
           message: "invalid password..!",
         });
       }
-      const tokenData = { userId: user.id, email: user.email };
+      const tokenData = { id: user.id, email: user.email, role: user.role };
       const token = await createToken(tokenData);
       if (!token) {
         return res.status(401).json({
@@ -292,6 +292,7 @@ module.exports = {
   feedback: async (req, res) => {
     try {
       const { userId, shopId, rating } = req.body;
+      console.log(userId, shopId, rating);
       if (!userId || !shopId || !rating) {
         return res.status(400).json({
           success: false,
@@ -341,9 +342,17 @@ module.exports = {
       res.status(500).json({ success: false, message: error.message });
     }
   },
-  getAllComplaints: async (req, res) => {
+  getComplaints: async (req, res) => {
     try {
-      const complaints = await Complaint.findAll();
+      const complaints = await Complaint.findAll({
+        where: { userId: req.body.userId },
+        order: [["createdAt", "DESC"]],
+      });
+      if (!complaints) {
+        return res
+          .status(404)
+          .json({ success: false, message: "No complaints found" });
+      }
       res.status(200).json({ success: true, complaints });
     } catch (error) {
       console.error(error);
@@ -353,7 +362,7 @@ module.exports = {
   getComplaintsById: async (req, res) => {
     try {
       const complaints = await Complaint.findAll({
-        where: { userId: req.params.userId },
+        where: { userId: req.body.userId },
       });
       res.status(200).json(complaints);
     } catch (error) {
@@ -519,11 +528,10 @@ module.exports = {
           .status(401)
           .json({ success: false, message: "User Not Found" });
       }
-      const resetOTP = String(Math.floor(100000 + Math.random() * 900000));
+      const otp = String(Math.floor(100000 + Math.random() * 900000));
       await UserOtp.create({
-        userId: user.id,
-        // otp: await hashData(otp),
-        resetOTP,
+        email,
+        otp: await hashData(otp),
       });
       const subject = "Password Reset OTP";
       const message = `
@@ -537,7 +545,7 @@ module.exports = {
           color: #007bff;
           padding: 10px 0;
         ">
-          ${resetOTP}
+          ${otp}
         </div>
         <p>This OTP is valid for 10 minutes.</p>
         <p>Please Verify Your Email.</p>
@@ -556,8 +564,8 @@ module.exports = {
     }
   },
   resetPassword: async (req, res) => {
-    const { email, resetOTP, newPassword } = req.body;
-    if (!email || !resetOTP || !newPassword) {
+    const { email, otp, newPassword } = req.body;
+    if (!email || !otp || !newPassword) {
       return res.status(410).json({
         success: false,
         message: "Email,OTP and new password are required",
@@ -574,11 +582,12 @@ module.exports = {
       }
       const otpEntry = await UserOtp.findOne({
         where: {
-          userId: user.id,
-          resetOTP,
+          email,
         },
+        order: [["createdAt", "DESC"]],
       });
-      if (!otpEntry) {
+      const isMatch = await bcrypt.compare(otpEntry.otp, otp);
+      if (!isMatch) {
         return res.status(401).json({ success: false, message: "Invalid OTP" });
       }
       if (otpEntry.expiresAt < Date.now()) {
@@ -664,6 +673,15 @@ module.exports = {
     } catch (error) {
       console.log(error);
       return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  getCurrentUser: async (req, res) => {
+    const { id, email, role } = req.body;
+    try {
+      res.status(200).json({ id, email, role });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ success: false, message: error.message });
     }
   },
 };

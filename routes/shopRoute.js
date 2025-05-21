@@ -2,9 +2,13 @@ const express = require("express");
 const router = express.Router();
 
 const shopController = require("../controllers/shopController");
+const userAuth = require("../middleware/authMiddleware");
+const autherizeRoles = require("../middleware/roleMiddleware");
 
 router.post(
   "/add-shop",
+  userAuth,
+  autherizeRoles("admin"),
   shopController.upload.fields([{ name: "image" }, { name: "icon" }]),
   shopController.addshop
 );
@@ -20,5 +24,6 @@ router.get("/get-shop/:shopId", shopController.getShopById);
 router.get("/get-shop-categories", shopController.getShopCategories);
 router.get("/get-shop-feedbacks", shopController.getShopFeedbacks);
 router.get("/get-shop-complaints", shopController.getShopComplaints);
+
 
 module.exports = router;
