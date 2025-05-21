@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router();
 
 const classifiedController = require("../controllers/classifiedController");
+const userAuth = require("../middleware/authMiddleware");
+const autherizeRoles = require("../middleware/roleMiddleware");
+router.use(userAuth, autherizeRoles("admin"));
 
 router.post(
   "/add-classified",

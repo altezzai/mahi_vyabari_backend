@@ -57,17 +57,5 @@ router.get(
 //   autherizeRoles("admin"),
 //   userController.getComplaintsById
 // );
-// router.patch(
-//   "/update-complaints/:id",
-//   userAuth,
-//   autherizeRoles("admin"),
-//   userController.updateComplaints
-// );
-// router.get(
-//   "/delete-complaints/:id",
-//   userAuth,
-//   autherizeRoles("admin"),
-//   userController.deleteComplaints
-// );
 
 module.exports = router;

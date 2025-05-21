@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router();
 
 const medDirectoryController = require("../controllers/medDirectoryController");
+const userAuth = require("../middleware/authMiddleware");
+const autherizeRoles = require("../middleware/roleMiddleware");
+router.use(userAuth, autherizeRoles("admin"));
 
 router.post(
   "/add-medicalDirectory",

@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router();
 
 const categoryController = require("../controllers/categoryController");
+const userAuth = require("../middleware/authMiddleware");
+const autherizeRoles = require("../middleware/roleMiddleware");
+router.use(userAuth, autherizeRoles("admin"));
 
 router.post("/add-type", categoryController.addType);
 router.patch("/delete-type/:id", categoryController.deleteType);

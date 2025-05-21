@@ -63,7 +63,7 @@ module.exports = {
         const otpMatch = await bcrypt.compare(otp, otpEntry.otp);
         console.log(otpEntry);
         console.log(otpMatch);
-        if (!otpEntry || !otpMatch) {
+        if (!otpMatch) {
           return res.status(404).json({
             success: false,
             message: "Invalid OTP",
@@ -259,7 +259,7 @@ module.exports = {
           message: "invalid password..!",
         });
       }
-      const tokenData = { id: user.id, email: user.email, role: user.role };
+      const tokenData = { userId: user.id, email: user.email, role: user.role };
       const token = await createToken(tokenData);
       if (!token) {
         return res.status(401).json({
@@ -365,37 +365,6 @@ module.exports = {
         where: { userId: req.body.userId },
       });
       res.status(200).json(complaints);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ success: false, message: error.message });
-    }
-  },
-  updateComplaints: async (req, res) => {
-    try {
-      const { status, resolution } = req.body;
-      const complaint = await Complaint.findByPk(req.params.id);
-      if (!complaint) {
-        return res
-          .status(404)
-          .json({ success: false, message: "Complaint not found" });
-      }
-      await complaint.update({ status, resolution });
-      res.status(200).json({ success: true, complaint });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ success: false, message: error.message });
-    }
-  },
-  deleteComplaints: async (req, res) => {
-    try {
-      const complaint = await Complaint.findByPk(req.params.id);
-      if (!complaint) {
-        return res
-          .status(404)
-          .json({ success: false, message: "Complaint not found" });
-      }
-      await complaint.update({ trash: true });
-      res.status(200).json({ success: true, complaint });
     } catch (error) {
       console.error(error);
       res.status(500).json({ success: false, message: error.message });
@@ -586,8 +555,8 @@ module.exports = {
         },
         order: [["createdAt", "DESC"]],
       });
-      const isMatch = await bcrypt.compare(otpEntry.otp, otp);
-      if (!isMatch) {
+      const otpMatch = await bcrypt.compare(otpEntry.otp, otp);
+      if (!otpMatch) {
         return res.status(401).json({ success: false, message: "Invalid OTP" });
       }
       if (otpEntry.expiresAt < Date.now()) {

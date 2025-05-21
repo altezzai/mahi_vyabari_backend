@@ -13,7 +13,7 @@ const Complaint = require("../models/Complaint");
 const Feedback = require("../models/Feedback");
 const User = require("../models/User");
 const { hashData } = require("../utils/hashData");
-const {sendEmail} = require("../utils/nodemailer");
+const { sendEmail } = require("../utils/nodemailer");
 
 const uploadPath = path.join(__dirname, "../public/uploads/shopImages");
 if (!fs.existsSync(uploadPath)) {
@@ -35,6 +35,7 @@ module.exports = {
   upload,
   addshop: async (req, res) => {
     const { shopName, phone, areas, email } = req.body;
+    console.log(req.body);
     const t = await sequelize.transaction();
     try {
       const shopData = {
@@ -373,7 +374,6 @@ module.exports = {
     if (search) {
       whereCondition = {
         shopName: { [Op.like]: `%${search}%` },
-        trash: false,
       };
     }
     try {
@@ -381,6 +381,48 @@ module.exports = {
         limit,
         offset,
         where: whereCondition,
+        attributes: {
+          include: [
+            [
+              sequelize.literal(
+                `(SELECT COUNT(*) FROM complaints As c WHERE c.shopId = Complaint.shopId)`
+              ),
+              "totalComplaints",
+            ],
+          ],
+          exclude: ["userId", "shopId", "resolution", "createdAt", "updatedAt"],
+        },
+        include: [
+          {
+            model: User,
+            attributes: ["id", "userName"],
+            as: "user",
+          },
+          {
+            model: Shop,
+            attributes: ["id", "shopName"],
+            as: "shop",
+          },
+        ],
+        order: [["createdAt", "DESC"]],
+      });
+      const totalPages = Math.ceil(count / limit);
+      return res.status(200).json({
+        success: true,
+        count,
+        totalPages,
+        currentPage: page,
+        data: complaints,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  getShopComplaintById: async (req, res) => {
+    try {
+      const { complaintId } = req.params;
+      const complaint = await Complaint.findByPk(complaintId, {
         include: [
           {
             model: User,
@@ -394,17 +436,63 @@ module.exports = {
           },
         ],
       });
-      const totalPages = Math.ceil(count / limit);
-      return res.status(200).json({
-        success: true,
-        count,
-        totalPages,
-        currentPage: page,
-        data: complaints,
-      });
+      if (!complaint) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Complaint not found" });
+      }
+      res.status(200).json({ success: true, data: complaint });
     } catch (error) {
-      console.log(error);
-      return res.status(500).json({ success: false, message: error.message });
+      console.error(error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  resolveComplaints: async (req, res) => {
+    const { complaintId } = req.params;
+    try {
+      const { resolution } = req.body;
+      const complaint = await Complaint.findByPk(complaintId);
+      if (!complaint) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Complaint not found" });
+      }
+      await complaint.update({ status: "resolved", resolution });
+      res.status(200).json({ success: true, complaint });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  rejectComplaints: async (req, res) => {
+    const { complaintId } = req.params;
+    try {
+      const complaint = await Complaint.findByPk(complaintId);
+      if (!complaint) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Complaint not found" });
+      }
+      await complaint.update({ status: "rejected" });
+      res.status(200).json({ success: true, complaint });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  deleteComplaints: async (req, res) => {
+    try {
+      const complaint = await Complaint.findByPk(req.params.id);
+      if (!complaint) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Complaint not found" });
+      }
+      await complaint.update({ trash: true });
+      res.status(200).json({ success: true, complaint });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, message: error.message });
     }
   },
 };

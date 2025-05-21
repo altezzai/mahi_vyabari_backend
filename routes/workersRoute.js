@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router();
 
 const workerController = require("../controllers/workerController");
+const userAuth = require("../middleware/authMiddleware");
+const autherizeRoles = require("../middleware/roleMiddleware");
+router.use(userAuth, autherizeRoles("admin"));
 
 router.post(
   "/add-worker-profile",

@@ -2,7 +2,9 @@ const express = require("express");
 const router = express.Router();
 
 const vehicleController = require("../controllers/vehicleController");
-const { route } = require("./emergencyRoute");
+const userAuth = require("../middleware/authMiddleware");
+const autherizeRoles = require("../middleware/roleMiddleware");
+router.use(userAuth, autherizeRoles("admin"));
 
 router.post("/add-vehicleSchedule", vehicleController.addVehicleSchedule);
 router.put(
