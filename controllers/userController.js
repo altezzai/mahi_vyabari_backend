@@ -64,7 +64,7 @@ module.exports = {
         console.log(otpEntry);
         console.log(otpMatch);
         if (!otpMatch) {
-          return res.status(404).json({
+          return res.status(401).json({
             success: false,
             message: "Invalid OTP",
           });
@@ -81,7 +81,7 @@ module.exports = {
         };
         await otpEntry.destroy();
         const savedUser = await User.create(userData);
-        const tokenData = { id: user.id, email: user.email, role: user.role };
+        const tokenData = { id: savedUser.id, email: savedUser.email, role: savedUser.role };
         const token = await createToken(tokenData);
         if (!token) {
           return res.status(401).json({
@@ -259,7 +259,7 @@ module.exports = {
           message: "invalid password..!",
         });
       }
-      const tokenData = { userId: user.id, email: user.email, role: user.role };
+      const tokenData = { id: user.id, email: user.email, role: user.role };
       const token = await createToken(tokenData);
       if (!token) {
         return res.status(401).json({
