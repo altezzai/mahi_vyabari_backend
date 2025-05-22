@@ -8,9 +8,11 @@ const Tourism = require("../models/Tourism");
 
 module.exports = {
   requestCoupen: async (req, res) => {
+    const { requestedCount, shopId } = req.body;
     const couponData = {
-      ...req.body,
       status: "pending",
+      requestedCount,
+      shopId,
     };
     try {
       const shopcoupon = await ShopCoupon.create(couponData);
@@ -100,7 +102,7 @@ module.exports = {
         });
       }
 
-      let remaining = assignedCount;
+      let remaining = Number(assignedCount);
       const assignments = [];
 
       for (const batch of shopBatches) {
@@ -401,7 +403,7 @@ module.exports = {
             as: "user",
           },
         ],
-        order:[["createdAt","DESC"]]
+        order: [["createdAt", "DESC"]],
       });
       res.status(200).json({
         success: true,
@@ -415,7 +417,7 @@ module.exports = {
   getCurrentShopCouponStatus: async (req, res) => {
     const { shopId } = req.body;
     try {
-      const couponStatus = await ShopCoupon.findAll({
+      const couponStatus = await ShopCoupon.findOne({
         where: shopId,
         attributes: {
           include: [
@@ -472,7 +474,7 @@ module.exports = {
   getUserCouponStatus: async (req, res) => {
     const { userId } = req.body;
     try {
-      const totalCouponCount = await User.findByPk(userId,{
+      const totalCouponCount = await User.findByPk(userId, {
         attributes: ["couponCount"],
       });
       const userCouponStatus = await UserCoupon.findAll({
@@ -499,7 +501,9 @@ module.exports = {
         ],
         order: [["createdAt", "DESC"]],
       });
-      res.status(200).json({ success: true, data:{totalCouponCount,userCouponStatus} });
+      res
+        .status(200)
+        .json({ success: true, data: { totalCouponCount, userCouponStatus } });
     } catch (error) {
       console.log(error);
       res.status(500).json({ success: false, message: error.message });
