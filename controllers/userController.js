@@ -15,6 +15,7 @@ const { sendEmail } = require("../utils/nodemailer");
 const { hashData } = require("../utils/hashData");
 const { where, Op } = require("sequelize");
 const sendSMS = require("../utils/tiwilio");
+const Shop = require("../models/Shop");
 
 const uploadPath = path.join(__dirname, "../public/uploads/userImages");
 
@@ -55,14 +56,10 @@ module.exports = {
         const otpEntry = await UserOtp.findOne({
           where: {
             email,
-            // otp: await hashData(otp),
-            // otp,
           },
           order: [["createdAt", "DESC"]],
         });
         const otpMatch = await bcrypt.compare(otp, otpEntry.otp);
-        console.log(otpEntry);
-        console.log(otpMatch);
         if (!otpMatch) {
           return res.status(401).json({
             success: false,
@@ -79,9 +76,13 @@ module.exports = {
           ...req.body,
           password: await hashData(password),
         };
-        await otpEntry.destroy();
+        await otpEntry.destroy({ where: { email } });
         const savedUser = await User.create(userData);
-        const tokenData = { id: savedUser.id, email: savedUser.email, role: savedUser.role };
+        const tokenData = {
+          id: savedUser.id,
+          email: savedUser.email,
+          role: savedUser.role,
+        };
         const token = await createToken(tokenData);
         if (!token) {
           return res.status(401).json({
@@ -259,7 +260,12 @@ module.exports = {
           message: "invalid password..!",
         });
       }
-      const tokenData = { id: user.id, email: user.email, role: user.role };
+      let shopId;
+      if(user.role === "shop"){
+        shopId = await Shop.findOne({where:{email},attributes:["id"]});
+      }
+      console.log(shopId);
+      const tokenData = { id: user.id, email: user.email, role: user.role,shopId: shopId?.id };
       const token = await createToken(tokenData);
       if (!token) {
         return res.status(401).json({
@@ -365,6 +371,24 @@ module.exports = {
         where: { userId: req.body.userId },
       });
       res.status(200).json(complaints);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  getPersonalDetails: async (req, res) => {
+    const {id} = req.body;
+    try {
+      const user = await User.findOne({
+        where: { id},
+        attributes:["id","image","userName","email","phone","area"],
+      });
+      if (!user) {
+        return res
+          .status(404)
+          .json({ success: false, message: "User not found" });
+      }
+      res.status(200).json({ success: true, user });
     } catch (error) {
       console.error(error);
       res.status(500).json({ success: false, message: error.message });
@@ -567,7 +591,7 @@ module.exports = {
       await user.update({
         password: await hashData(newPassword),
       });
-      await otpEntry.destroy();
+      await otpEntry.destroy({ where: { email } });
       return res
         .status(200)
         .json({ success: true, message: "Password Reset Successfully" });
@@ -645,9 +669,9 @@ module.exports = {
     }
   },
   getCurrentUser: async (req, res) => {
-    const { id, email, role } = req.body;
+    const { id, email, role, shopId } = req.body;
     try {
-      res.status(200).json({ id, email, role });
+      res.status(200).json({ id, email, role, shopId });
     } catch (error) {
       console.log(error);
       res.status(500).json({ success: false, message: error.message });

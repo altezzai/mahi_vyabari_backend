@@ -12,7 +12,6 @@ const OTP = sequelize.define(
         isEmail: true,
         notEmpty: true,
       },
-      unique: true,
     },
     otp: {
       type: DataTypes.STRING,

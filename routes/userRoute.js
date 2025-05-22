@@ -33,6 +33,12 @@ router.put(
 //   })
 // );
 // router.get("/dashboard", userController.getDashboard);
+router.get(
+  "/personal-details",
+  userAuth,
+  autherizeRoles("user"),
+  userController.getPersonalDetails
+);
 router.post(
   "/add-feedback",
   userAuth,

@@ -47,7 +47,7 @@ module.exports = {
       await shopCoupon.update({
         assignedCount,
         couponIdFrom: nextCouponIdFrom,
-        couponIdTo: nextCouponIdFrom + assignedCount - 1,
+        couponIdTo: nextCouponIdFrom + Number(assignedCount) - 1,
         status: "assigned",
       });
       res.status(200).json({ success: true, shopCoupon });
@@ -70,7 +70,7 @@ module.exports = {
         shopId,
         assignedCount,
         couponIdFrom: nextCouponIdFrom,
-        couponIdTo: nextCouponIdFrom + assignedCount - 1,
+        couponIdTo: nextCouponIdFrom + Number(assignedCount) - 1,
         status: "assigned",
       });
       // const shopCoupon = await ShopCoupon.bulkCreate(req.body,{validate:true});

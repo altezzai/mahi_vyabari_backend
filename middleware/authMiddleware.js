@@ -12,16 +12,17 @@ const userAuth = async (req, res, next) => {
       .status(403)
       .json({ success: false, message: "An authentication token is required" });
   }
-  console.log("Token: ", token);
   try {
     const decodedToken = await jwt.verify(token, TOKEN_KEY);
-    console.log("Decoded Token: ", decodedToken);
-    if (decodedToken.userId) {
+    if (decodedToken) {
       req.body.id = decodedToken.id;
       req.body.role = decodedToken.role;
       req.body.email = decodedToken.email;
+      if (decodedToken.shopId) {
+        req.body.shopId = decodedToken.shopId;
+      }
     } else {
-      res
+      return res
         .status(401)
         .json({ success: false, message: "Not Authorized, Login Again" });
     }
