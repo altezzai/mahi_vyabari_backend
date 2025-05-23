@@ -677,7 +677,7 @@ module.exports = {
     const { id, userName, email, role, shopId } = req.body;
     const userImage = await User.findOne({
       where: { id },
-      attributes: ["image"],
+      attributes: ["image","userName"],
     });
     try {
       res
