@@ -675,8 +675,14 @@ module.exports = {
   },
   getCurrentUser: async (req, res) => {
     const { id, userName, email, role, shopId } = req.body;
+    const userImage = await User.findOne({
+      where: { id },
+      attributes: ["image"],
+    });
     try {
-      res.status(200).json({ id, email, role, shopId });
+      res
+        .status(200)
+        .json({ id, userName, email, role, shopId, image: userImage.image });
     } catch (error) {
       console.log(error);
       res.status(500).json({ success: false, message: error.message });
