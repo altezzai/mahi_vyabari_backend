@@ -161,7 +161,6 @@ module.exports = {
           .json({ success: false, message: "No categories found" });
       }
       const totalPages = Math.ceil(count / limit);
-      console.log(count, totalPages);
       return res.status(200).json({
         success: true,
         count,

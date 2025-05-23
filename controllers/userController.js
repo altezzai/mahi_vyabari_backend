@@ -3,6 +3,7 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const bcrypt = require("bcrypt");
+const { startOfMonth, endOfMonth, subMonths } = require("date-fns");
 const { deletefile, deletefilewithfoldername } = require("../utils/util");
 const createToken = require("../utils/createToken");
 // const { hashPassword } = require("../utils/hashData");
@@ -13,9 +14,16 @@ const Complaint = require("../models/Complaint");
 const UserOtp = require("../models/Otp");
 const { sendEmail } = require("../utils/nodemailer");
 const { hashData } = require("../utils/hashData");
-const { where, Op } = require("sequelize");
+const { where, Op, fn, literal, col } = require("sequelize");
 const sendSMS = require("../utils/tiwilio");
 const Shop = require("../models/Shop");
+const HealthcareProvider = require("../models/MedDirectory");
+const VehicleService = require("../models/VehicleService");
+const Worker = require("../models/Worker");
+const Classified = require("../models/Classified");
+const Type = require("../models/Type");
+const Category = require("../models/Category");
+const UserCoupen = require("../models/userCoupon");
 
 const uploadPath = path.join(__dirname, "../public/uploads/userImages");
 
@@ -76,12 +84,12 @@ module.exports = {
           ...req.body,
           password: await hashData(password),
         };
-        await otpEntry.destroy({ where: { email } });
         const savedUser = await User.create(userData);
         const tokenData = {
           id: savedUser.id,
           email: savedUser.email,
           role: savedUser.role,
+          userName: savedUser.userName,
         };
         const token = await createToken(tokenData);
         if (!token) {
@@ -96,6 +104,7 @@ module.exports = {
           sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
           maxAge: 1000 * 60 * 60 * 24 * 7,
         });
+        await UserOtp.destroy({ where: { email } });
         return res.status(200).json({
           success: true,
           message: "User Registered Successfully",
@@ -111,7 +120,7 @@ module.exports = {
   },
   editUser: async (req, res) => {
     try {
-      const user = await User.findByPk(req.params.id);
+      const user = await User.findByPk(req.body.id);
       if (!user) {
         await deletefilewithfoldername(uploadPath, req.file?.filename);
         res.status(409).json({
@@ -134,7 +143,7 @@ module.exports = {
       }
       const updatedUserData = {
         ...req.body,
-        password: await hashPassword(req.body.password),
+        password: await hashData(req.body.password),
         image: req.file ? req.file.filename : oldImage,
       };
       await user.update(updatedUserData);
@@ -261,11 +270,16 @@ module.exports = {
         });
       }
       let shopId;
-      if(user.role === "shop"){
-        shopId = await Shop.findOne({where:{email},attributes:["id"]});
+      if (user.role === "shop") {
+        shopId = await Shop.findOne({ where: { email }, attributes: ["id"] });
       }
-      console.log(shopId);
-      const tokenData = { id: user.id, email: user.email, role: user.role,shopId: shopId?.id };
+      const tokenData = {
+        id: user.id,
+        userName: user.userName,
+        email: user.email,
+        role: user.role,
+        shopId: shopId?.id,
+      };
       const token = await createToken(tokenData);
       if (!token) {
         return res.status(401).json({
@@ -298,7 +312,6 @@ module.exports = {
   feedback: async (req, res) => {
     try {
       const { userId, shopId, rating } = req.body;
-      console.log(userId, shopId, rating);
       if (!userId || !shopId || !rating) {
         return res.status(400).json({
           success: false,
@@ -377,11 +390,11 @@ module.exports = {
     }
   },
   getPersonalDetails: async (req, res) => {
-    const {id} = req.body;
+    const { id } = req.body;
     try {
       const user = await User.findOne({
-        where: { id},
-        attributes:["id","image","userName","email","phone","area"],
+        where: { id },
+        attributes: ["id", "image", "userName", "email", "phone", "area"],
       });
       if (!user) {
         return res
@@ -412,7 +425,6 @@ module.exports = {
   sendVerifyOtp: async (req, res) => {
     try {
       const { email } = req.body;
-      console.log(email);
       const user = await User.findOne({ where: { email } });
       if (user) {
         return res
@@ -496,13 +508,6 @@ module.exports = {
     } catch (error) {
       console.log(error);
       return res.status(500).json({ success: false, message: error.message });
-    }
-  },
-  isAuthenticated: async (req, res) => {
-    try {
-      return res.json({ success: true });
-    } catch (error) {
-      res.status(500).json({ success: false, message: error.message });
     }
   },
   sendResetOtp: async (req, res) => {
@@ -591,7 +596,7 @@ module.exports = {
       await user.update({
         password: await hashData(newPassword),
       });
-      await otpEntry.destroy({ where: { email } });
+      await UserOtp.destroy({ where: { email } });
       return res
         .status(200)
         .json({ success: true, message: "Password Reset Successfully" });
@@ -669,12 +674,431 @@ module.exports = {
     }
   },
   getCurrentUser: async (req, res) => {
-    const { id, email, role, shopId } = req.body;
+    const { id, userName, email, role, shopId } = req.body;
     try {
       res.status(200).json({ id, email, role, shopId });
     } catch (error) {
       console.log(error);
       res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  getRegistrationStatus: async (req, res) => {
+    try {
+      const now = new Date();
+      const currentMonthStart = startOfMonth(now);
+      const currentMonthEnd = endOfMonth(now);
+      const lastMonthStart = startOfMonth(subMonths(now, 1));
+      const lastMonthEnd = endOfMonth(subMonths(now, 1));
+
+      const countModel = async (model, where = {}, start, end) => {
+        return model.count({
+          where: {
+            ...where,
+            createdAt: { [Op.between]: [start, end] },
+            trash: false,
+          },
+        });
+      };
+
+      const countTotalModel = async (model, where = {}) => {
+        return model.count({
+          where: {
+            ...where,
+            trash: false,
+          },
+        });
+      };
+
+      const getChange = (current, last) => {
+        if (last === 0) return current > 0 ? "+100%" : "0%";
+        const diff = ((current - last) / last) * 100;
+        return `${diff >= 0 ? "+" : ""}${diff.toFixed(2)}%`;
+      };
+
+      const [
+        userCurrent,
+        userLast,
+        userTotal,
+        shopCurrent,
+        shopLast,
+        shopTotal,
+        doctorCurrent,
+        doctorLast,
+        doctorTotal,
+        hospitalCurrent,
+        hospitalLast,
+        hospitalTotal,
+        vehicleCurrent,
+        vehicleLast,
+        vehicleTotal,
+        workerCurrent,
+        workerLast,
+        workerTotal,
+        classifiedCurrent,
+        classifiedLast,
+        classifiedTotal,
+      ] = await Promise.all([
+        countModel(User, {}, currentMonthStart, currentMonthEnd),
+        countModel(User, {}, lastMonthStart, lastMonthEnd),
+        countTotalModel(User),
+
+        countModel(Shop, {}, currentMonthStart, currentMonthEnd),
+        countModel(Shop, {}, lastMonthStart, lastMonthEnd),
+        countTotalModel(Shop),
+
+        countModel(
+          HealthcareProvider,
+          { category: "doctor" },
+          currentMonthStart,
+          currentMonthEnd
+        ),
+        countModel(
+          HealthcareProvider,
+          { category: "doctor" },
+          lastMonthStart,
+          lastMonthEnd
+        ),
+        countTotalModel(HealthcareProvider, { category: "doctor" }),
+
+        countModel(
+          HealthcareProvider,
+          { category: "hospital" },
+          currentMonthStart,
+          currentMonthEnd
+        ),
+        countModel(
+          HealthcareProvider,
+          { category: "hospital" },
+          lastMonthStart,
+          lastMonthEnd
+        ),
+        countTotalModel(HealthcareProvider, { category: "hospital" }),
+
+        countModel(VehicleService, {}, currentMonthStart, currentMonthEnd),
+        countModel(VehicleService, {}, lastMonthStart, lastMonthEnd),
+        countTotalModel(VehicleService),
+
+        countModel(Worker, {}, currentMonthStart, currentMonthEnd),
+        countModel(Worker, {}, lastMonthStart, lastMonthEnd),
+        countTotalModel(Worker),
+
+        countModel(Classified, {}, currentMonthStart, currentMonthEnd),
+        countModel(Classified, {}, lastMonthStart, lastMonthEnd),
+        countTotalModel(Classified),
+      ]);
+
+      return res.status(200).json({
+        success: true,
+        users: {
+          currentMonth: userCurrent,
+          lastMonth: userLast,
+          total: userTotal,
+          change: getChange(userCurrent, userLast),
+        },
+        shops: {
+          currentMonth: shopCurrent,
+          lastMonth: shopLast,
+          total: shopTotal,
+          change: getChange(shopCurrent, shopLast),
+        },
+        healthcare: {
+          doctors: {
+            currentMonth: doctorCurrent,
+            lastMonth: doctorLast,
+            total: doctorTotal,
+            change: getChange(doctorCurrent, doctorLast),
+          },
+          hospitals: {
+            currentMonth: hospitalCurrent,
+            lastMonth: hospitalLast,
+            total: hospitalTotal,
+            change: getChange(hospitalCurrent, hospitalLast),
+          },
+        },
+        vehicleServices: {
+          currentMonth: vehicleCurrent,
+          lastMonth: vehicleLast,
+          total: vehicleTotal,
+          change: getChange(vehicleCurrent, vehicleLast),
+        },
+        workers: {
+          currentMonth: workerCurrent,
+          lastMonth: workerLast,
+          total: workerTotal,
+          change: getChange(workerCurrent, workerLast),
+        },
+        classifieds: {
+          currentMonth: classifiedCurrent,
+          lastMonth: classifiedLast,
+          total: classifiedTotal,
+          change: getChange(classifiedCurrent, classifiedLast),
+        },
+      });
+    } catch (error) {
+      console.error("Error in getRegistrationStats:", error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  getCategoryDistribution: async (req, res) => {
+    try {
+      const types = await Type.findAll({
+        include: {
+          model: Category,
+          as: "category",
+          attributes: ["id"],
+        },
+      });
+      const results = {};
+      let grandTotal = 0;
+      const counts = {};
+
+      for (const type of types) {
+        const categoryIds = type.category.map((cat) => cat.id);
+
+        let count = 0;
+
+        switch (type.typeName.toLowerCase()) {
+          case "shop":
+            count = await Shop.count({
+              where: {
+                categories: {
+                  [Op.ne]: null,
+                },
+                trash: false,
+              },
+            });
+            break;
+          case "medical":
+            count = await HealthcareProvider.count({
+              where: {
+                subCategory: {
+                  [Op.in]: categoryIds,
+                },
+                trash: false,
+              },
+            });
+            break;
+          case "taxi":
+            count = await VehicleService.count({
+              where: {
+                category: {
+                  [Op.in]: categoryIds,
+                },
+                trash: false,
+              },
+            });
+            break;
+          case "worker":
+            count = await Worker.count({
+              where: {
+                trash: false,
+              },
+            });
+            break;
+          case "classified":
+            count = await Classified.count({
+              where: {
+                category: {
+                  [Op.in]: categoryIds,
+                },
+                trash: false,
+              },
+            });
+            break;
+          default:
+            break;
+        }
+
+        counts[type.typeName] = count;
+        grandTotal += count;
+      }
+
+      for (const [typeName, count] of Object.entries(counts)) {
+        const percentage =
+          grandTotal === 0 ? 0 : ((count / grandTotal) * 100).toFixed(2);
+        results[typeName] = {
+          total: count,
+          percentage: `${percentage}%`,
+        };
+      }
+      return res.status(200).json({
+        success: true,
+        totalRegistrations: grandTotal,
+        breakdown: results,
+      });
+    } catch (error) {
+      console.error("Error getting type stats:", error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  getUserMonthlyRegistration: async (req, res) => {
+    try {
+      const registrations = await User.findAll({
+        attributes: [
+          [fn("DATE_FORMAT", col("createdAt"), "%Y-%m"), "month"],
+          [fn("COUNT", col("id")), "totalUsers"],
+        ],
+        where: { trash: false },
+        group: [literal("month")],
+        order: [literal("month ASC")],
+        raw: true,
+      });
+
+      return res.status(200).json({
+        success: true,
+        data: registrations,
+      });
+    } catch (error) {
+      console.error("Error fetching user registrations by month:", error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  getRecentActivities: async (req, res) => {
+    try {
+      const limit = 20; // total activities to return
+
+      const recentUsers = await User.findAll({
+        where: { trash: false },
+        attributes: ["id", "userName", "createdAt", literal("'User' AS type")],
+        order: [["createdAt", "DESC"]],
+        limit,
+        raw: true,
+      });
+
+      const recentShops = await Shop.findAll({
+        where: { trash: false },
+        attributes: ["id", "shopName", "createdAt", literal("'Shop' AS type")],
+        order: [["createdAt", "DESC"]],
+        limit,
+        raw: true,
+      });
+
+      const recentHealthcare = await HealthcareProvider.findAll({
+        where: { trash: false },
+        attributes: [
+          "id",
+          "name",
+          "createdAt",
+          literal("'HealthcareProvider' AS type"),
+        ],
+        order: [["createdAt", "DESC"]],
+        limit,
+        raw: true,
+      });
+
+      const recentWorkers = await Worker.findAll({
+        where: { trash: false },
+        attributes: [
+          "id",
+          "workerName",
+          "createdAt",
+          literal("'Worker' AS type"),
+        ],
+        order: [["createdAt", "DESC"]],
+        limit,
+        raw: true,
+      });
+
+      const recentClassifieds = await Classified.findAll({
+        where: { trash: false },
+        attributes: [
+          "id",
+          "itemName",
+          "createdAt",
+          literal("'Classified' AS type"),
+        ],
+        order: [["createdAt", "DESC"]],
+        limit,
+        raw: true,
+      });
+
+      const recentVehicleServices = await VehicleService.findAll({
+        where: { trash: false },
+        attributes: [
+          "id",
+          "ownerName",
+          "createdAt",
+          literal("'VehicleService' AS type"),
+        ],
+        order: [["createdAt", "DESC"]],
+        limit,
+        raw: true,
+      });
+
+      const combinedActivities = [
+        ...recentUsers,
+        ...recentShops,
+        ...recentHealthcare,
+        ...recentWorkers,
+        ...recentClassifieds,
+        ...recentVehicleServices,
+      ];
+
+      combinedActivities.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+
+      const recentActivities = combinedActivities.slice(0, limit);
+
+      return res.status(200).json({
+        success: true,
+        data: recentActivities,
+      });
+    } catch (error) {
+      console.error("Error fetching recent activities:", error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  getTopShopUserCoupon: async (req, res) => {
+    try {
+      // Top 5 Shops
+      const topShops = await UserCoupen.findAll({
+        attributes: [
+          "shopId",
+          [fn("SUM", col("assignedCount")), "totalCoupons"],
+        ],
+        include: [
+          {
+            model: Shop,
+            as: "shop",
+            attributes: ["id", "shopName"],
+          },
+        ],
+        group: ["shopId", "shop.id"],
+        order: [[literal("totalCoupons"), "DESC"]],
+        limit: 5,
+        raw: true,
+        nest: true,
+      });
+
+      // Top 5 Users
+      const topUsers = await UserCoupen.findAll({
+        attributes: [
+          "userId",
+          [fn("SUM", col("assignedCount")), "totalCoupons"],
+        ],
+        include: [
+          {
+            model: User,
+            as: "user",
+            attributes: ["id", "userName", "phone"],
+          },
+        ],
+        group: ["userId", "user.id"],
+        order: [[literal("totalCoupons"), "DESC"]],
+        limit: 5,
+        raw: true,
+        nest: true,
+      });
+
+      return res.status(200).json({
+        success: true,
+        topShops,
+        topUsers,
+      });
+    } catch (error) {
+      console.error("Error fetching top coupon distributors:", error);
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
 };

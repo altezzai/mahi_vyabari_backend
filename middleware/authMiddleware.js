@@ -18,6 +18,7 @@ const userAuth = async (req, res, next) => {
       req.body.id = decodedToken.id;
       req.body.role = decodedToken.role;
       req.body.email = decodedToken.email;
+      req.body.userName = decodedToken.userName;
       if (decodedToken.shopId) {
         req.body.shopId = decodedToken.shopId;
       }

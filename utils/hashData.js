@@ -4,7 +4,6 @@ module.exports = {
   hashData: async (plainData) => {
     const saltRounds = 10;
     const hashedData = await bcrypt.hash(plainData, saltRounds);
-    console.log("Hashed Data:", hashedData);
     return hashedData;
   },
 };

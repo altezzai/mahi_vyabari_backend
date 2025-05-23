@@ -35,7 +35,6 @@ module.exports = {
   upload,
   addshop: async (req, res) => {
     const { shopName, phone, areas, email } = req.body;
-    console.log(req.body);
     const t = await sequelize.transaction();
     try {
       const shopData = {
@@ -43,7 +42,6 @@ module.exports = {
         image: req.files?.image?.[0]?.filename || null,
         icon: req.files?.icon?.[0]?.filename || null,
       };
-      console.log(req.body);
       const savedShop = await Shop.create(shopData, { transaction: t });
       if (savedShop.categories && savedShop.categories.length > 0) {
         const categoriesToCreate = await savedShop.categories.map(
@@ -162,7 +160,6 @@ module.exports = {
           },
         ],
       });
-      console.log(shop.categories);
       if (!shop) {
         return res
           .status(404)

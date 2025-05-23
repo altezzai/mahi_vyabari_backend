@@ -1,7 +1,6 @@
 const fs = require("fs");
 const path = require("path");
 const deletefile = async (files) => {
-  //   console.log(files);
   try {
     if (files.file) {
       const filePath = path.join("uploads/files/", files.file[0].filename);
@@ -26,7 +25,6 @@ const deletefilewithfoldername = async (uploadPath, filename) => {
   try {
     if (filename) {
       const filePath = path.join(uploadPath, filename);
-      console.log(filePath);
       if (fs.existsSync(filePath)) {
         await fs.promises.unlink(filePath);
       }

@@ -45,7 +45,6 @@ module.exports = {
   },
   updateEmergency: async (req, res) => {
     const { emergencyName, phone, description } = req.body;
-    console.log(req.body);
     try {
       const { id } = req.params;
       const emergency = await Emergency.findByPk(id);

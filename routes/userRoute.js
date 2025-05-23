@@ -9,15 +9,16 @@ router.get("/me", userAuth, userController.getCurrentUser);
 router.post("/send-register-otp", userController.sendVerifyOtp);
 router.post("/register-user", userController.registerUser);
 router.post("/login-user", userController.userLogin);
-router.post("/send-reset-otp", userController.sendResetOtp);
-router.post("/reset-password", userController.resetPassword);
-router.post("/logout", userController.Logout);
-
+router.post("/send-reset-otp", userAuth, userController.sendResetOtp);
+router.post("/reset-password", userAuth, userController.resetPassword);
+router.post("/logout", userAuth, userController.Logout);
 // router.post("/verify-account", userAuth, userController.verifyAccount);
 // router.post("/is-auth", userAuth, userController.isAuthenticated);
 // router.post("/send-login-otp", userController.sendLoginOtp);
 router.put(
-  "/edit-user/:id",
+  "/edit-user",
+  userAuth,
+  autherizeRoles("user","shop"),
   userController.upload.single("image"),
   userController.editUser
 );
@@ -36,7 +37,7 @@ router.put(
 router.get(
   "/personal-details",
   userAuth,
-  autherizeRoles("user"),
+  autherizeRoles("user", "shop"),
   userController.getPersonalDetails
 );
 router.post(
@@ -56,6 +57,36 @@ router.get(
   userAuth,
   autherizeRoles("user"),
   userController.getComplaints
+);
+router.get(
+  "/get-registration-status",
+  userAuth,
+  autherizeRoles("admin"),
+  userController.getRegistrationStatus
+);
+router.get(
+  "/get-category-distribution",
+  userAuth,
+  autherizeRoles("admin"),
+  userController.getCategoryDistribution
+);
+router.get(
+  "/get-user-monthly-registration",
+  userAuth,
+  autherizeRoles("admin"),
+  userController.getUserMonthlyRegistration
+);
+router.get(
+  "/get-recent-activities",
+  userAuth,
+  autherizeRoles("admin"),
+  userController.getRecentActivities
+);
+router.get(
+  "/get-top-shop-user-coupon",
+  userAuth,
+  autherizeRoles("admin"),
+  userController.getTopShopUserCoupon
 );
 // router.get(
 //   "/get-complaints/:id",
