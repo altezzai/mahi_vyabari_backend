@@ -472,13 +472,13 @@ module.exports = {
     }
   },
   getUserCouponStatus: async (req, res) => {
-    const { userId } = req.body;
+    const { id } = req.body;
     try {
-      const totalCouponCount = await User.findByPk(userId, {
+      const totalCouponCount = await User.findByPk(id, {
         attributes: ["couponCount"],
       });
       const userCouponStatus = await UserCoupon.findAll({
-        where: { userId },
+        where: { id },
         attributes: [
           "id",
           "couponIdFrom",
