@@ -976,7 +976,7 @@ module.exports = {
   },
   getRecentActivities: async (req, res) => {
     try {
-      const limit = 8;
+      const limit = 5;
 
       const recentUsers = (
         await User.findAll({

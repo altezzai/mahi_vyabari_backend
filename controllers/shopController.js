@@ -42,6 +42,12 @@ module.exports = {
         image: req.files?.image?.[0]?.filename || null,
         icon: req.files?.icon?.[0]?.filename || null,
       };
+      const existingShop = await Shop.findOne({ where: { email } });
+      if (existingShop) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Shop Email already exists" });
+      }
       const savedShop = await Shop.create(shopData, { transaction: t });
       if (savedShop.categories && savedShop.categories.length > 0) {
         const categoriesToCreate = await savedShop.categories.map(
