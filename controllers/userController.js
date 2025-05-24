@@ -677,12 +677,19 @@ module.exports = {
     const { id, email, role, shopId } = req.body;
     const user = await User.findOne({
       where: { id },
-      attributes: ["image","userName"],
+      attributes: ["image", "userName"],
     });
     try {
       res
         .status(200)
-        .json({ id, userName:user.userName, email, role, shopId, image: user.image });
+        .json({
+          id,
+          userName: user.userName,
+          email,
+          role,
+          shopId,
+          image: user.image,
+        });
     } catch (error) {
       console.log(error);
       res.status(500).json({ success: false, message: error.message });
@@ -854,7 +861,8 @@ module.exports = {
           attributes: ["id"],
         },
       });
-      const results = {};
+      //const results = {};
+      const results = [];
       let grandTotal = 0;
       const counts = {};
 
@@ -919,13 +927,22 @@ module.exports = {
         grandTotal += count;
       }
 
+      // for (const [typeName, count] of Object.entries(counts)) {
+      //   const percentage =
+      //     grandTotal === 0 ? 0 : ((count / grandTotal) * 100).toFixed(2);
+      //   results[typeName] = {
+      //     total: count,
+      //     percentage: `${percentage}%`,
+      //   };
+      // }
       for (const [typeName, count] of Object.entries(counts)) {
         const percentage =
           grandTotal === 0 ? 0 : ((count / grandTotal) * 100).toFixed(2);
-        results[typeName] = {
+        results.push({
+          type: typeName,
           total: count,
           percentage: `${percentage}%`,
-        };
+        });
       }
       return res.status(200).json({
         success: true,
