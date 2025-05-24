@@ -680,16 +680,14 @@ module.exports = {
       attributes: ["image", "userName"],
     });
     try {
-      res
-        .status(200)
-        .json({
-          id,
-          userName: user.userName,
-          email,
-          role,
-          shopId,
-          image: user.image,
-        });
+      res.status(200).json({
+        id,
+        userName: user.userName,
+        email,
+        role,
+        shopId,
+        image: user.image,
+      });
     } catch (error) {
       console.log(error);
       res.status(500).json({ success: false, message: error.message });
@@ -980,23 +978,40 @@ module.exports = {
     try {
       const limit = 20; // total activities to return
 
-      const recentUsers = await User.findAll({
-        where: { trash: false },
-        attributes: ["id", "userName", "createdAt", literal("'User' AS type")],
-        order: [["createdAt", "DESC"]],
-        limit,
-        raw: true,
-      });
+      const recentUsers = (
+        await User.findAll({
+          where: { trash: false },
+          attributes: [
+            "id",
+            "userName",
+            "createdAt",
+            literal("'User' AS type"),
+          ],
+          order: [["createdAt", "DESC"]],
+          limit,
+          raw: true,
+        })
+      ).map((item) => ({
+        id: item.id,
+        name: item.userName,
+        createdAt: item.createdAt,
+        type: "User",
+      }));
 
-      const recentShops = await Shop.findAll({
+      const recentShops = (await Shop.findAll({
         where: { trash: false },
         attributes: ["id", "shopName", "createdAt", literal("'Shop' AS type")],
         order: [["createdAt", "DESC"]],
         limit,
         raw: true,
-      });
+      })).map((item) => ({
+        id: item.id,
+        name: item.shopName,
+        createdAt: item.createdAt,
+        type: "Shop",
+      }));
 
-      const recentHealthcare = await HealthcareProvider.findAll({
+      const recentHealthcare = (await HealthcareProvider.findAll({
         where: { trash: false },
         attributes: [
           "id",
@@ -1007,9 +1022,14 @@ module.exports = {
         order: [["createdAt", "DESC"]],
         limit,
         raw: true,
-      });
+      })).map((item) => ({
+        id: item.id,
+        name: item.name,
+        createdAt: item.createdAt,
+        type: "HealthcareProvider",
+      }));
 
-      const recentWorkers = await Worker.findAll({
+      const recentWorkers = (await Worker.findAll({
         where: { trash: false },
         attributes: [
           "id",
@@ -1020,9 +1040,14 @@ module.exports = {
         order: [["createdAt", "DESC"]],
         limit,
         raw: true,
-      });
+      })).map((item) => ({
+        id: item.id,
+        name: item.workerName,
+        createdAt: item.createdAt,
+        type: "Worker",
+      }));
 
-      const recentClassifieds = await Classified.findAll({
+      const recentClassifieds = (await Classified.findAll({
         where: { trash: false },
         attributes: [
           "id",
@@ -1033,9 +1058,14 @@ module.exports = {
         order: [["createdAt", "DESC"]],
         limit,
         raw: true,
-      });
+      })).map((item) => ({
+        id: item.id,
+        name: item.itemName,
+        createdAt: item.createdAt,
+        type: "Classified",
+      }));
 
-      const recentVehicleServices = await VehicleService.findAll({
+      const recentVehicleServices = (await VehicleService.findAll({
         where: { trash: false },
         attributes: [
           "id",
@@ -1046,7 +1076,12 @@ module.exports = {
         order: [["createdAt", "DESC"]],
         limit,
         raw: true,
-      });
+      })).map((item) => ({
+        id: item.id,
+        name: item.ownerName,
+        createdAt: item.createdAt,
+        type: "VehicleService",
+      }));
 
       const combinedActivities = [
         ...recentUsers,
