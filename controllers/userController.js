@@ -976,7 +976,7 @@ module.exports = {
   },
   getRecentActivities: async (req, res) => {
     try {
-      const limit = 20; // total activities to return
+      const limit = 8;
 
       const recentUsers = (
         await User.findAll({
@@ -995,92 +995,107 @@ module.exports = {
         id: item.id,
         name: item.userName,
         createdAt: item.createdAt,
-        type: "User",
+        type: "user",
       }));
 
-      const recentShops = (await Shop.findAll({
-        where: { trash: false },
-        attributes: ["id", "shopName", "createdAt", literal("'Shop' AS type")],
-        order: [["createdAt", "DESC"]],
-        limit,
-        raw: true,
-      })).map((item) => ({
+      const recentShops = (
+        await Shop.findAll({
+          where: { trash: false },
+          attributes: [
+            "id",
+            "shopName",
+            "createdAt",
+            literal("'Shop' AS type"),
+          ],
+          order: [["createdAt", "DESC"]],
+          limit,
+          raw: true,
+        })
+      ).map((item) => ({
         id: item.id,
         name: item.shopName,
         createdAt: item.createdAt,
-        type: "Shop",
+        type: "shop",
       }));
 
-      const recentHealthcare = (await HealthcareProvider.findAll({
-        where: { trash: false },
-        attributes: [
-          "id",
-          "name",
-          "createdAt",
-          literal("'HealthcareProvider' AS type"),
-        ],
-        order: [["createdAt", "DESC"]],
-        limit,
-        raw: true,
-      })).map((item) => ({
+      const recentHealthcare = (
+        await HealthcareProvider.findAll({
+          where: { trash: false },
+          attributes: [
+            "id",
+            "name",
+            "createdAt",
+            literal("'HealthcareProvider' AS type"),
+          ],
+          order: [["createdAt", "DESC"]],
+          limit,
+          raw: true,
+        })
+      ).map((item) => ({
         id: item.id,
         name: item.name,
         createdAt: item.createdAt,
-        type: "HealthcareProvider",
+        type: "medical",
       }));
 
-      const recentWorkers = (await Worker.findAll({
-        where: { trash: false },
-        attributes: [
-          "id",
-          "workerName",
-          "createdAt",
-          literal("'Worker' AS type"),
-        ],
-        order: [["createdAt", "DESC"]],
-        limit,
-        raw: true,
-      })).map((item) => ({
+      const recentWorkers = (
+        await Worker.findAll({
+          where: { trash: false },
+          attributes: [
+            "id",
+            "workerName",
+            "createdAt",
+            literal("'Worker' AS type"),
+          ],
+          order: [["createdAt", "DESC"]],
+          limit,
+          raw: true,
+        })
+      ).map((item) => ({
         id: item.id,
         name: item.workerName,
         createdAt: item.createdAt,
-        type: "Worker",
+        type: "worker",
       }));
 
-      const recentClassifieds = (await Classified.findAll({
-        where: { trash: false },
-        attributes: [
-          "id",
-          "itemName",
-          "createdAt",
-          literal("'Classified' AS type"),
-        ],
-        order: [["createdAt", "DESC"]],
-        limit,
-        raw: true,
-      })).map((item) => ({
+      const recentClassifieds = (
+        await Classified.findAll({
+          where: { trash: false },
+          attributes: [
+            "id",
+            "itemName",
+            "createdAt",
+            literal("'Classified' AS type"),
+          ],
+          order: [["createdAt", "DESC"]],
+          limit,
+          raw: true,
+        })
+      ).map((item) => ({
         id: item.id,
         name: item.itemName,
         createdAt: item.createdAt,
-        type: "Classified",
+        type: "classified",
       }));
 
-      const recentVehicleServices = (await VehicleService.findAll({
-        where: { trash: false },
-        attributes: [
-          "id",
-          "ownerName",
-          "createdAt",
-          literal("'VehicleService' AS type"),
-        ],
-        order: [["createdAt", "DESC"]],
-        limit,
-        raw: true,
-      })).map((item) => ({
+      const recentVehicleServices = (
+        await VehicleService.findAll({
+          where: { trash: false },
+          attributes: [
+            "id",
+            "ownerName",
+            "createdAt",
+            literal("'VehicleService' AS type"),
+          ],
+          order: [["createdAt", "DESC"]],
+          limit,
+          raw: true,
+        })
+      ).map((item) => ({
         id: item.id,
         name: item.ownerName,
         createdAt: item.createdAt,
-        type: "VehicleService",
+        type: "taxi",
       }));
 
       const combinedActivities = [
@@ -1109,7 +1124,6 @@ module.exports = {
   },
   getTopShopUserCoupon: async (req, res) => {
     try {
-      // Top 5 Shops
       const topShops = await UserCoupen.findAll({
         attributes: [
           "shopId",
@@ -1128,8 +1142,6 @@ module.exports = {
         raw: true,
         nest: true,
       });
-
-      // Top 5 Users
       const topUsers = await UserCoupen.findAll({
         attributes: [
           "userId",
