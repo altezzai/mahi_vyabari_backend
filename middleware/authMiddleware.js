@@ -17,7 +17,7 @@ const userAuth = async (req, res, next) => {
     console.log("Decoded Token:", decodedToken);
     if (decodedToken) {
       req.user = {};
-      req.user.userId = decodedToken.id;
+      req.user.id = decodedToken.id;
       req.user.role = decodedToken.role;
       req.user.email = decodedToken.email;
       req.user.userName = decodedToken.userName;

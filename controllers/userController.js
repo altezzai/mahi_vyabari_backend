@@ -313,15 +313,15 @@ module.exports = {
   feedback: async (req, res) => {
     try {
       const { shopId, rating } = req.body;
-      const userId = req.user;
-      if (!userId || !shopId || !rating) {
+      const { id } = req.user;
+      if (!id || !shopId || !rating) {
         return res.status(400).json({
           success: false,
           message: "User ID, Shop ID, and Rating are required!",
         });
       }
       const existingFeedback = await Feedback.findOne({
-        where: { userId, shopId },
+        where: { userId: id, shopId },
       });
 
       if (existingFeedback) {
@@ -350,9 +350,9 @@ module.exports = {
   complaints: async (req, res) => {
     try {
       const { shopId, title, description } = req.body;
-      const { userId } = req.user;
+      const { id } = req.user;
       const complaint = await Complaint.create({
-        userId,
+        userId:id,
         shopId,
         title,
         description,
@@ -367,7 +367,7 @@ module.exports = {
   getComplaints: async (req, res) => {
     try {
       const complaints = await Complaint.findAll({
-        where: { userId: req.body.userId },
+        where: { userId: req.user.id },
         order: [["createdAt", "DESC"]],
       });
       if (!complaints) {
