@@ -121,7 +121,7 @@ module.exports = {
   },
   editUser: async (req, res) => {
     try {
-      const user = await User.findByPk(req.body.id);
+      const user = await User.findByPk(req.user.id);
       if (!user) {
         await deletefilewithfoldername(uploadPath, req.file?.filename);
         res.status(409).json({
@@ -312,7 +312,8 @@ module.exports = {
   },
   feedback: async (req, res) => {
     try {
-      const { userId, shopId, rating } = req.body;
+      const { shopId, rating } = req.body;
+      const userId = req.user;
       if (!userId || !shopId || !rating) {
         return res.status(400).json({
           success: false,
@@ -348,7 +349,8 @@ module.exports = {
   },
   complaints: async (req, res) => {
     try {
-      const { userId, shopId, title, description } = req.body;
+      const { shopId, title, description } = req.body;
+      const { userId } = req.user;
       const complaint = await Complaint.create({
         userId,
         shopId,
@@ -391,7 +393,7 @@ module.exports = {
     }
   },
   getPersonalDetails: async (req, res) => {
-    const { id } = req.body;
+    const { id } = req.user;
     try {
       const user = await User.findOne({
         where: { id },
@@ -675,7 +677,7 @@ module.exports = {
     }
   },
   getCurrentUser: async (req, res) => {
-    const { id, email, role, shopId } = req.body;
+    const { id, email, role, shopId } = req.user;
     const user = await User.findOne({
       where: { id },
       attributes: ["image", "userName"],

@@ -18,7 +18,7 @@ router.post("/logout", userAuth, userController.Logout);
 router.put(
   "/edit-user",
   userAuth,
-  autherizeRoles("user","shop"),
+  autherizeRoles("user", "shop"),
   userController.upload.single("image"),
   userController.editUser
 );

@@ -2,11 +2,11 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.changeColumn("HealthcareProviders", "openingTime", {
+    await queryInterface.changeColumn("vehicleschedules", "departureTime", {
       type: Sequelize.STRING,
     });
 
-    await queryInterface.changeColumn("HealthcareProviders", "closingTime", {
+    await queryInterface.changeColumn("vehicleschedules", "arrivalTime", {
       type: Sequelize.STRING,
     });
   },

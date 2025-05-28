@@ -8,7 +8,8 @@ const Tourism = require("../models/Tourism");
 
 module.exports = {
   requestCoupen: async (req, res) => {
-    const { requestedCount, shopId } = req.body;
+    const { requestedCount } = req.body;
+    const { shopId } = req.user;
     const couponData = {
       status: "pending",
       requestedCount,
@@ -83,7 +84,8 @@ module.exports = {
     }
   },
   assignUserCoupon: async (req, res) => {
-    const { shopId, userId, assignedCount } = req.body;
+    const { userId, assignedCount } = req.body;
+    const { shopId } = req.user;
     const t = await sequelize.transaction();
     try {
       const shopBatches = await ShopCoupon.findAll({
@@ -392,8 +394,10 @@ module.exports = {
     }
   },
   getRecentUserCoupons: async (req, res) => {
+    const { shopId } = req.user;
     try {
       const couponHistory = await UserCoupon.findAndCountAll({
+        where: { shopId },
         limit: 20,
         attributes: ["id", "couponIdFrom", "couponIdTo"],
         include: [
@@ -415,7 +419,7 @@ module.exports = {
     }
   },
   getCurrentShopCouponStatus: async (req, res) => {
-    const { shopId } = req.body;
+    const { shopId } = req.user;
     console.log(shopId);
     try {
       if (!shopId) {
@@ -424,7 +428,7 @@ module.exports = {
           .json({ success: false, message: "Shop ID is required" });
       }
       const couponStatus = await ShopCoupon.findOne({
-        where: {shopId},
+        where: { shopId },
         attributes: {
           include: [
             [
@@ -467,7 +471,7 @@ module.exports = {
     }
   },
   getPendingCoupons: async (req, res) => {
-    const { shopId } = req.body;
+    const { shopId } = req.user;
     try {
       const pendingCoupons = await ShopCoupon.sum("requestedCount", {
         where: { status: "pending", shopId },
@@ -479,25 +483,19 @@ module.exports = {
     }
   },
   getUserCouponStatus: async (req, res) => {
-    const { id } = req.body;
+    const { userId } = req.user;
     try {
-      const totalCouponCount = await User.findByPk(id, {
+      const totalCouponCount = await User.findByPk(userId, {
         attributes: ["couponCount"],
       });
       const userCouponStatus = await UserCoupon.findAll({
-        where: { id },
+        where: { userId },
         attributes: [
           "id",
           "couponIdFrom",
           "couponIdTo",
           "assignedCount",
           "createdAt",
-          // [
-          //   literal(
-          //     `(SELECT couponCount FROM users WHERE users.id = ${userId})`
-          //   ),
-          //   "totalCouponCount",
-          // ],
         ],
         include: [
           {

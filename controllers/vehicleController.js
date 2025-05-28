@@ -29,6 +29,7 @@ const upload = multer({ storage });
 module.exports = {
   upload,
   addVehicleSchedule: async (req, res) => {
+    console.log(req.body);
     try {
       const savedSchedule = await VehicleSchedule.create(req.body);
       if (!savedSchedule) {

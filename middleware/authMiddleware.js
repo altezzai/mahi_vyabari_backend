@@ -14,21 +14,25 @@ const userAuth = async (req, res, next) => {
   }
   try {
     const decodedToken = await jwt.verify(token, TOKEN_KEY);
+    console.log("Decoded Token:", decodedToken);
     if (decodedToken) {
-      req.body.id = decodedToken.id;
-      req.body.role = decodedToken.role;
-      req.body.email = decodedToken.email;
-      req.body.userName = decodedToken.userName;
+      req.user = {};
+      req.user.userId = decodedToken.id;
+      req.user.role = decodedToken.role;
+      req.user.email = decodedToken.email;
+      req.user.userName = decodedToken.userName;
       if (decodedToken.shopId) {
-        req.body.shopId = decodedToken.shopId;
+        req.user.shopId = decodedToken.shopId;
       }
     } else {
+      console.error("Invalid token:", token);
       return res
         .status(401)
         .json({ success: false, message: "Not Authorized, Login Again" });
     }
     next();
   } catch (error) {
+    console.error("Authentication error:", error);
     return res.status(401).json({ success: false, message: error.message });
   }
 };

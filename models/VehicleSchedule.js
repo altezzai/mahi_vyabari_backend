@@ -25,10 +25,10 @@ const VehicleSchedule = sequelize.define(
       allowNull: false,
     },
     departureTime: {
-      type: DataTypes.TIME,
+      type: DataTypes.STRING,
     },
     arrivalTime: {
-      type: DataTypes.TIME,
+      type: DataTypes.STRING,
     },
     trash: {
       type: DataTypes.BOOLEAN,

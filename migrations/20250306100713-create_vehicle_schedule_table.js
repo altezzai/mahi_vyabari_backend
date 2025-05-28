@@ -13,7 +13,7 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       category: {
-        type: Sequelize.ENUM("train","bus"),
+        type: Sequelize.ENUM("train", "bus"),
       },
       vehicleName: {
         type: Sequelize.STRING,
@@ -31,10 +31,10 @@ module.exports = {
         allowNull: false,
       },
       departureTime: {
-        type: Sequelize.TIME,
+        type: Sequelize.STRING,
       },
       arrivalTime: {
-        type: Sequelize.TIME,
+        type: Sequelize.STRING,
       },
       trash: {
         type: Sequelize.BOOLEAN,
@@ -48,7 +48,9 @@ module.exports = {
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        defaultValue: Sequelize.literal(
+          "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+        ),
       },
     });
   },
