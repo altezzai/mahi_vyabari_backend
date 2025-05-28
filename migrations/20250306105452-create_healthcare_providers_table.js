@@ -53,10 +53,10 @@ module.exports = {
         type: Sequelize.TEXT,
       },
       openingTime: {
-        type: Sequelize.TIME,
+        type: Sequelize.STRING,
       },
       closingTime: {
-        type: Sequelize.TIME,
+        type: Sequelize.STRING,
       },
       workingDays: {
         type: Sequelize.STRING,

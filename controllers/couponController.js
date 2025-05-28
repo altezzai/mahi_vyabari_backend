@@ -416,9 +416,15 @@ module.exports = {
   },
   getCurrentShopCouponStatus: async (req, res) => {
     const { shopId } = req.body;
+    console.log(shopId);
     try {
+      if (!shopId) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Shop ID is required" });
+      }
       const couponStatus = await ShopCoupon.findOne({
-        where: shopId,
+        where: {shopId},
         attributes: {
           include: [
             [
@@ -453,6 +459,7 @@ module.exports = {
           ],
         },
       });
+      console.log(couponStatus);
       res.status(200).json({ success: true, couponStatus });
     } catch (error) {
       console.log(error);

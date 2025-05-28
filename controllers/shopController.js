@@ -424,8 +424,8 @@ module.exports = {
   },
   getShopComplaintById: async (req, res) => {
     try {
-      const { complaintId } = req.params;
-      const complaint = await Complaint.findByPk(complaintId, {
+      const { id } = req.params;
+      const complaint = await Complaint.findByPk(id, {
         include: [
           {
             model: User,

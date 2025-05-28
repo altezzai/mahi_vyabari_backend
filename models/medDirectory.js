@@ -57,10 +57,10 @@ const HealthcareProvider = sequelize.define(
       type: DataTypes.TEXT,
     },
     openingTime: {
-      type: DataTypes.TIME,
+      type: DataTypes.STRING,
     },
     closingTime: {
-      type: DataTypes.TIME,
+      type: DataTypes.STRING,
     },
     workingDays: {
       type: DataTypes.STRING,

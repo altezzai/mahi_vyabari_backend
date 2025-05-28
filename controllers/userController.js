@@ -67,6 +67,7 @@ module.exports = {
           },
           order: [["createdAt", "DESC"]],
         });
+        console.log("otpEntry: ", otpEntry);
         const otpMatch = await bcrypt.compare(otp, otpEntry.otp);
         if (!otpMatch) {
           return res.status(401).json({
