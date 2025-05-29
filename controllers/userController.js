@@ -145,7 +145,7 @@ module.exports = {
       const updatedUserData = {
         ...req.body,
         password: await hashData(req.body.password),
-        image: req.file ? req.file.filename : oldImage,
+        image: req.file ? req.file.filename : null,
       };
       await user.update(updatedUserData);
       res.status(200).json({

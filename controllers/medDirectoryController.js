@@ -80,8 +80,8 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Healthcare Provider not found" });
       }
-      let newImage = healthcareProvider.image;
-      let newIcon = healthcareProvider.icon;
+      let newImage = null;
+      let newIcon = null;
       if (req.files?.image?.[0]) {
         if (healthcareProvider.image) {
           const oldImagePath = path.join(uploadPath, healthcareProvider.image);

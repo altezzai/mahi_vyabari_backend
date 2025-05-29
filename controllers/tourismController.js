@@ -45,7 +45,7 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Tourism not found" });
       }
-      let newImages = tourism.images;
+      let newImages = null;
       if (req.files) {
         if (tourism.images) {
           await tourism.images.forEach((imageName) => {

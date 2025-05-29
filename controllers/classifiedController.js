@@ -86,8 +86,8 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Item not found" });
       }
-      let newImage = item.image;
-      let newIcon = item.icon;
+      let newImage = null;
+      let newIcon = null;
       if (req.files?.image) {
         if (item.image) {
           const oldImagePath = path.join(uploadPath, item.image);

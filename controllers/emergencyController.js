@@ -53,7 +53,7 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Emergency record not found" });
       }
-      let newFile = emergency.icon;
+      let newFile = null;
       if (req.file) {
         if (emergency.icon) {
           const oldFilePath = path.join(uploadPath, emergency.icon);

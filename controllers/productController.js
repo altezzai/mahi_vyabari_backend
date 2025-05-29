@@ -68,7 +68,7 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Product not found" });
       }
-      let newImage = product.image;
+      let newImage = null;
       if (req.file) {
         if (product.image) {
           const oldImagePath = path.join(uploadPath, product.image);

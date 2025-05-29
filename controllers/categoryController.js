@@ -61,7 +61,7 @@ module.exports = {
       if (!category) {
         res.status(400).json({ success: false, message: "Category not found" });
       }
-      let newIcon = category.icon;
+      let newIcon = null;
       if (req.file) {
         if (category.icon) {
           const oldImagePath = path.join(uploadPath, category.icon);

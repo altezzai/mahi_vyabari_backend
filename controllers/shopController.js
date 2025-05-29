@@ -180,6 +180,7 @@ module.exports = {
   updateShop: async (req, res) => {
     const {
       shopName,
+      email,
       categories,
       phone,
       whatsapp,
@@ -209,8 +210,8 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Shop not found" });
       }
-      let newImage = shop.image;
-      let newIcon = shop.icon;
+      let newImage = null;
+      let newIcon = null;
       if (req.files?.image?.[0]) {
         if (shop.image) {
           const oldImagePath = path.join(uploadPath, shop.image);
@@ -232,21 +233,22 @@ module.exports = {
       }
 
       const updateData = {
-        shopName: shopName || shop.shopName,
-        categories: categories || shop.categories,
-        phone: phone || shop.phone,
-        whatsapp: whatsapp || shop.whatsapp,
-        website: website || shop.website,
-        location: location || shop.location,
-        description: description || shop.location,
-        address: address || shop.address,
-        openingTime: openingTime || shop.openingTime,
-        closingTime: closingTime || shop.closingTime,
-        workingDays: workingDays || shop.workingDays,
-        priority: priority || shop.priority,
-        areas: areas || shop.areas,
-        image: newImage || shop.image,
-        icon: newIcon || shop.icon,
+        shopName,
+        email, 
+        categories,
+        phone,
+        whatsapp,
+        website,
+        location,
+        description,
+        address,
+        openingTime,
+        closingTime,
+        workingDays,
+        priority,
+        area,
+        image: newImage,
+        icon: newIcon,
       };
       await shop.update(updateData);
       return res.status(200).json({ success: true, shop });
