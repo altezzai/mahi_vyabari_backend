@@ -66,6 +66,7 @@ module.exports = {
         order: [["couponIdTo", "DESC"]],
         attributes: ["couponIdTo"],
       });
+      let nextCouponIdFrom = 1;
       if (lastAssigned && lastAssigned.couponIdTo) {
         nextCouponIdFrom = lastAssigned.couponIdTo + 1;
       }

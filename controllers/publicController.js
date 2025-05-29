@@ -480,9 +480,17 @@ module.exports = {
     }
   },
   getEmergencies: async (req, res) => {
+    const searchQuery = req.query.q || "";
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
+    let whereCondition = { trash: false };
+    if (searchQuery) {
+      whereCondition = {
+        ...whereCondition,
+        emergencyName: { [Op.like]: `%${searchQuery}%` }
+      }
+    }
     try {
       const { count, rows: emergencies } = await Emergency.findAndCountAll({
         limit,
@@ -511,16 +519,19 @@ module.exports = {
     let whereCondition = { trash: false };
     if (searchQuery) {
       whereCondition = {
+        ...whereCondition,
         ownerName: { [Op.like]: `%${searchQuery}%` },
       };
     }
     if (area) {
       whereCondition = {
+        ...whereCondition,
         area: area,
       };
     }
     if (category) {
       whereCondition = {
+        ...whereCondition,
         category: category,
       };
     }
@@ -586,11 +597,13 @@ module.exports = {
     let whereCondition = { trash: false };
     if (searchQuery) {
       whereCondition = {
+        ...whereCondition,
         workerName: { [Op.like]: `%${searchQuery}%` },
       };
     }
     if (area) {
       whereCondition = {
+        ...whereCondition,
         area: area,
       };
     }
@@ -654,16 +667,19 @@ module.exports = {
     let whereCondition = { trash: false };
     if (searchQuery) {
       whereCondition = {
+        ...whereCondition,
         itemName: { [Op.like]: `%${searchQuery}%` },
       };
     }
     if (area) {
       whereCondition = {
+        ...whereCondition,
         area: area,
       };
     }
     if (category) {
       whereCondition = {
+        ...whereCondition,
         category: category,
       };
     }
@@ -726,6 +742,7 @@ module.exports = {
     let whereCondition = { trash: false };
     if (area) {
       whereCondition = {
+        ...whereCondition,
         area: area,
       };
     }
