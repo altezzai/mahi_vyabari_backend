@@ -74,11 +74,13 @@ module.exports = {
       let whereCondition = { trash: false };
       if (searchQuery) {
         whereCondition = {
+          ...whereCondition,
           shopName: { [Op.like]: `%${searchQuery}%` },
         };
       }
       if (area) {
         whereCondition = {
+          ...whereCondition,
           area: area,
         };
       }
