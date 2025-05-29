@@ -191,7 +191,7 @@ module.exports = {
       workingDays,
       priority,
       website,
-      areas,
+      area,
     } = req.body;
     try {
       const { shopId } = req.params;

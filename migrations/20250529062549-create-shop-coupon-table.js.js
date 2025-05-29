@@ -50,6 +50,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('shopcoupon');
+    await queryInterface.dropTable('shopcoupons');
   }
 };
