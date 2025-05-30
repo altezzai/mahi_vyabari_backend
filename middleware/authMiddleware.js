@@ -14,7 +14,6 @@ const userAuth = async (req, res, next) => {
   }
   try {
     const decodedToken = await jwt.verify(token, TOKEN_KEY);
-    console.log("Decoded Token:", decodedToken);
     if (decodedToken) {
       req.user = {};
       req.user.id = decodedToken.id;
@@ -25,14 +24,12 @@ const userAuth = async (req, res, next) => {
         req.user.shopId = decodedToken.shopId;
       }
     } else {
-      console.error("Invalid token:", token);
       return res
         .status(401)
         .json({ success: false, message: "Not Authorized, Login Again" });
     }
     next();
   } catch (error) {
-    console.error("Authentication error:", error);
     return res.status(401).json({ success: false, message: error.message });
   }
 };

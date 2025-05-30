@@ -144,7 +144,6 @@ module.exports = {
       }
       const updatedUserData = {
         ...req.body,
-        password: await hashData(req.body.password),
         image: req.file ? req.file.filename : null,
       };
       await user.update(updatedUserData);
@@ -752,9 +751,9 @@ module.exports = {
         classifiedLast,
         classifiedTotal,
       ] = await Promise.all([
-        countModel(User, {}, currentMonthStart, currentMonthEnd),
-        countModel(User, {}, lastMonthStart, lastMonthEnd),
-        countTotalModel(User),
+        countModel(User, {role:"user"}, currentMonthStart, currentMonthEnd),
+        countModel(User, {role:"user"}, lastMonthStart, lastMonthEnd),
+        countTotalModel(User,{role:"user"}),
 
         countModel(Shop, {}, currentMonthStart, currentMonthEnd),
         countModel(Shop, {}, lastMonthStart, lastMonthEnd),
@@ -800,7 +799,6 @@ module.exports = {
         countModel(Classified, {}, lastMonthStart, lastMonthEnd),
         countTotalModel(Classified),
       ]);
-
       return res.status(200).json({
         success: true,
         users: {
@@ -962,7 +960,7 @@ module.exports = {
           [fn("DATE_FORMAT", col("createdAt"), "%Y-%m"), "month"],
           [fn("COUNT", col("id")), "totalUsers"],
         ],
-        where: { trash: false },
+        where: { trash: false,role: "user" },
         group: [literal("month")],
         order: [literal("month ASC")],
         raw: true,
@@ -983,7 +981,7 @@ module.exports = {
 
       const recentUsers = (
         await User.findAll({
-          where: { trash: false },
+          where: { trash: false,role: "user" },
           attributes: [
             "id",
             "userName",
