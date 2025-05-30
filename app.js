@@ -12,7 +12,7 @@ const cookieParser = require('cookie-parser');
 const compression = require("compression");
 const { errorMiddleware } = require("./middleware/error");
 const allowOrings = [process.env.CLIENT_URL];
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
 const shopRouter = require("./routes/shopRoute");
 const productRouter = require("./routes/productRoute");

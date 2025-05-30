@@ -586,7 +586,7 @@ module.exports = {
         },
         order: [["createdAt", "DESC"]],
       });
-      const otpMatch = await bcrypt.compare(otpEntry.otp, otp);
+      const otpMatch = await bcrypt.compare(otp,otpEntry.otp);
       if (!otpMatch) {
         return res.status(401).json({ success: false, message: "Invalid OTP" });
       }
