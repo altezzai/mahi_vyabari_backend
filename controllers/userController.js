@@ -333,7 +333,7 @@ module.exports = {
         });
       }
       const feedback = await Feedback.create({
-        userId,
+        userId: id,
         shopId,
         rating,
       });
@@ -351,7 +351,7 @@ module.exports = {
       const { shopId, title, description } = req.body;
       const { id } = req.user;
       const complaint = await Complaint.create({
-        userId:id,
+        userId: id,
         shopId,
         title,
         description,
@@ -586,7 +586,7 @@ module.exports = {
         },
         order: [["createdAt", "DESC"]],
       });
-      const otpMatch = await bcrypt.compare(otp,otpEntry.otp);
+      const otpMatch = await bcrypt.compare(otp, otpEntry.otp);
       if (!otpMatch) {
         return res.status(401).json({ success: false, message: "Invalid OTP" });
       }
@@ -751,9 +751,9 @@ module.exports = {
         classifiedLast,
         classifiedTotal,
       ] = await Promise.all([
-        countModel(User, {role:"user"}, currentMonthStart, currentMonthEnd),
-        countModel(User, {role:"user"}, lastMonthStart, lastMonthEnd),
-        countTotalModel(User,{role:"user"}),
+        countModel(User, { role: "user" }, currentMonthStart, currentMonthEnd),
+        countModel(User, { role: "user" }, lastMonthStart, lastMonthEnd),
+        countTotalModel(User, { role: "user" }),
 
         countModel(Shop, {}, currentMonthStart, currentMonthEnd),
         countModel(Shop, {}, lastMonthStart, lastMonthEnd),
@@ -960,7 +960,7 @@ module.exports = {
           [fn("DATE_FORMAT", col("createdAt"), "%Y-%m"), "month"],
           [fn("COUNT", col("id")), "totalUsers"],
         ],
-        where: { trash: false,role: "user" },
+        where: { trash: false, role: "user" },
         group: [literal("month")],
         order: [literal("month ASC")],
         raw: true,
@@ -981,7 +981,7 @@ module.exports = {
 
       const recentUsers = (
         await User.findAll({
-          where: { trash: false,role: "user" },
+          where: { trash: false, role: "user" },
           attributes: [
             "id",
             "userName",
