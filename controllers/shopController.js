@@ -234,7 +234,7 @@ module.exports = {
 
       const updateData = {
         shopName,
-        email, 
+        email,
         categories,
         phone,
         whatsapp,
@@ -453,10 +453,10 @@ module.exports = {
     }
   },
   resolveComplaints: async (req, res) => {
-    const { complaintId } = req.params;
+    const { id } = req.params;
     try {
       const { resolution } = req.body;
-      const complaint = await Complaint.findByPk(complaintId);
+      const complaint = await Complaint.findByPk(id);
       if (!complaint) {
         return res
           .status(404)
@@ -470,9 +470,9 @@ module.exports = {
     }
   },
   rejectComplaints: async (req, res) => {
-    const { complaintId } = req.params;
+    const { id } = req.params;
     try {
-      const complaint = await Complaint.findByPk(complaintId);
+      const complaint = await Complaint.findByPk(id);
       if (!complaint) {
         return res
           .status(404)
