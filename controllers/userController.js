@@ -67,7 +67,6 @@ module.exports = {
           },
           order: [["createdAt", "DESC"]],
         });
-        console.log("otpEntry: ", otpEntry);
         const otpMatch = await bcrypt.compare(otp, otpEntry.otp);
         if (!otpMatch) {
           return res.status(401).json({
@@ -350,6 +349,7 @@ module.exports = {
     try {
       const { shopId, title, description } = req.body;
       const { id } = req.user;
+      console.log(id,shopId,title,description)
       const complaint = await Complaint.create({
         userId: id,
         shopId,
