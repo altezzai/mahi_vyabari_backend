@@ -95,7 +95,7 @@ module.exports = {
             success: true,
             totalPages: 0,
             currentPage: page,
-            data: ["No shops found"],
+            data: [],
           });
         }
 
@@ -619,7 +619,7 @@ module.exports = {
           success: true,
           totalPages: 0,
           currentPage: page,
-          data: ["No shops found"],
+          data: [],
         });
       }
 
