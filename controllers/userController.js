@@ -349,7 +349,6 @@ module.exports = {
     try {
       const { shopId, title, description } = req.body;
       const { id } = req.user;
-      console.log(id,shopId,title,description)
       const complaint = await Complaint.create({
         userId: id,
         shopId,
