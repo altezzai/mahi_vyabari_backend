@@ -613,7 +613,6 @@ module.exports = {
         attributes: ["workerId"],
       });
       const workerIds = workerCategoryEntries.map((entry) => entry.workerId);
-      // If no matching shops for category, return empty result
       if (workerIds.length === 0) {
         return res.status(200).json({
           success: true,

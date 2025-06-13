@@ -74,7 +74,7 @@ module.exports = {
         data: emergency,
       });
     } catch (error) {
-      // await deletefilewithfoldername(uploadPath, req.file.filename);
+      await deletefilewithfoldername(uploadPath, req.file.filename);
       console.error(error);
       return res.status(500).json({
         success: false,

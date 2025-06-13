@@ -355,7 +355,6 @@ module.exports = {
         title,
         description,
       });
-      // const complaint = await Complaint.bulkCreate(req.body,{validate:true});
       res.status(201).json({ success: true, complaint });
     } catch (error) {
       console.error(error);

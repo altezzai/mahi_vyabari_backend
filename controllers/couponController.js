@@ -77,7 +77,6 @@ module.exports = {
         couponIdTo: nextCouponIdFrom + Number(assignedCount) - 1,
         status: "assigned",
       });
-      // const shopCoupon = await ShopCoupon.bulkCreate(req.body,{validate:true});
       res.status(200).json({ success: true, shopCoupon });
     } catch (error) {
       console.log(error);

@@ -8,10 +8,10 @@ const cors = require("cors");
 const session = require("express-session");
 const passport = require("passport");
 const helmet = require("helmet");
-const cookieParser = require('cookie-parser');
+const cookieParser = require("cookie-parser");
 const compression = require("compression");
 const { errorMiddleware } = require("./middleware/error");
-const allowOrings = [process.env.CLIENT_URL];
+const allowOrigins = [process.env.CLIENT_URL];
 const PORT = process.env.PORT || 4000;
 
 const shopRouter = require("./routes/shopRoute");
@@ -44,7 +44,7 @@ app.use(express.json());
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({credentials:true, origin: allowOrings}));
+app.use(cors({ credentials: true, origin: allowOrigins }));
 app.use(helmet());
 app.use(compression());
 app.use(errorMiddleware);
@@ -60,7 +60,7 @@ app.use("/api/workers", workersRouter);
 app.use("/api/user", userRouter);
 app.use("/api/public", publicRouter);
 app.use("/api/customer", customerRouter);
-app.use("/api/coupon",couponRouter);
+app.use("/api/coupon", couponRouter);
 app.use("/api/tourism", tourismRouter);
 
 app.listen(PORT, () => {

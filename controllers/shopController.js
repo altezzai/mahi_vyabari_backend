@@ -58,18 +58,6 @@ module.exports = {
         );
         await ShopCategory.bulkCreate(categoriesToCreate, { transaction: t });
       }
-      // const savedShop = await Shop.bulkCreate(req.body, { validate: true });
-      // savedShop.forEach(async (data) => {
-      //   console.log(data)
-      //   if (data.categories && data.categories.length > 0) {
-      //     await ShopCategory.bulkCreate(
-      //       data.categories.map((category) => ({
-      //         shopId: data.id,
-      //         categoryId: category,
-      //       }))
-      //     );
-      //   }
-      // });
       await User.create(
         {
           userName: shopName,

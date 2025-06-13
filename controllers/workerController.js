@@ -44,17 +44,6 @@ module.exports = {
           }))
         );
       }
-      // const savedWorker = await Worker.bulkCreate(req.body, { validate: true });
-      // savedWorker.forEach(async (data) => {
-      //   if (data.categories && data.categories.length > 0) {
-      //     await WorkerCategory.bulkCreate(
-      //       data.categories.map((category) => ({
-      //         workerId: data.id,
-      //         categoryId: category,
-      //       }))
-      //     );
-      //   }
-      // });
       res.status(201).json({
         success: true,
         result: savedWorker,

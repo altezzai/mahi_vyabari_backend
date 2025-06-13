@@ -36,7 +36,6 @@ module.exports = {
         icon: req.files?.icon?.[0]?.filename || null,
       };
       const savedClassified = await Classified.create(classifiedData);
-      // const savedClassified = await Classified.bulkCreate(req.body);
       res.status(201).json({
         success: true,
         savedShop: savedClassified,
