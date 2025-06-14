@@ -4,9 +4,8 @@ const fs = require("fs");
 const path = require("path");
 const bcrypt = require("bcrypt");
 const { startOfMonth, endOfMonth, subMonths } = require("date-fns");
-const { deletefile, deletefilewithfoldername } = require("../utils/util");
+const { deletefile, deletefilewithfoldername } = require("../utils/deleteFile");
 const createToken = require("../utils/createToken");
-// const { hashPassword } = require("../utils/hashData");
 
 const User = require("../models/User");
 const Feedback = require("../models/Feedback");

@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const Product = require("../models/Product");
 const Shop = require("../models/Shop");
-const { deletefilewithfoldername } = require("../utils/util");
+const { deletefilewithfoldername } = require("../utils/deleteFile");
 const { Op } = require("sequelize");
 
 const uploadPath = path.join(__dirname, "../public/uploads/productImages");

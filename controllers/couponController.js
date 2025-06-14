@@ -420,7 +420,6 @@ module.exports = {
   },
   getCurrentShopCouponStatus: async (req, res) => {
     const { shopId } = req.user;
-    console.log(shopId);
     try {
       if (!shopId) {
         return res
@@ -463,7 +462,6 @@ module.exports = {
           ],
         },
       });
-      console.log(couponStatus);
       res.status(200).json({ success: true, couponStatus });
     } catch (error) {
       console.log(error);

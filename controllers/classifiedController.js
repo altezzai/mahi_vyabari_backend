@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const Classified = require("../models/Classified");
 const Type = require("../models/Type");
-const { deletefilewithfoldername } = require("../utils/util");
+const { deletefilewithfoldername } = require("../utils/deleteFile");
 const Category = require("../models/Category");
 const { Op } = require("sequelize");
 

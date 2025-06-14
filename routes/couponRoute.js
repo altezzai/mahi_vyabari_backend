@@ -3,11 +3,13 @@ const router = express.Router();
 const coupenController = require("../controllers/couponController");
 const userAuth = require("../middleware/authMiddleware");
 const autherizeRoles = require("../middleware/roleMiddleware");
+const {couponRequestLimiter} = require("../middleware/rateLimiter");
 
 router.post(
   "/request-coupon",
   userAuth,
   autherizeRoles("shop"),
+  couponRequestLimiter,
   coupenController.requestCoupen
 );
 router.put(

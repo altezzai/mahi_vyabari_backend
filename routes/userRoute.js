@@ -4,12 +4,22 @@ const passport = require("passport");
 const userController = require("../controllers/userController");
 const userAuth = require("../middleware/authMiddleware");
 const autherizeRoles = require("../middleware/roleMiddleware");
+const {
+  otpLimiter,
+  authLimiter,
+  apiLimiter,
+} = require("../middleware/rateLimiter");
 
 router.get("/me", userAuth, userController.getCurrentUser);
-router.post("/send-register-otp", userController.sendVerifyOtp);
-router.post("/register-user", userController.registerUser);
-router.post("/login-user", userController.userLogin);
-router.post("/send-reset-otp", userAuth, userController.sendResetOtp);
+router.post("/send-register-otp", otpLimiter, userController.sendVerifyOtp);
+router.post("/register-user", authLimiter, userController.registerUser);
+router.post("/login-user", authLimiter, userController.userLogin);
+router.post(
+  "/send-reset-otp",
+  otpLimiter,
+  userAuth,
+  userController.sendResetOtp
+);
 router.post("/reset-password", userAuth, userController.resetPassword);
 router.post("/logout", userAuth, userController.Logout);
 // router.post("/verify-account", userAuth, userController.verifyAccount);
@@ -44,12 +54,14 @@ router.post(
   "/add-feedback",
   userAuth,
   autherizeRoles("user"),
+  apiLimiter,
   userController.feedback
 );
 router.post(
   "/add-complaints",
   userAuth,
   autherizeRoles("user"),
+  apiLimiter,
   userController.complaints
 );
 router.get(

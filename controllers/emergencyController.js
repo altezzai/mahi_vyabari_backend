@@ -2,7 +2,7 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const Emergency = require("../models/Emergency");
-const { deletefilewithfoldername } = require("../utils/util");
+const { deletefilewithfoldername } = require("../utils/deleteFile");
 const { Op } = require("sequelize");
 
 const uploadPath = path.join(__dirname, "../public/uploads/emergency");
