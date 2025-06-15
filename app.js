@@ -10,7 +10,6 @@ const passport = require("passport");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const compression = require("compression");
-const { errorMiddleware } = require("./middleware/error");
 const allowOrigins = [process.env.CLIENT_URL];
 const PORT = process.env.PORT || 4000;
 
@@ -47,7 +46,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors({ credentials: true, origin: allowOrigins }));
 app.use(helmet());
 app.use(compression());
-app.use(errorMiddleware);
 
 app.use("/api/shop", shopRouter);
 app.use("/api/product", productRouter);
