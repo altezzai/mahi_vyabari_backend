@@ -11,9 +11,10 @@ module.exports = {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
-    let whereCondition = {};
+    let whereCondition = {role:"user"};
     if (search) {
       whereCondition = {
+        ...whereCondition,
         [Op.or]: [
           { userName: { [Op.like]: `%${search}%` } },
           { phone: { [Op.like]: `%${search}%` } },

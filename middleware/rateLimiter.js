@@ -45,7 +45,7 @@ const couponRequestLimiter = rateLimit({
 });
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  max: 15,
   handler: (req, res, next, options) => {
     return res.status(options.statusCode).json({
       status: "error",

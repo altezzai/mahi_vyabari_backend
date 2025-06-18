@@ -681,11 +681,11 @@ module.exports = {
     try {
       res.status(200).json({
         id,
-        userName: user.userName,
+        userName: user?.userName,
         email,
         role,
         shopId,
-        image: user.image,
+        image: user?.image,
       });
     } catch (error) {
       console.log(error);
