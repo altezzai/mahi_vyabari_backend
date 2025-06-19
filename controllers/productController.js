@@ -148,6 +148,7 @@ module.exports = {
   getProductById: async (req, res) => {
     try {
       const { id } = req.params;
+      console.log(id);
       const product = await Product.findOne({
         where: { id },
         include: [
