@@ -3,7 +3,7 @@ require("./utils/passport");
 require("./config/database");
 const express = require("express");
 const app = express();
-const bodyparser = require("body-parser");
+const bodyParser = require("body-parser");
 const cors = require("cors");
 const session = require("express-session");
 const passport = require("passport");
@@ -17,8 +17,8 @@ const shopRouter = require("./routes/shopRoute");
 const productRouter = require("./routes/productRoute");
 const categoryRouter = require("./routes/categoryRoute");
 const classifiedRouter = require("./routes/classifiedRoute");
-const emergenctRouter = require("./routes/emergencyRoute");
-const medDirectoryRouter = require("./routes/medDirecotoryRoute");
+const emergencyRouter = require("./routes/emergencyRoute");
+const medDirectoryRouter = require("./routes/medDirectoryRoute");
 const vehicleRouter = require("./routes/vehicleRoute");
 const workersRouter = require("./routes/workersRoute");
 const userRouter = require("./routes/userRoute");
@@ -27,20 +27,20 @@ const customerRouter = require("./routes/customerRoute");
 const couponRouter = require("./routes/couponRoute");
 const tourismRouter = require("./routes/tourismRoute");
 
-app.use(
-  session({
-    resave: false,
-    saveUninitialized: true,
-    secret: process.env.SESSION_SECRET,
-  })
-);
+// app.use(
+//   session({
+//     resave: false,
+//     saveUninitialized: true,
+//     secret: process.env.SESSION_SECRET,
+//   })
+// );
 
 app.use("/public/uploads", express.static("public/uploads"));
-app.use(passport.initialize());
-app.use(passport.session());
-app.use(bodyparser.json());
+// app.use(passport.initialize());
+// app.use(passport.session());
+app.use(bodyParser.json());
 app.use(express.json());
-app.use(bodyparser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({ credentials: true, origin: allowOrigins }));
@@ -51,7 +51,7 @@ app.use("/api/shop", shopRouter);
 app.use("/api/product", productRouter);
 app.use("/api/category", categoryRouter);
 app.use("/api/classified", classifiedRouter);
-app.use("/api/emergency", emergenctRouter);
+app.use("/api/emergency", emergencyRouter);
 app.use("/api/medDirectory", medDirectoryRouter);
 app.use("/api/vehicle", vehicleRouter);
 app.use("/api/workers", workersRouter);

@@ -628,7 +628,7 @@ module.exports = {
       const { count, rows: workers } = await Worker.findAndCountAll({
         limit,
         offset,
-        attributes: ["id", "workerName", "image"],
+        attributes: ["id", "workerName", "image","area","phone"],
         where: whereCondition,
         order: [["priority", "ASC"]],
       });

@@ -31,8 +31,10 @@ module.exports = {
   },
   assignShopCouponRequest: async (req, res) => {
     const { assignedCount } = req.body;
+    console.log(assignedCount)
     try {
       const { id } = req.params;
+      console.log(id);
       const shopCoupon = await ShopCoupon.findByPk(id);
       if (!shopCoupon) {
         return res
@@ -157,7 +159,6 @@ module.exports = {
         { where: { id: userId }, transaction: t }
       );
       await t.commit();
-      // await UserCoupon.bulkCreate(req.body,{validate:true});
       return res.status(200).json({
         success: true,
         message: "Coupons successfully assigned to user",

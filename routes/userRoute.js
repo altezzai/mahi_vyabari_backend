@@ -3,7 +3,7 @@ const router = express.Router();
 const passport = require("passport");
 const userController = require("../controllers/userController");
 const userAuth = require("../middleware/authMiddleware");
-const autherizeRoles = require("../middleware/roleMiddleware");
+const authorizeRoles = require("../middleware/roleMiddleware");
 const {
   otpLimiter,
   authLimiter,
@@ -28,7 +28,7 @@ router.post("/logout", userAuth, userController.Logout);
 router.put(
   "/edit-user",
   userAuth,
-  autherizeRoles("user", "shop"),
+  authorizeRoles("user", "shop"),
   userController.upload.single("image"),
   userController.editUser
 );
@@ -47,57 +47,57 @@ router.put(
 router.get(
   "/personal-details",
   userAuth,
-  autherizeRoles("user", "shop"),
+  authorizeRoles("user", "shop"),
   userController.getPersonalDetails
 );
 router.post(
   "/add-feedback",
   userAuth,
-  autherizeRoles("user"),
+  authorizeRoles("user"),
   apiLimiter,
   userController.feedback
 );
 router.post(
   "/add-complaints",
   userAuth,
-  autherizeRoles("user"),
+  authorizeRoles("user"),
   apiLimiter,
   userController.complaints
 );
 router.get(
   "/get-complaints",
   userAuth,
-  autherizeRoles("user"),
+  authorizeRoles("user"),
   userController.getComplaints
 );
 router.get(
   "/get-registration-status",
   userAuth,
-  autherizeRoles("admin"),
+  authorizeRoles("admin"),
   userController.getRegistrationStatus
 );
 router.get(
   "/get-category-distribution",
   userAuth,
-  autherizeRoles("admin"),
+  authorizeRoles("admin"),
   userController.getCategoryDistribution
 );
 router.get(
   "/get-user-monthly-registration",
   userAuth,
-  autherizeRoles("admin"),
+  authorizeRoles("admin"),
   userController.getUserMonthlyRegistration
 );
 router.get(
   "/get-recent-activities",
   userAuth,
-  autherizeRoles("admin"),
+  authorizeRoles("admin"),
   userController.getRecentActivities
 );
 router.get(
   "/get-top-shop-user-coupon",
   userAuth,
-  autherizeRoles("admin"),
+  authorizeRoles("admin"),
   userController.getTopShopUserCoupon
 );
 // router.get(
