@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const Product = require("../models/Product");
 const Shop = require("../models/Shop");
-const { deletefilewithfoldername } = require("../utils/deleteFile");
+const { deleteFileWithFolderName } = require("../utils/deleteFile");
 const { Op } = require("sequelize");
 
 const uploadPath = path.join(__dirname, "../public/uploads/productImages");
@@ -42,7 +42,7 @@ module.exports = {
         result: savedProduct,
       });
     } catch (error) {
-      await deletefilewithfoldername(uploadPath, req.file?.filename);
+      await deleteFileWithFolderName(uploadPath, req.file?.filename);
       console.log(error);
       return res.status(401).json({
         success: false,
@@ -63,7 +63,7 @@ module.exports = {
       const { id } = req.params;
       let product = await Product.findByPk(id);
       if (!product) {
-        await deletefilewithfoldername(uploadPath, req.file.filename);
+        await deleteFileWithFolderName(uploadPath, req.file.filename);
         return res
           .status(404)
           .json({ success: false, message: "Product not found" });

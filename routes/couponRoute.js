@@ -1,88 +1,88 @@
 const express = require("express");
 const router = express.Router();
-const coupenController = require("../controllers/couponController");
+const couponController = require("../controllers/couponController");
 const userAuth = require("../middleware/authMiddleware");
-const autherizeRoles = require("../middleware/roleMiddleware");
+const authorizeRoles = require("../middleware/roleMiddleware");
 const {couponRequestLimiter} = require("../middleware/rateLimiter");
 
 router.post(
   "/request-coupon",
   userAuth,
-  autherizeRoles("shop"),
+  authorizeRoles("shop"),
   couponRequestLimiter,
-  coupenController.requestCoupen
+  couponController.requestCoupon
 );
 router.put(
   "/assign-shop-coupon-request/:id",
   userAuth,
-  autherizeRoles("admin"),
-  coupenController.assignShopCouponRequest
+  authorizeRoles("admin"),
+  couponController.assignShopCouponRequest
 );
 router.post(
   "/assign-shop-coupon",
   userAuth,
-  autherizeRoles("admin"),
-  coupenController.assignShopCoupon
+  authorizeRoles("admin"),
+  couponController.assignShopCoupon
 );
 router.post(
   "/assign-user-coupon",
   userAuth,
-  autherizeRoles("shop"),
-  coupenController.assignUserCoupon
+  authorizeRoles("shop"),
+  couponController.assignUserCoupon
 );
 router.get(
   "/get-shops",
   userAuth,
-  autherizeRoles("admin"),
-  coupenController.getShops
+  authorizeRoles("admin"),
+  couponController.getShops
 );
 router.get(
   "/get-users",
   userAuth,
-  autherizeRoles("shop"),
-  coupenController.getUsers
+  authorizeRoles("shop"),
+  couponController.getUsers
 );
 router.get(
   "/get-recent-user-coupons",
   userAuth,
-  autherizeRoles("shop"),
-  coupenController.getRecentUserCoupons
+  authorizeRoles("shop"),
+  couponController.getRecentUserCoupons
 );
 router.get(
   "/get-shop-current-coupon-status",
   userAuth,
-  autherizeRoles("shop"),
-  coupenController.getCurrentShopCouponStatus
+  authorizeRoles("shop"),
+  couponController.getCurrentShopCouponStatus
 );
 router.get(
   "/get-user-coupon-status",
   userAuth,
-  autherizeRoles("user"),
-  coupenController.getUserCouponStatus
+  authorizeRoles("user"),
+  couponController.getUserCouponStatus
 );
 router.get(
   "/get-pending-coupons",
   userAuth,
-  autherizeRoles("shop"),
-  coupenController.getPendingCoupons
+  authorizeRoles("shop"),
+  couponController.getPendingCoupons
 );
 router.get(
   "/get-coupon-requests",
   userAuth,
-  autherizeRoles("admin"),
-  coupenController.getCouponRequests
+  authorizeRoles("admin"),
+  couponController.getCouponRequests
 );
 router.get(
   "/get-assigned-coupons",
   userAuth,
-  autherizeRoles("admin"),
-  coupenController.getAssignedCoupon
+  authorizeRoles("admin"),
+  couponController.getAssignedCoupon
 );
 router.get(
   "/get-coupon-history",
   userAuth,
-  autherizeRoles("admin"),
-  coupenController.getCouponHistory
+  authorizeRoles("admin"),
+  couponController.getCouponHistory
 );
 
 module.exports = router;

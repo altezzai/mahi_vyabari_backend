@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const bcrypt = require("bcrypt");
 const { startOfMonth, endOfMonth, subMonths } = require("date-fns");
-const { deletefile, deletefilewithfoldername } = require("../utils/deleteFile");
+const { deletefile, deleteFileWithFolderName } = require("../utils/deleteFile");
 const createToken = require("../utils/createToken");
 
 const User = require("../models/User");
@@ -121,7 +121,7 @@ module.exports = {
     try {
       const user = await User.findByPk(req.user.id);
       if (!user) {
-        await deletefilewithfoldername(uploadPath, req.file?.filename);
+        await deleteFileWithFolderName(uploadPath, req.file?.filename);
         res.status(409).json({
           success: false,
           message: "user not found",
@@ -150,7 +150,7 @@ module.exports = {
         message: "User updated successfully",
       });
     } catch (error) {
-      await deletefilewithfoldername(uploadPath, req.file?.filename);
+      await deleteFileWithFolderName(uploadPath, req.file?.filename);
       console.log(error);
       res.status(500).json({
         success: false,

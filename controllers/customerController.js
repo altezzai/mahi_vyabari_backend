@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const generatePassowrd = require("generate-password");
+const generatePassword = require("generate-password");
 const Customer = require("../models/User");
 const { hashData } = require("../utils/hashData");
 const { sendEmail } = require("../utils/nodemailer");
@@ -77,7 +77,7 @@ module.exports = {
           .status(400)
           .json({ success: false, message: "Email already exists" });
       }
-      const password = await generatePassowrd.generate({
+      const password = await generatePassword.generate({
         length: 10,
         numbers: true,
       });

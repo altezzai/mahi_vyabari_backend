@@ -3,7 +3,7 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const Medical = require("../models/MedDirectory");
-const { deletefilewithfoldername } = require("../utils/deleteFile");
+const { deleteFileWithFolderName } = require("../utils/deleteFile");
 const { Op } = require("sequelize");
 const Category = require("../models/Category");
 const Type = require("../models/Type");
@@ -40,11 +40,11 @@ module.exports = {
         result: savedMedicalDirectory,
       });
     } catch (error) {
-      await deletefilewithfoldername(
+      await deleteFileWithFolderName(
         uploadPath,
         req.files?.image?.[0]?.filename
       );
-      await deletefilewithfoldername(
+      await deleteFileWithFolderName(
         uploadPath,
         req.files?.icon?.[0]?.filename
       );
@@ -123,11 +123,11 @@ module.exports = {
         data: healthcareProvider,
       });
     } catch (error) {
-      await deletefilewithfoldername(
+      await deleteFileWithFolderName(
         uploadPath,
         req.files?.image?.[0]?.filename
       );
-      await deletefilewithfoldername(
+      await deleteFileWithFolderName(
         uploadPath,
         req.files?.icon?.[0]?.filename
       );

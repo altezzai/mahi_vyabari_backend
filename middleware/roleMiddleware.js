@@ -1,4 +1,4 @@
-const autherize = (...allowedRoles) => {
+const authorize = (...allowedRoles) => {
   return (req, res, next) => {
     if (!allowedRoles.includes(req.user.role)) {
       return res
@@ -9,4 +9,4 @@ const autherize = (...allowedRoles) => {
   };
 };
 
-module.exports = autherize;
+module.exports = authorize;

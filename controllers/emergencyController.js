@@ -2,7 +2,7 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const Emergency = require("../models/Emergency");
-const { deletefilewithfoldername } = require("../utils/deleteFile");
+const { deleteFileWithFolderName } = require("../utils/deleteFile");
 const { Op } = require("sequelize");
 
 const uploadPath = path.join(__dirname, "../public/uploads/emergency");
@@ -74,7 +74,7 @@ module.exports = {
         data: emergency,
       });
     } catch (error) {
-      await deletefilewithfoldername(uploadPath, req.file.filename);
+      await deleteFileWithFolderName(uploadPath, req.file.filename);
       console.error(error);
       return res.status(500).json({
         success: false,

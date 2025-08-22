@@ -22,7 +22,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 module.exports = {
   upload,
-  addTrouristPlace: async (req, res) => {
+  addTouristPlace: async (req, res) => {
     try {
       const tourismData = {
         ...req.body,

@@ -6,7 +6,7 @@ const sequelize = require("../config/database");
 const Shop = require("../models/Shop");
 const Category = require("../models/Category");
 const ShopCategory = require("../models/ShopCategory");
-const { deletefilewithfoldername } = require("../utils/deleteFile");
+const { deleteFileWithFolderName } = require("../utils/deleteFile");
 const { Op, Sequelize, literal, where, col } = require("sequelize");
 const Type = require("../models/Type");
 const Complaint = require("../models/Complaint");
@@ -19,9 +19,6 @@ const uploadPath = path.join(__dirname, "../public/uploads/shopImages");
 const userProfilePath = path.join(__dirname, "../public/uploads/userImages");
 if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath, { recursive: true });
-}
-if (!fs.existsSync(userProfilePath)) {
-  fs.mkdirSync(backupPath, { recursive: true });
 }
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -36,7 +33,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 module.exports = {
   upload,
-  addshop: async (req, res) => {
+  addShop: async (req, res) => {
     const { shopName, phone, areas, email } = req.body;
     const t = await sequelize.transaction();
     try {
@@ -104,11 +101,11 @@ module.exports = {
     } catch (error) {
       await t.rollback();
       console.log(error);
-      await deletefilewithfoldername(
+      await deleteFileWithFolderName(
         uploadPath,
         req.files?.image?.[0]?.filename
       );
-      await deletefilewithfoldername(
+      await deleteFileWithFolderName(
         uploadPath,
         req.files?.icon?.[0]?.filename
       );
@@ -197,11 +194,11 @@ module.exports = {
       const { shopId } = req.params;
       const shop = await Shop.findByPk(shopId);
       if (!shop) {
-        await deletefilewithfoldername(
+        await deleteFileWithFolderName(
           uploadPath,
           req.files?.image?.[0]?.filename
         );
-        await deletefilewithfoldername(
+        await deleteFileWithFolderName(
           uploadPath,
           req.files?.icon?.[0]?.filename
         );
@@ -252,11 +249,11 @@ module.exports = {
       await shop.update(updateData);
       return res.status(200).json({ success: true, shop });
     } catch (error) {
-      await deletefilewithfoldername(
+      await deleteFileWithFolderName(
         uploadPath,
         req.files?.image?.[0]?.filename
       );
-      await deletefilewithfoldername(
+      await deleteFileWithFolderName(
         uploadPath,
         req.files?.icon?.[0]?.filename
       );
@@ -298,7 +295,7 @@ module.exports = {
       console.error(error);
       res
         .status(500)
-        .json({ success: false, message: "Internal Server Errro" });
+        .json({ success: false, message: "Internal Server Error" });
     }
   },
   getShopCategories: async (req, res) => {

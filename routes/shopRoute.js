@@ -9,7 +9,7 @@ router.use(userAuth, autherizeRoles("admin"));
 router.post(
   "/add-shop",
   shopController.upload.fields([{ name: "image" }, { name: "icon" }]),
-  shopController.addshop
+  shopController.addShop
 );
 router.put(
   "/update-shop/:shopId",

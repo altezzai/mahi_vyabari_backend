@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const Worker = require("../models/Worker");
 const WorkerCategory = require("../models/WorkerCategory");
-const { deletefilewithfoldername } = require("../utils/deleteFile");
+const { deleteFileWithFolderName } = require("../utils/deleteFile");
 const { Op, where, col } = require("sequelize");
 const Type = require("../models/Type");
 const Category = require("../models/Category");
@@ -49,11 +49,11 @@ module.exports = {
         result: savedWorker,
       });
     } catch (error) {
-      await deletefilewithfoldername(
+      await deleteFileWithFolderName(
         uploadPath,
         req.files?.image?.[0]?.filename
       );
-      await deletefilewithfoldername(
+      await deleteFileWithFolderName(
         uploadPath,
         req.files?.icon?.[0]?.filename
       );
@@ -79,11 +79,11 @@ module.exports = {
       const { id } = req.params;
       const worker = await Worker.findByPk(id);
       if (!worker) {
-        await deletefilewithfoldername(
+        await deleteFileWithFolderName(
           uploadPath,
           req.files?.image?.[0]?.filename
         );
-        await deletefilewithfoldername(
+        await deleteFileWithFolderName(
           uploadPath,
           req.files?.icon?.[0]?.filename
         );
@@ -128,11 +128,11 @@ module.exports = {
         data: worker,
       });
     } catch (error) {
-      await deletefilewithfoldername(
+      await deleteFileWithFolderName(
         uploadPath,
         req.files?.image?.[0]?.filename
       );
-      await deletefilewithfoldername(
+      await deleteFileWithFolderName(
         uploadPath,
         req.files?.icon?.[0]?.filename
       );

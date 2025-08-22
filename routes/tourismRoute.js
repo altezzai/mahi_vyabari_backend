@@ -3,13 +3,13 @@ const router = express.Router();
 
 const tourismController = require("../controllers/tourismController");
 const userAuth = require("../middleware/authMiddleware");
-const autherizeRoles = require("../middleware/roleMiddleware");
-router.use(userAuth, autherizeRoles("admin"));
+const authorizeRoles = require("../middleware/roleMiddleware");
+router.use(userAuth, authorizeRoles("admin"));
 
 router.post(
   "/add-tourist-place",
   tourismController.upload.array("images", 4),
-  tourismController.addTrouristPlace
+  tourismController.addTouristPlace
 );
 router.put(
   "/update-tourist-place/:id",

@@ -257,7 +257,7 @@ module.exports = {
       });
     } catch (error) {}
   },
-  getDocters: async (req, res) => {
+  getDoctors: async (req, res) => {
     const searchQuery = req.query.q || "";
     const area = req.query.area || "";
     const page = parseInt(req.query.page) || 1;
@@ -316,7 +316,7 @@ module.exports = {
       res.status(500).json({ success: false, message: error.message });
     }
   },
-  getDocterById: async (req, res) => {
+  getDoctorById: async (req, res) => {
     try {
       const { id } = req.params;
       const doctor = await Medical.findOne({

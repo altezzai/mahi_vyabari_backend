@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const Category = require("../models/Category");
 const Type = require("../models/Type");
-const { deletefilewithfoldername } = require("../utils/deleteFile");
+const { deleteFileWithFolderName } = require("../utils/deleteFile");
 const { Op } = require("sequelize");
 
 const uploadPath = path.join(__dirname, "../public/uploads/categoryImages");
@@ -34,7 +34,7 @@ module.exports = {
       };
       const savedCategory = await Category.create(categoryData);
       if (!savedCategory) {
-        await deletefilewithfoldername(uploadPath, req.file?.filename);
+        await deleteFileWithFolderName(uploadPath, req.file?.filename);
         res.status(404).json({
           success: false,
           message: "Can't upload Category Data",
@@ -45,11 +45,11 @@ module.exports = {
         data: savedCategory,
       });
     } catch (error) {
-      await deletefilewithfoldername(uploadPath, req.file?.filename);
+      await deleteFileWithFolderName(uploadPath, req.file?.filename);
       console.log(error);
       res.status(500).json({
         success: false,
-        message: "An error occure while uploading Category data",
+        message: "An error occur while uploading Category data",
       });
     }
   },

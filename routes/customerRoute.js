@@ -3,8 +3,8 @@ const router = express.Router();
 
 const customerController = require("../controllers/customerController");
 const userAuth = require("../middleware/authMiddleware");
-const autherizeRoles = require("../middleware/roleMiddleware");
-router.use(userAuth, autherizeRoles("admin"));
+const authorizeRoles = require("../middleware/roleMiddleware");
+router.use(userAuth, authorizeRoles("admin"));
 
 router.get("/get-customers", customerController.getCustomers);
 router.get("/get-customer/:id", customerController.getCustomerById);

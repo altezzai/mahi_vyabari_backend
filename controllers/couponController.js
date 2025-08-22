@@ -7,7 +7,7 @@ const User = require("../models/User");
 const Tourism = require("../models/Tourism");
 
 module.exports = {
-  requestCoupen: async (req, res) => {
+  requestCoupon: async (req, res) => {
     const { requestedCount } = req.body;
     const { shopId } = req.user;
     const couponData = {
@@ -16,10 +16,10 @@ module.exports = {
       shopId,
     };
     try {
-      const shopcoupon = await ShopCoupon.create(couponData);
+      const shopCoupon = await ShopCoupon.create(couponData);
       res.status(200).json({
         success: true,
-        shopcoupon,
+        shopCoupon,
       });
     } catch (error) {
       console.log(error);
@@ -449,7 +449,7 @@ module.exports = {
                 FROM usercoupons uc 
                 WHERE uc.shopId = ShopCoupon.shopId))`
               ),
-              "remainigCoupon",
+              "remainingCoupon",
             ],
           ],
           exclude: [

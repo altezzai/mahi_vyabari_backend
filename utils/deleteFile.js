@@ -21,7 +21,7 @@ const deletefile = async (files) => {
     console.error("Error cleaning up files:", err);
   }
 };
-const deletefilewithfoldername = async (uploadPath, filename) => {
+const deleteFileWithFolderName = async (uploadPath, filename) => {
   try {
     if (filename) {
       const filePath = path.join(uploadPath, filename);
@@ -33,4 +33,4 @@ const deletefilewithfoldername = async (uploadPath, filename) => {
     console.error("Error cleaning up" + filename + " files:", err);
   }
 };
-module.exports = { deletefile, deletefilewithfoldername };
+module.exports = { deletefile, deleteFileWithFolderName };

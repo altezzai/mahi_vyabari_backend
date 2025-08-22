@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const Classified = require("../models/Classified");
 const Type = require("../models/Type");
-const { deletefilewithfoldername } = require("../utils/deleteFile");
+const { deleteFileWithFolderName } = require("../utils/deleteFile");
 const Category = require("../models/Category");
 const { Op } = require("sequelize");
 
@@ -28,7 +28,7 @@ const upload = multer({ storage });
 
 module.exports = {
   upload,
-  addClassfied: async (req, res) => {
+  addClassified: async (req, res) => {
     try {
       const classifiedData = {
         ...req.body,
@@ -41,11 +41,11 @@ module.exports = {
         savedShop: savedClassified,
       });
     } catch (error) {
-      await deletefilewithfoldername(
+      await deleteFileWithFolderName(
         uploadPath,
         req.files?.image?.[0]?.filename
       );
-      await deletefilewithfoldername(
+      await deleteFileWithFolderName(
         uploadPath,
         req.files?.icon?.[0]?.filename
       );
@@ -56,7 +56,7 @@ module.exports = {
       });
     }
   },
-  updateClassfied: async (req, res) => {
+  updateClassified: async (req, res) => {
     const {
       category,
       itemName,
@@ -73,11 +73,11 @@ module.exports = {
       const { id } = req.params;
       const item = await Classified.findByPk(id);
       if (!item) {
-        await deletefilewithfoldername(
+        await deleteFileWithFolderName(
           uploadPath,
           req.files?.image?.[0]?.filename
         );
-        await deletefilewithfoldername(
+        await deleteFileWithFolderName(
           uploadPath,
           req.files?.icon?.[0]?.filename
         );
@@ -123,18 +123,18 @@ module.exports = {
       return res.status(200).json({ success: true, item });
     } catch (error) {
       console.log(error);
-      await deletefilewithfoldername(
+      await deleteFileWithFolderName(
         uploadPath,
         req.files?.image?.[0]?.filename
       );
-      await deletefilewithfoldername(
+      await deleteFileWithFolderName(
         uploadPath,
         req.files?.icon?.[0]?.filename
       );
       return res.status(500).json({ success: false, message: error.message });
     }
   },
-  deleteClassfied: async (req, res) => {
+  deleteClassified: async (req, res) => {
     try {
       const { id } = req.params;
       const item = await Classified.findByPk(id);
@@ -152,7 +152,7 @@ module.exports = {
         .json({ success: false, message: "Internal Sever Error" });
     }
   },
-  restoreClassfied: async (req, res) => {
+  restoreClassified: async (req, res) => {
     try {
       const { id } = req.params;
       const item = await Classified.findByPk(id);
@@ -168,7 +168,7 @@ module.exports = {
       return res.status(500).json({ success: false, message: error.message });
     }
   },
-  getClassfieds: async (req, res) => {
+  getClassifieds: async (req, res) => {
     const search = req.query.search || "";
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -215,7 +215,7 @@ module.exports = {
       return res.status(500).json({ success: false, message: error.message });
     }
   },
-  getClassfiedById: async (req, res) => {
+  getClassifiedById: async (req, res) => {
     try {
       const { id } = req.params;
       const classified = await Classified.findByPk(id, {
@@ -238,7 +238,7 @@ module.exports = {
       return res.status(500).json({ success: false, message: error.message });
     }
   },
-  getClassfiedCategories: async (req, res) => {
+  getClassifiedCategories: async (req, res) => {
     try {
       const classifiedCategories = await Type.findOne({
         where: { typeName: "classified" },

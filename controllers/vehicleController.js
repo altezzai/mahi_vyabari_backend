@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const VehicleSchedule = require("../models/VehicleSchedule");
 const VehicleService = require("../models/VehicleService");
-const { deletefilewithfoldername } = require("../utils/deleteFile");
+const { deleteFileWithFolderName } = require("../utils/deleteFile");
 const { Op } = require("sequelize");
 const Type = require("../models/Type");
 const Category = require("../models/Category");
@@ -222,8 +222,8 @@ module.exports = {
         result: savedService,
       });
     } catch (error) {
-      deletefilewithfoldername(uploadPath, req.files?.image?.[0]?.filename);
-      deletefilewithfoldername(uploadPath, req.files?.icon?.[0]?.filename);
+      deleteFileWithFolderName(uploadPath, req.files?.image?.[0]?.filename);
+      deleteFileWithFolderName(uploadPath, req.files?.icon?.[0]?.filename);
       console.log(error);
       res.status(500).json({
         success: false,
@@ -248,11 +248,11 @@ module.exports = {
       const { id } = req.params;
       const vehicleService = await VehicleService.findByPk(id);
       if (!vehicleService) {
-        await deletefilewithfoldername(
+        await deleteFileWithFolderName(
           uploadPath,
           req.files?.image?.[0]?.filename
         );
-        await deletefilewithfoldername(
+        await deleteFileWithFolderName(
           uploadPath,
           req.files?.icon?.[0]?.filename
         );
@@ -299,11 +299,11 @@ module.exports = {
         data: vehicleService,
       });
     } catch (error) {
-      await deletefilewithfoldername(
+      await deleteFileWithFolderName(
         uploadPath,
         req.files?.image?.[0]?.filename
       );
-      await deletefilewithfoldername(
+      await deleteFileWithFolderName(
         uploadPath,
         req.files?.icon?.[0]?.filename
       );
