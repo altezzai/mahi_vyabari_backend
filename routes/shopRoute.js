@@ -3,8 +3,8 @@ const router = express.Router();
 
 const shopController = require("../controllers/shopController");
 const userAuth = require("../middleware/authMiddleware");
-const autherizeRoles = require("../middleware/roleMiddleware");
-router.use(userAuth, autherizeRoles("admin"));
+const authorizeRoles = require("../middleware/roleMiddleware");
+router.use(userAuth, authorizeRoles("admin"));
 
 router.post(
   "/add-shop",

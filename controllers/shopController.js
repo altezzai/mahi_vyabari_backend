@@ -17,8 +17,12 @@ const { sendEmail } = require("../utils/nodemailer");
 
 const uploadPath = path.join(__dirname, "../public/uploads/shopImages");
 const userProfilePath = path.join(__dirname, "../public/uploads/userImages");
+
 if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath, { recursive: true });
+}
+if (!fs.existsSync(userProfilePath)) {
+  fs.mkdirSync(userProfilePath, { recursive: true });
 }
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -86,10 +90,10 @@ module.exports = {
     `;
       sendEmail(email, subject, message);
       const imagePath = req.files?.image?.[0]?.path || null;
-      const profilePath = path.join(
-        userProfilePath,
-        req.files?.image?.[0]?.filename
-      );
+      const imageFile = req.files?.image?.[0]?.filename ?? null;
+      const profilePath = imageFile
+        ? path.join(userProfilePath, req.files?.image?.[0]?.filename)
+        : null;
       if (imagePath && profilePath) {
         fs.copyFileSync(imagePath, profilePath);
       }
