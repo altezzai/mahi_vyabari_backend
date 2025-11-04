@@ -68,7 +68,7 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Product not found" });
       }
-      let newImage = null;
+      let newImage = product.image;
       if (req.file) {
         if (product.image) {
           const oldImagePath = path.join(uploadPath, product.image);
@@ -124,7 +124,7 @@ module.exports = {
             model: Shop,
             attributes: ["id", "shopName"],
             as: "shop",
-            required:true
+            required: true,
           },
         ],
         order: [["createdAt", "DESC"]],

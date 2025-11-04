@@ -210,8 +210,8 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Shop not found" });
       }
-      let newImage = null;
-      let newIcon = null;
+      let newImage = shop.image;
+      let newIcon = shop.icon;
       if (req.files?.image?.[0]) {
         if (shop.image) {
           const oldImagePath = path.join(uploadPath, shop.image);

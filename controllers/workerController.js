@@ -91,8 +91,8 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Worker profile not found" });
       }
-      let newImage = null;
-      let newIcon = null;
+      let newImage = worker.image;
+      let newIcon = worker.icon;
       if (req.files?.image) {
         if (worker.image) {
           const oldImagePath = path.join(uploadPath, worker.image);

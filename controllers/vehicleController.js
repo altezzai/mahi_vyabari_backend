@@ -260,8 +260,8 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Vehicle Service not found" });
       }
-      let newImage = null;
-      let newIcon = null;
+      let newImage = vehicleService.image;
+      let newIcon = vehicleService.icon;
       if (req.files?.image) {
         if (vehicleService.image) {
           const oldImagePath = path.join(uploadPath, vehicleService.image);
