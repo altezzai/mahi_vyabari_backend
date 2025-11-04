@@ -20,18 +20,6 @@ module.exports = {
       expiresAt: {
         type: Sequelize.DATE,
       },
-      // resetOTP: {
-      //   type: Sequelize.STRING,
-      // },
-      // resetOTPExpires: {
-      //   type: Sequelize.DATE,
-      // },
-      // loginOTP: {
-      //   type: Sequelize.STRING,
-      // },
-      // loginOTPExpires: {
-      //   type: Sequelize.DATE,
-      // },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

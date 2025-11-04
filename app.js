@@ -26,6 +26,7 @@ const publicRouter = require("./routes/publicRoute");
 const customerRouter = require("./routes/customerRoute");
 const couponRouter = require("./routes/couponRoute");
 const tourismRouter = require("./routes/tourismRoute");
+const bannerRouter = require("./routes/bannerRoute")
 
 // app.use(
 //   session({
@@ -60,6 +61,7 @@ app.use("/api/public", publicRouter);
 app.use("/api/customer", customerRouter);
 app.use("/api/coupon", couponRouter);
 app.use("/api/tourism", tourismRouter);
+app.use("/api/banners",bannerRouter)
 
 app.listen(PORT, () => {
   console.log(`server started on port number ${PORT}`);
