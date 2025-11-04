@@ -31,7 +31,7 @@ module.exports = {
   },
   assignShopCouponRequest: async (req, res) => {
     const { assignedCount } = req.body;
-    console.log(assignedCount)
+    console.log(assignedCount);
     try {
       const { id } = req.params;
       console.log(id);
@@ -215,7 +215,7 @@ module.exports = {
             [
               Sequelize.literal(
                 `((SELECT COALESCE(SUM(sc.assignedCount),0) 
-                FROM ShopCoupons sc
+                FROM shopcoupons sc
                 WHERE sc.shopId = ShopCoupon.shopId
                  ) -
               (SELECT COALESCE(SUM(uc.assignedCount), 0) 
@@ -442,7 +442,7 @@ module.exports = {
             [
               Sequelize.literal(
                 `((SELECT COALESCE(SUM(sc.assignedCount),0) 
-                FROM ShopCoupons sc 
+                FROM shopcoupons sc 
                 WHERE sc.shopId = ShopCoupon.shopId)
                 -
                 (SELECT COALEsCE(SUM(uc.assignedCount),0) 
