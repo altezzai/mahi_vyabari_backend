@@ -36,7 +36,8 @@ module.exports = {
     }
   },
   updateTouristPlace: async (req, res) => {
-    const { placeName, phone, area, startTime, endTime, entryFee } = req.body;
+    const { placeName, phone, area, startTime, endTime, entryFee, location } =
+      req.body;
     try {
       const { id } = req.params;
       const tourism = await Tourism.findByPk(id);
@@ -65,6 +66,7 @@ module.exports = {
         startTime,
         endTime,
         entryFee,
+        location,
         images: newImages,
       });
       return res.status(200).json({ success: true, updatedTourism });

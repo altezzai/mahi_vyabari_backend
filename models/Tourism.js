@@ -11,12 +11,12 @@ const Tourism = sequelize.define(
     images: {
       type: DataTypes.TEXT,
       get() {
-        const rawValue = this.getDataValue('images');
+        const rawValue = this.getDataValue("images");
         return rawValue ? JSON.parse(rawValue) : [];
       },
       set(value) {
-        this.setDataValue('images', JSON.stringify(value));
-      }
+        this.setDataValue("images", JSON.stringify(value));
+      },
     },
     phone: {
       type: DataTypes.STRING,
@@ -36,10 +36,14 @@ const Tourism = sequelize.define(
     entryFee: {
       type: DataTypes.STRING,
     },
-    trash:{
+    location: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    trash: {
       type: DataTypes.BOOLEAN,
-      defaultValue:false
-    }
+      defaultValue: false,
+    },
   },
   {
     tableName: "tourism",
