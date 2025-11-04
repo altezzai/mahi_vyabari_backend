@@ -64,7 +64,7 @@ const WorkerProfile = sequelize.define(
     },
   },
   {
-    tableName: "Workers",
+    tableName: "workers",
     timestamps: true,
   }
 );
