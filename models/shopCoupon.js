@@ -8,11 +8,11 @@ const ShopCoupon = sequelize.define(
     shopId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references:{
-        model:Shop,
-        key:"id"
+      references: {
+        model: Shop,
+        key: "id",
       },
-      onDelete: 'CASCADE',
+      onDelete: "CASCADE",
     },
     requestedCount: {
       type: DataTypes.INTEGER,
@@ -22,11 +22,11 @@ const ShopCoupon = sequelize.define(
     },
     couponIdFrom: {
       type: DataTypes.INTEGER,
-      unique:true
+      unique: true,
     },
     couponIdTo: {
       type: DataTypes.INTEGER,
-      unique:true
+      unique: true,
     },
     status: {
       type: DataTypes.ENUM("pending", "assigned"),
@@ -38,7 +38,7 @@ const ShopCoupon = sequelize.define(
   }
 );
 
-Shop.hasMany(ShopCoupon,{foreignKey:"shopId",as: "shopCoupons"});
-ShopCoupon.belongsTo(Shop,{foreignKey:"shopId",as:"shop"});
+// Shop.hasMany(ShopCoupon, { foreignKey: "shopId", as: "shopCoupons" });
+// ShopCoupon.belongsTo(Shop, { foreignKey: "shopId", as: "shop" });
 
 module.exports = ShopCoupon;
