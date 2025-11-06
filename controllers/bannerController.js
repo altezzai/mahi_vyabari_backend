@@ -6,57 +6,14 @@ const Banner = require("../models/Banner");
 const sequelize = require("../config/database");
 const { deleteFileWithFolderName } = require("../utils/deleteFile");
 
-const uploadDir = path.join(__dirname, "../public/uploads/banners");
-
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const extension = path.extname(file.originalname);
-    const originalName = path.basename(file.originalname, extension);
-    const sanitizedName = originalName
-      .toLowerCase()
-      .replace(/[^a-z0-9-]/g, "-");
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, sanitizedName + "-" + uniqueSuffix + extension);
-  },
-});
-
-const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith("image/")) {
-    cb(null, true);
-  } else {
-    cb(new Error("Only image files are allowed!"), false);
-  }
-};
-
-const upload = multer({
-  storage: storage,
-  fileFilter: fileFilter,
-  limits: { fileSize: 1024 * 1024 * 5 },
-}).array("images", 10);
-
-const uploadSingle = multer({
-  storage: storage,
-  fileFilter: fileFilter,
-  limits: { fileSize: 1024 * 1024 * 5 }, // 5MB file size limit
-}).single("image");
-
 module.exports = {
-  uploadSingle,
-  upload,
   uploadBanners: async (req, res) => {
     const t = await sequelize.transaction();
 
     try {
       const { banner_type } = req.body;
       const files = req.files;
-
+      console.log(files);
       if (!files || files.length === 0) {
         return res
           .status(400)
@@ -72,21 +29,36 @@ module.exports = {
         });
       }
 
-      const bannersToCreate = files.map((file) => ({
-        image_path: file.filename,
+      const largeImagePath =
+        req.files && req.files.banner_image_large
+          ? req.files.banner_image_large[0].filename
+          : null;
+      const smallImagePath =
+        req.files && req.files.banner_image_small
+          ? req.files.banner_image_small[0].filename
+          : null;
+      
+      await Banner.create({
+        banner_image_large: largeImagePath,
+        banner_image_small: smallImagePath,
         banner_type: banner_type,
-      }));
-
-      await Banner.bulkCreate(bannersToCreate, { transaction: t });
+      });
 
       await t.commit();
 
       res.status(201).json({
-        message: `${files.length} banners uploaded successfully for ${banner_type}.`,
+        message: `banners uploaded successfully for ${banner_type}.`,
       });
     } catch (error) {
       await t.rollback();
-
+      await deleteFileWithFolderName(
+        req.files.banner_image_large?.[0]?.destination,
+        req.files.banner_image_large?.[0]?.filename
+      );
+      await deleteFileWithFolderName(
+        req.files.banner_image_small?.[0]?.destination,
+        req.files.banner_image_small?.[0]?.filename
+      );
       res.status(500).json({
         message: "An error occurred on the server while uploading banners.",
       });
@@ -95,32 +67,40 @@ module.exports = {
   updateBanner: async (req, res) => {
     try {
       const { id } = req.params;
-      const { banner_type } = req.body;
 
-      const banner = await Banner.findByPk(id);
-      if (!banner) {
+      const { banner_type } = req.body;
+      const updateData = { banner_type };
+
+      if (req.files && req.files.banner_image_large) {
+        updateData.banner_image_large =
+          req.files?.banner_image_large?.[0]?.filename;
+      }
+
+      if (req.files && req.files.banner_image_small) {
+        updateData.banner_image_small =
+          req.files?.banner_image_small?.[0]?.filename;
+      }
+
+      const [updated] = await Banner.update(updateData, {
+        where: { id: id },
+      });
+
+      if (!updated) {
         return res.status(404).json({ message: "Banner not found." });
       }
-      const oldImagePath = banner.image_path;
 
-      if (req.file) {
-        banner.image_path = req.file.filename;
-      }
-      if (banner_type && (banner_type === "type1" || banner_type === "type2")) {
-        banner.banner_type = banner_type;
-      }
-
-      await banner.save();
-
-      if (req.file && oldImagePath) {
-        await deleteFileWithFolderName(uploadDir, oldImagePath);
-      }
-
-      res.status(200).json({
-        message: "Banner updated successfully.",
-        banner: banner,
-      });
+      const updatedBanner = await Banner.findByPk(id);
+      res.status(200).json(updatedBanner);
     } catch (error) {
+      console.error(error);
+      await deleteFileWithFolderName(
+        req.files?.banner_image_large?.[0]?.destination,
+        req.files?.banner_image_large?.[0]?.filename
+      );
+      await deleteFileWithFolderName(
+        req.files?.banner_image_small?.[0]?.destination,
+        req.files?.banner_image_small?.[0]?.filename
+      );
       res.status(500).json({ message: "Error updating banner." });
     }
   },
@@ -162,7 +142,6 @@ module.exports = {
   },
   getAllBannersAdmin: async (req, res) => {
     try {
-      // 1. Get query parameters
       const {
         page = 1,
         limit = 10,

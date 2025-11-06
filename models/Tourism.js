@@ -36,6 +36,10 @@ const Tourism = sequelize.define(
     entryFee: {
       type: DataTypes.STRING,
     },
+    address: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     location: {
       type: DataTypes.STRING,
       allowNull: true,
