@@ -1,19 +1,35 @@
-const Shop = require("../models/Shop");
-const Feedback = require("../models/Feedback");
-const Medical = require("../models/MedDirectory");
-const VehicleSchedule = require("../models/VehicleSchedule");
-const Emergency = require("../models/Emergency");
-const VehicleService = require("../models/VehicleService");
-const Worker = require("../models/Worker");
-const Classified = require("../models/Classified");
-const ShopCategory = require("../models/ShopCategory");
-const WorkerCategory = require("../models/WorkerCategory");
-const Tourism = require("../models/Tourism");
-const { Sequelize, where, Op } = require("sequelize");
-const Category = require("../models/Category");
-const Product = require("../models/Product");
-const Type = require("../models/Type");
-const { getWorkerCategory } = require("./workerController");
+// const Shop = require("../models/Shop");
+// const Feedback = require("../models/Feedback");
+// const Medical = require("../models/MedDirectory");
+// const VehicleSchedule = require("../models/VehicleSchedule");
+// const Emergency = require("../models/Emergency");
+// const VehicleService = require("../models/VehicleService");
+// const Worker = require("../models/Worker");
+// const Classified = require("../models/Classified");
+// const ShopCategory = require("../models/ShopCategory");
+// const WorkerCategory = require("../models/WorkerCategory");
+// const Tourism = require("../models/Tourism");
+const { Sequelize } = require("sequelize");
+// const Category = require("../models/Category");
+// const Product = require("../models/Product");
+// const Type = require("../models/Type");
+const {
+  Shop,
+  Medical,
+  Feedback,
+  VehicleSchedule,
+  Emergency,
+  VehicleService,
+  Worker,
+  Classified,
+  ShopCategory,
+  WorkerCategory,
+  Tourism,
+  Category,
+  Product,
+  Type,
+} = require("../models");
+// const { getWorkerCategory } = require("./workerController");
 
 module.exports = {
   homePage: async (req, res) => {
@@ -488,8 +504,8 @@ module.exports = {
     if (searchQuery) {
       whereCondition = {
         ...whereCondition,
-        emergencyName: { [Op.like]: `%${searchQuery}%` }
-      }
+        emergencyName: { [Op.like]: `%${searchQuery}%` },
+      };
     }
     try {
       const { count, rows: emergencies } = await Emergency.findAndCountAll({
@@ -628,7 +644,7 @@ module.exports = {
       const { count, rows: workers } = await Worker.findAndCountAll({
         limit,
         offset,
-        attributes: ["id", "workerName", "image","area","phone"],
+        attributes: ["id", "workerName", "image", "area", "phone"],
         where: whereCondition,
         order: [["priority", "ASC"]],
       });

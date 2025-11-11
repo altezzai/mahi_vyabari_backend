@@ -4,16 +4,21 @@ const router = express.Router();
 const workerController = require("../controllers/workerController");
 const userAuth = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
-router.use(userAuth, authorizeRoles("admin"));
+const multerInstance = require("../middleware/upload");
+// router.use(userAuth, authorizeRoles("admin"));
+const workerUploadFields = [
+  { name: "image", maxCount: 1 },
+  { name: "icon", maxCount: 1 },
+];
 
 router.post(
   "/add-worker-profile",
-  workerController.upload.fields([{ name: "image" }, { name: "icon" }]),
+  multerInstance.fields(workerUploadFields),
   workerController.addWorkerProfile
 );
 router.put(
   "/update-worker-profile/:id",
-  workerController.upload.fields([{ name: "image" }, { name: "icon" }]),
+  multerInstance.fields(workerUploadFields),
   workerController.updateWorkerProfile
 );
 router.patch(

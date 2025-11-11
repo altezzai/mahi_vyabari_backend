@@ -4,7 +4,12 @@ const router = express.Router();
 const vehicleController = require("../controllers/vehicleController");
 const userAuth = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
-router.use(userAuth, authorizeRoles("admin"));
+const multerInstance = require("../middleware/upload");
+// router.use(userAuth, authorizeRoles("admin"));
+const vehicleUploadFields = [
+  { name: "image", maxCount: 1 },
+  { name: "icon", maxCount: 1 },
+];
 
 router.post("/add-vehicleSchedule", vehicleController.addVehicleSchedule);
 router.put(
@@ -27,12 +32,12 @@ router.get(
 
 router.post(
   "/add-vehicle-Service",
-  vehicleController.upload.fields([{ name: "image" }, { name: "icon" }]),
+  multerInstance.fields(vehicleUploadFields),
   vehicleController.addVehicleServiceProvider
 );
 router.put(
   "/update-vehicle-Service/:id",
-  vehicleController.upload.fields([{ name: "image" }, { name: "icon" }]),
+  multerInstance.fields(vehicleUploadFields),
   vehicleController.updateVehicleServiceProvider
 );
 router.patch(

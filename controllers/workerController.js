@@ -1,62 +1,47 @@
 require("../config/database");
-const multer = require("multer");
-const fs = require("fs");
 const path = require("path");
-const Worker = require("../models/Worker");
-const WorkerCategory = require("../models/WorkerCategory");
-const { deleteFileWithFolderName } = require("../utils/deleteFile");
-const { Op, where, col } = require("sequelize");
-const Type = require("../models/Type");
-const Category = require("../models/Category");
+// const Worker = require("../models/Worker");
+// const WorkerCategory = require("../models/WorkerCategory");
+const { Op, where, col, Transaction } = require("sequelize");
+// const Type = require("../models/Type");
+// const Category = require("../models/Category");
+const { Type, Category, Worker, WorkerCategory } = require("../models");
+const sequelize = require("../config/database");
+const { cleanupFiles,deleteFileWithFolderName,processImageFields } = require("../utils/fileHandler");
 
-const uploadPath = path.join(__dirname, "../public/uploads/workers");
-if (!fs.existsSync(uploadPath)) {
-  fs.mkdirSync(uploadPath, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadPath);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = `${Date.now()}-${file.originalname}`;
-    cb(null, uniqueSuffix);
-  },
-});
-
-const upload = multer({ storage });
-
+const UPLOAD_SUBFOLDER = "workers";
+const UPLOAD_PATH = process.env.UPLOAD_PATH;
+const workerProcessingConfig = {
+  image: { width: 1024 },
+  icon: { width: 150 },
+};
 module.exports = {
-  upload,
   addWorkerProfile: async (req, res) => {
+    let processedFiles;
+    const t = await sequelize.transaction();
     try {
+      processedFiles = await processImageFields(
+        req.files,
+        workerProcessingConfig,
+        UPLOAD_SUBFOLDER
+      );
       const workerData = {
         ...req.body,
-        image: req.files?.image?.[0]?.filename || null,
-        icon: req.files?.icon?.[0]?.filename || null,
+        image: processedFiles.image.filename || null,
+        icon: processedFiles.icon.filename || null,
       };
-      const savedWorker = await Worker.create(workerData);
-      if (savedWorker.categories && savedWorker.categories.length > 0) {
-        await WorkerCategory.bulkCreate(
-          savedWorker.categories.map((category) => ({
-            workerId: savedWorker.id,
-            categoryId: category,
-          }))
-        );
+      const newWorker = await Worker.create(workerData, { transaction: t });
+      if (newWorker.categories && newWorker.categories.length > 0) {
+        await newWorker.setCategories(newWorker.categories, { transaction: t });
       }
+      await t.commit();
       res.status(201).json({
         success: true,
-        result: savedWorker,
+        result: newWorker,
       });
     } catch (error) {
-      await deleteFileWithFolderName(
-        uploadPath,
-        req.files?.image?.[0]?.filename
-      );
-      await deleteFileWithFolderName(
-        uploadPath,
-        req.files?.icon?.[0]?.filename
-      );
+      await t.rollback();
+      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       console.log(error);
       res.status(401).json({
         success: false,
@@ -65,77 +50,62 @@ module.exports = {
     }
   },
   updateWorkerProfile: async (req, res) => {
-    const {
-      categories,
-      workerName,
-      minWage,
-      priority,
-      area,
-      phone,
-      whatsapp,
-      description,
-    } = req.body;
+    let processedFiles;
+    const t = await sequelize.transaction();
     try {
       const { id } = req.params;
       const worker = await Worker.findByPk(id);
       if (!worker) {
-        await deleteFileWithFolderName(
-          uploadPath,
-          req.files?.image?.[0]?.filename
-        );
-        await deleteFileWithFolderName(
-          uploadPath,
-          req.files?.icon?.[0]?.filename
-        );
         return res
           .status(404)
           .json({ success: false, message: "Worker profile not found" });
       }
-      let newImage = worker.image;
-      let newIcon = worker.icon;
-      if (req.files?.image) {
-        if (worker.image) {
-          const oldImagePath = path.join(uploadPath, worker.image);
-          if (fs.existsSync(oldImagePath)) {
-            fs.unlinkSync(oldImagePath);
-          }
-        }
-        newImage = req.files.image[0].filename;
+      processedFiles = await processImageFields(
+        req.files,
+        workerProcessingConfig,
+        UPLOAD_SUBFOLDER
+      );
+      const { categories, ...bodyData } = req.body;
+      if (processedFiles.image && worker.image) {
+        const oldFilename = path.basename(worker.image);
+        const oldFilePath = path.join(UPLOAD_PATH, UPLOAD_SUBFOLDER);
+        await deleteFileWithFolderName(oldFilePath, oldFilename);
       }
-      if (req.files?.icon) {
-        if (worker.icon) {
-          const oldIconPath = path.join(uploadPath, worker.icon);
-          if (fs.existsSync(oldIconPath)) {
-            fs.unlinkSync(oldIconPath);
-          }
-        }
-        newIcon = req.files.icon[0].filename;
+      if (processedFiles.icon && worker.icon) {
+        const oldFilename = path.basename(worker.icon);
+        const oldFilePath = path.join(UPLOAD_PATH, UPLOAD_SUBFOLDER);
+        await deleteFileWithFolderName(oldFilePath, oldFilename);
       }
-      await worker.update({
-        categories,
-        workerName,
-        minWage,
-        priority,
-        area,
-        phone,
-        whatsapp,
-        image: newImage,
-        icon: newIcon,
-        description,
+      for (const key in bodyData) {
+        if (bodyData[key] !== null && bodyData[key] !== undefined) {
+          worker[key] = bodyData[key];
+        }
+      }
+      if (categories) {
+        worker.categories = categories;
+      }
+      if (processedFiles.image) {
+        worker.image = processedFiles.image.filename;
+      }
+      if (processedFiles.icon) {
+        worker.icon = processedFiles.icon.filename;
+      }
+      const updatedWorker = await worker.save();
+      if (categories) {
+        updatedWorker.setCategories(categories, { Transaction: t });
+      }
+      const finalWorker = await Worker.findByPk(updatedWorker.id, {
+        include: Category,
+        transaction: t,
       });
+      await t.commit();
       return res.status(200).json({
         success: true,
-        data: worker,
+        data: finalWorker,
       });
     } catch (error) {
-      await deleteFileWithFolderName(
-        uploadPath,
-        req.files?.image?.[0]?.filename
-      );
-      await deleteFileWithFolderName(
-        uploadPath,
-        req.files?.icon?.[0]?.filename
-      );
+      await t.rollback();
+      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       console.error(error);
       return res.status(500).json({
         success: false,

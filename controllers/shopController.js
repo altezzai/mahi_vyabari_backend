@@ -1,67 +1,76 @@
 require("../config/database");
-const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const sequelize = require("../config/database");
-const Shop = require("../models/Shop");
-const Category = require("../models/Category");
-const ShopCategory = require("../models/ShopCategory");
-const { deleteFileWithFolderName } = require("../utils/deleteFile");
-const { Op, Sequelize, literal, where, col } = require("sequelize");
-const Type = require("../models/Type");
-const Complaint = require("../models/Complaint");
-const Feedback = require("../models/Feedback");
-const User = require("../models/User");
+const {
+  Op,
+} = require("sequelize");
+
+const {
+  User,
+  Feedback,
+  Complaint,
+  Type,
+  Shop,
+  Category,
+} = require("../models");
+
 const { hashData } = require("../utils/hashData");
-const { sendEmail } = require("../utils/nodemailer");
+const { sendShopWelcomeEmail } = require("../utils/emailService");
+const { processImageFields, cleanupFiles,deleteFileWithFolderName } = require("../utils/fileHandler");
 
-const uploadPath = path.join(__dirname, "../public/uploads/shopImages");
-const userProfilePath = path.join(__dirname, "../public/uploads/userImages");
+const UPLOAD_SUBFOLDER = "shopImages";
+const UPLOAD_PATH = process.env.UPLOAD_PATH;
+const USER_PROFILE_SUBFOLDER = "userImages";
 
-if (!fs.existsSync(uploadPath)) {
-  fs.mkdirSync(uploadPath, { recursive: true });
-}
-if (!fs.existsSync(userProfilePath)) {
-  fs.mkdirSync(userProfilePath, { recursive: true });
-}
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadPath);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = `${Date.now()}-${file.originalname}`;
-    cb(null, uniqueSuffix);
-  },
-});
+const shopProcessingConfig = {
+  image: { width: 1024 },
+  icon: { width: 150 },
+};
 
-const upload = multer({ storage });
 module.exports = {
-  upload,
   addShop: async (req, res) => {
     const { shopName, phone, areas, email } = req.body;
+    let processedShopFiles;
+    let processedUserFiles;
     const t = await sequelize.transaction();
+    if (!shopName || !phone || !email) {
+      return res
+        .status(400)
+        .json({ error: "shopName, phone, and email are required." });
+    }
+    const existingShop = await Shop.findOne({
+      where: { email },
+      transaction: t,
+    });
+    if (existingShop) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Shop Email already exists" });
+    }
     try {
+      processedShopFiles = await processImageFields(
+        req.files,
+        shopProcessingConfig,
+        UPLOAD_SUBFOLDER
+      );
       const shopData = {
         ...req.body,
-        image: req.files?.image?.[0]?.filename || null,
-        icon: req.files?.icon?.[0]?.filename || null,
+        image: processedShopFiles.image.filename || null,
+        icon: processedShopFiles.icon.filename || null,
       };
-      const existingShop = await Shop.findOne({ where: { email } });
-      if (existingShop) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Shop Email already exists" });
+      const newShop = await Shop.create(shopData, { transaction: t });
+      if (newShop.categories && newShop.categories.length > 0) {
+        await newShop.setCategories(newShop.categories, { transaction: t });
       }
-      const savedShop = await Shop.create(shopData, { transaction: t });
-      if (savedShop.categories && savedShop.categories.length > 0) {
-        const categoriesToCreate = await savedShop.categories.map(
-          (category) => ({
-            shopId: savedShop.id,
-            categoryId: category,
-          })
-        );
-        await ShopCategory.bulkCreate(categoriesToCreate, { transaction: t });
-      }
+      const userImageConfig = {
+        image: { width: 500 },
+      };
+      processedUserFiles = await processImageFields(
+        req.files,
+        userImageConfig,
+        USER_PROFILE_SUBFOLDER
+      );
       await User.create(
         {
           userName: shopName,
@@ -70,49 +79,31 @@ module.exports = {
           areas,
           password: await hashData(phone),
           role: "shop",
-          image: req.files?.image?.[0]?.filename || null,
+          image: processedUserFiles.image.filename || null,
         },
         { transaction: t }
       );
-      const subject = "Welcome to Mahe Vyapari!";
-      const message = `
-      <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4;">
-        <div style="max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px #ccc;">
-          <h2 style="color: #4CAF50;">Welcome, ${shopName} 👋</h2>
-          <p>Your account has been created by the Admin.</p>
-          <p><strong>Login Email:</strong> ${email}</p>
-          <p><strong>Password:</strong><span style="font-weight:900;"> ${phone}</span></p>
-          <p>Please login and change your password immediately for security reasons.</p>
-          <br/>
-          <p>Thanks,<br/>Team Mahe Vyapari</p>
-        </div>
-      </div>
-    `;
-      sendEmail(email, subject, message);
-      const imagePath = req.files?.image?.[0]?.path || null;
-      const imageFile = req.files?.image?.[0]?.filename ?? null;
-      const profilePath = imageFile
-        ? path.join(userProfilePath, req.files?.image?.[0]?.filename)
-        : null;
-      if (imagePath && profilePath) {
-        fs.copyFileSync(imagePath, profilePath);
-      }
+      sendShopWelcomeEmail(
+        newShop.shopName,
+        newShop.email,
+        newShop.phone
+      ).catch(() => {
+        console.error("--- ASYNC EMAIL FAILED TO SEND ---", err);
+      });
+      const finalShop = await Shop.findByPk(newShop.id, {
+        include: Category,
+        transaction: t,
+      });
       await t.commit();
       res.status(201).json({
         success: true,
-        savedShop: savedShop,
+        shop: finalShop,
       });
     } catch (error) {
       await t.rollback();
       console.log(error);
-      await deleteFileWithFolderName(
-        uploadPath,
-        req.files?.image?.[0]?.filename
-      );
-      await deleteFileWithFolderName(
-        uploadPath,
-        req.files?.icon?.[0]?.filename
-      );
+      await cleanupFiles(processedShopFiles, UPLOAD_SUBFOLDER);
+      await cleanupFiles(processedUserFiles, USER_PROFILE_SUBFOLDER);
       res.status(500).json({
         success: false,
         message: error.message,
@@ -178,89 +169,75 @@ module.exports = {
     }
   },
   updateShop: async (req, res) => {
-    const {
-      shopName,
-      email,
-      categories,
-      phone,
-      whatsapp,
-      location,
-      description,
-      address,
-      openingTime,
-      closingTime,
-      workingDays,
-      priority,
-      website,
-      area,
-    } = req.body;
+    let processedFiles;
+    const t = await sequelize.transaction();
     try {
       const { shopId } = req.params;
-      const shop = await Shop.findByPk(shopId);
+      const shop = await Shop.findByPk(shopId, { transaction: t });
       if (!shop) {
-        await deleteFileWithFolderName(
-          uploadPath,
-          req.files?.image?.[0]?.filename
-        );
-        await deleteFileWithFolderName(
-          uploadPath,
-          req.files?.icon?.[0]?.filename
-        );
         return res
           .status(404)
           .json({ success: false, message: "Shop not found" });
       }
-      let newImage = shop.image;
-      let newIcon = shop.icon;
-      if (req.files?.image?.[0]) {
-        if (shop.image) {
-          const oldImagePath = path.join(uploadPath, shop.image);
-          if (fs.existsSync(oldImagePath)) {
-            fs.unlinkSync(oldImagePath);
-          }
-        }
-        newImage = req.files.image[0].filename;
+      const processedShopFiles = await processImageFields(
+        req.files,
+        shopProcessingConfig,
+        UPLOAD_SUBFOLDER
+      );
+      processedFiles = processedShopFiles;
+
+      const { categories, ...bodyData } = req.body;
+
+      if (processedFiles.image && shop.image) {
+        const oldFilename = path.basename(shop.image);
+        const oldFilePath = path.join(
+          UPLOAD_PATH,
+          UPLOAD_SUBFOLDER,
+        );
+        await deleteFileWithFolderName(oldFilePath,oldFilename)
+      }
+      if (processedFiles.icon && shop.icon) {
+        const oldFilename = path.basename(shop.icon);
+        const oldFilePath = path.join(
+          UPLOAD_PATH,
+          UPLOAD_SUBFOLDER,
+        );
+        await deleteFileWithFolderName(oldFilePath,oldFilename);
       }
 
-      if (req.files?.icon?.[0]) {
-        if (shop.icon) {
-          const oldIconPath = path.join(uploadPath, shop.icon);
-          if (fs.existsSync(oldIconPath)) {
-            fs.unlinkSync(oldIconPath);
-          }
+      for (const key in bodyData) {
+        if (bodyData[key] !== null && bodyData[key] !== undefined) {
+          shop[key] = bodyData[key];
         }
-        newIcon = req.files.icon[0].filename;
+      }
+      if (categories) {
+        shop.categories = categories;
+      }
+      if (processedFiles.image) {
+        shop.image = processedFiles.image.filename;
+      }
+      if (processedFiles.icon) {
+        shop.icon = processedFiles.icon.filename;
+      }
+      const updatedShop = await shop.save({ transaction: t });
+
+      if (categories) {
+        updatedShop.setCategories(categories, { transaction: t });
       }
 
-      const updateData = {
-        shopName,
-        email,
-        categories,
-        phone,
-        whatsapp,
-        website,
-        location,
-        description,
-        address,
-        openingTime,
-        closingTime,
-        workingDays,
-        priority,
-        area,
-        image: newImage,
-        icon: newIcon,
-      };
-      await shop.update(updateData);
-      return res.status(200).json({ success: true, shop });
+      console.log("Old files cleaned up.");
+      const finalShop = await Shop.findByPk(updatedShop.id, {
+        include: Category,
+        transaction: t,
+      });
+      await t.commit();
+      res.status(200).json({
+        message: `Shop ${finalShop.id} updated successfully!`,
+        shop: finalShop,
+      });
     } catch (error) {
-      await deleteFileWithFolderName(
-        uploadPath,
-        req.files?.image?.[0]?.filename
-      );
-      await deleteFileWithFolderName(
-        uploadPath,
-        req.files?.icon?.[0]?.filename
-      );
+      await t.rollback();
+      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       console.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }

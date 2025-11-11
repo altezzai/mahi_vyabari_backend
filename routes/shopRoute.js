@@ -4,16 +4,22 @@ const router = express.Router();
 const shopController = require("../controllers/shopController");
 const userAuth = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
-router.use(userAuth, authorizeRoles("admin"));
+const multerInstance = require("../middleware/upload");
+// router.use(userAuth, authorizeRoles("admin"));
+
+const shopUploadFields = [
+  { name: "image", maxCount: 1 },
+  { name: "icon", maxCount: 1 },
+];
 
 router.post(
   "/add-shop",
-  shopController.upload.fields([{ name: "image" }, { name: "icon" }]),
+  multerInstance.fields(shopUploadFields),
   shopController.addShop
 );
 router.put(
   "/update-shop/:shopId",
-  shopController.upload.fields([{ name: "image" }, { name: "icon" }]),
+  multerInstance.fields(shopUploadFields),
   shopController.updateShop
 );
 router.patch("/delete-shop/:shopId", shopController.deleteShop);

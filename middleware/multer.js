@@ -1,7 +1,7 @@
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
-
+const uploadPath = process.env.UPLOAD_PATH
 const imageFileFilter = (req, file, cb) => {
   if (
     file.mimetype.startsWith("image/jpeg") ||
@@ -27,13 +27,18 @@ const bannerStorage = multer.diskStorage({
     } else {
       folder = "others";
     }
+   
+    // const uploadPath = path.join(__dirname, `../public/uploads/${folder}`);
+    // const uploadPathV = path.join('public','uploads',folder);
+    // console.log(uploadPathV);
+    const uploadPathFolder = path.join(uploadPath,folder);
+    console.log(uploadPathFolder)
 
-    const uploadPath = path.join(__dirname, `../public/uploads/${folder}`);
-    fs.mkdir(uploadPath, { recursive: true }, (err) => {
+    fs.mkdir(uploadPathFolder, { recursive: true }, (err) => {
       if (err) {
         return cb(err);
       }
-      cb(null, uploadPath);
+      cb(null, uploadPathFolder);
     });
   },
 

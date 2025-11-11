@@ -4,44 +4,46 @@ const fs = require("fs");
 const path = require("path");
 const bcrypt = require("bcrypt");
 const { startOfMonth, endOfMonth, subMonths } = require("date-fns");
-const { deletefile, deleteFileWithFolderName } = require("../utils/deleteFile");
 const createToken = require("../utils/createToken");
 
-const User = require("../models/User");
-const Feedback = require("../models/Feedback");
-const Complaint = require("../models/Complaint");
-const UserOtp = require("../models/Otp");
+// const User = require("../models/User");
+// const Feedback = require("../models/Feedback");
+// const Complaint = require("../models/Complaint");
+// const UserOtp = require("../models/Otp");
 const { sendEmail } = require("../utils/nodemailer");
 const { hashData } = require("../utils/hashData");
 const { where, Op, fn, literal, col } = require("sequelize");
 const sendSMS = require("../utils/tiwilio");
-const Shop = require("../models/Shop");
-const HealthcareProvider = require("../models/MedDirectory");
-const VehicleService = require("../models/VehicleService");
-const Worker = require("../models/Worker");
-const Classified = require("../models/Classified");
-const Type = require("../models/Type");
-const Category = require("../models/Category");
-const UserCoupen = require("../models/userCoupon");
+// const Shop = require("../models/Shop");
+// const HealthcareProvider = require("../models/MedDirectory");
+// const VehicleService = require("../models/VehicleService");
+// const Worker = require("../models/Worker");
+// const Classified = require("../models/Classified");
+// const Type = require("../models/Type");
+// const Category = require("../models/Category");
+// const UserCoupon = require("../models/userCoupon");
+const {
+  Shop,
+  HealthcareProvider,
+  VehicleService,
+  Worker,
+  Classified,
+  Type,
+  Category,
+  UserCoupen,
+  User,
+  Feedback,
+  Complaint,
+  UserOtp,
+} = require("../models");
+const { cleanupFiles,deleteFileWithFolderName,processImageFields } = require("../utils/fileHandler");
 
-const uploadPath = path.join(__dirname, "../public/uploads/userImages");
-
-if (!fs.existsSync(uploadPath)) {
-  fs.mkdirSync(uploadPath, { recursive: true });
-}
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadPath);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = `${Date.now()}-${file.originalname}`;
-    cb(null, uniqueSuffix);
-  },
-});
-const upload = multer({ storage });
-
+const UPLOAD_SUBFOLDER = "userImages";
+const UPLOAD_PATH = process.env.UPLOAD_PATH;
+const userProcessingConfig = {
+  image: { width: 1024 },
+};
 module.exports = {
-  upload,
   registerUser: async (req, res) => {
     try {
       const { userName, email, password, phone, otp } = req.body;
@@ -118,39 +120,42 @@ module.exports = {
     }
   },
   editUser: async (req, res) => {
+    let processedFiles;
     try {
-      const user = await User.findByPk(req.user.id);
+      const user = await User.findByPk(39);
       if (!user) {
-        await deleteFileWithFolderName(uploadPath, req.file?.filename);
         res.status(409).json({
           success: false,
           message: "user not found",
         });
       }
-      const oldImage = user.image;
-      try {
-        if (req.file?.filename) {
-          if (oldImage) {
-            const coverPath = path.join(uploadPath, oldImage);
-            if (fs.existsSync(coverPath)) {
-              fs.unlinkSync(coverPath);
-            }
-          }
-        }
-      } catch (error) {
-        console.log("error on deleting old user image: ", error);
+      processedFiles = await processImageFields(
+        req.files,
+        userProcessingConfig,
+        UPLOAD_SUBFOLDER
+      );
+      const { ...bodyData } = req.body;
+      if (processedFiles.image && user.image) {
+        const oldFilename = path.basename(user.image);
+        const oldFilePath = path.join(UPLOAD_PATH, UPLOAD_SUBFOLDER);
+        await deleteFileWithFolderName(oldFilePath, oldFilename);
       }
-      const updatedUserData = {
-        ...req.body,
-        image: req.file ? req.file.filename : null,
-      };
-      await user.update(updatedUserData);
+      for (const key in bodyData) {
+        if (bodyData[key] !== null && bodyData[key] !== undefined) {
+          user[key] = bodyData[key];
+        }
+      }
+      if (processedFiles.image) {
+        user.image = processedFiles.image.filename;
+      }
+      const updatedUser = await user.save();
       res.status(200).json({
         success: true,
+        user: updatedUser,
         message: "User updated successfully",
       });
     } catch (error) {
-      await deleteFileWithFolderName(uploadPath, req.file?.filename);
+      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       console.log(error);
       res.status(500).json({
         success: false,
@@ -177,89 +182,7 @@ module.exports = {
           message: "invalid email or phone, or account is not registered..!",
         });
       }
-      // if (verificationMethod === "password") {
-      //   const isMatch = await bcrypt.compare(password, user.password);
-      //   if (!isMatch) {
-      //     res.status(401).json({
-      //       success: false,
-      //       message: "invalid password..!",
-      //     });
-      //   }
-      //   const tokenData = { userId: user.id, email: user.email };
-      //   const token = await createToken(tokenData);
-      //   if (!token) {
-      //     res.status(401).json({
-      //       success: false,
-      //       message: "An error occured while creating jwt Token",
-      //     });
-      //   }
-      //   res.cookie("jwt", token, {
-      //     httpOnly: true,
-      //     secure: process.env.NODE_ENV === "production",
-      //     sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-      //     maxAge: 1000 * 60 * 60 * 24 * 7,
-      //   });
-      //   res.status(200).json({
-      //     success: true,
-      //     result: user,
-      //   });
-      // } else {
-      //   const otpEntry = await UserOtp.findOne({
-      //     where: {
-      //       userId: user.id,
-      //       loginOTP: otp,
-      //     },
-      //   });
-      //   if (!otpEntry) {
-      //     return res.status(404).json({
-      //       success: false,
-      //       message: "Invalid OTP",
-      //     });
-      //   }
-      //   if (otpEntry.expiresAt < Date.now()) {
-      //     return res.status(410).json({
-      //       success: false,
-      //       message: "OTP Expired",
-      //     });
-      //   }
-      //   const tokenData = { userId: user.id, email: user.email };
-      //   const token = await createToken(tokenData);
-      //   if (!token) {
-      //     res.status(401).json({
-      //       success: false,
-      //       message: "An error occured while creating jwt Token",
-      //     });
-      //   }
-      //   res.cookie("jwt", token, {
-      //     httpOnly: true,
-      //     secure: process.env.NODE_ENV === "production",
-      //     sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-      //     maxAge: 1000 * 60 * 60 * 24 * 7,
-      //   });
-      //   await otpEntry.destroy();
-      //   res.status(200).json({
-      //     success: true,
-      //     result: user,
-      //   });
-      // }
-      // const otpEntry = await UserOtp.findOne({
-      //   where: {
-      //     email,
-      //     otp,
-      //   },
-      // });
-      // if (!otpEntry) {
-      //   return res.status(404).json({
-      //     success: false,
-      //     message: "Invalid OTP",
-      //   });
-      // }
-      // if (otpEntry.expiresAt < Date.now()) {
-      //   return res.status(410).json({
-      //     success: false,
-      //     message: "OTP Expired",
-      //   });
-      // }
+
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         return res.status(401).json({

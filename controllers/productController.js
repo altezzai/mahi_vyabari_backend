@@ -1,35 +1,30 @@
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
-const Product = require("../models/Product");
-const Shop = require("../models/Shop");
-const { deleteFileWithFolderName } = require("../utils/deleteFile");
+const {Shop,Product} = require("../models");
 const { Op } = require("sequelize");
+const { cleanupFiles,deleteFileWithFolderName,processImageFields } = require("../utils/fileHandler");
 
-const uploadPath = path.join(__dirname, "../public/uploads/productImages");
-if (!fs.existsSync(uploadPath)) {
-  fs.mkdirSync(uploadPath, { recursive: true });
-}
+const UPLOAD_SUBFOLDER = "productImages";
+const UPLOAD_PATH = process.env.UPLOAD_PATH;
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadPath);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = `${Date.now()}-${file.originalname}`;
-    cb(null, uniqueSuffix);
-  },
-});
-
-const upload = multer({ storage });
+const productProcessingConfig = {
+  image: { width: 1024 },
+};
 
 module.exports = {
-  upload,
   addProduct: async (req, res) => {
+    let processedFiles;
     try {
+      processedFiles = await processImageFields(
+        req.files,
+        productProcessingConfig,
+        UPLOAD_SUBFOLDER
+      );
+      console.log(processedFiles)
       const productData = {
         ...req.body,
-        image: req.file ? req.file.filename : null,
+        image: processedFiles.image.filename || null,
       };
       const savedProduct = await Product.create(productData);
       if (!savedProduct) {
@@ -42,7 +37,7 @@ module.exports = {
         result: savedProduct,
       });
     } catch (error) {
-      await deleteFileWithFolderName(uploadPath, req.file?.filename);
+      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       console.log(error);
       return res.status(401).json({
         success: false,
@@ -51,44 +46,38 @@ module.exports = {
     }
   },
   updateProduct: async (req, res) => {
-    const {
-      shopId,
-      productName,
-      originalPrice,
-      offerPrice,
-      offerPercentage,
-      description,
-    } = req.body;
+    let processedFiles;
     try {
       const { id } = req.params;
       let product = await Product.findByPk(id);
       if (!product) {
-        await deleteFileWithFolderName(uploadPath, req.file.filename);
         return res
           .status(404)
           .json({ success: false, message: "Product not found" });
       }
-      let newImage = product.image;
-      if (req.file) {
-        if (product.image) {
-          const oldImagePath = path.join(uploadPath, product.image);
-          if (fs.existsSync(oldImagePath)) {
-            fs.unlinkSync(oldImagePath);
-          }
-        }
-        newImage = req.file.filename;
+      processedFiles = await processImageFields(
+        req.files,
+        productProcessingConfig,
+        UPLOAD_SUBFOLDER
+      );
+      const { ...bodyData } = req.body;
+      if (processedFiles.image && product.image) {
+        const oldFilename = path.basename(product.image);
+        const oldFilePath = path.join(UPLOAD_PATH, UPLOAD_SUBFOLDER);
+        await deleteFileWithFolderName(oldFilePath, oldFilename);
       }
-      await product.update({
-        shopId,
-        productName,
-        originalPrice,
-        offerPrice: offerPrice || product.offerPrice,
-        offerPercentage: offerPercentage || product.offerPercentage,
-        description: description || product.description,
-        image: newImage,
-      });
-      return res.status(200).json({ success: true, product });
+      for (const key in bodyData) {
+        if (bodyData[key] !== null && bodyData[key] !== undefined) {
+          product[key] = bodyData[key];
+        }
+      }
+      if (processedFiles.image) {
+        product.image = processedFiles.image.filename;
+      }
+      const updatedProduct = await product.save();
+      return res.status(200).json({ success: true, product: updatedProduct });
     } catch (error) {
+      await cleanupFiles(processedFiles,UPLOAD_SUBFOLDER);
       console.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }

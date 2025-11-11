@@ -4,50 +4,52 @@ const Shop = require("./Shop");
 const User = require("./User");
 const ShopCoupon = require("./shopCoupon");
 
-const UserCoupen = sequelize.define(
-  "UserCoupen",
-  {
-    shopId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: Shop,
-        key: "id",
+module.exports = (sequelize, DataTypes) => {
+  const UserCoupon = sequelize.define(
+    "UserCoupon",
+    {
+      shopId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: Shop,
+          key: "id",
+        },
+        onDelete: "CASCADE",
       },
-      onDelete: "CASCADE",
-    },
-    userId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: User,
-        key: "id",
+      userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: User,
+          key: "id",
+        },
+      },
+      assignedCount: {
+        type: DataTypes.INTEGER,
+      },
+      couponIdFrom: {
+        type: DataTypes.INTEGER,
+        unique: true,
+      },
+      couponIdTo: {
+        type: DataTypes.INTEGER,
+        unique: true,
       },
     },
-    assignedCount: {
-      type: DataTypes.INTEGER,
-    },
-    couponIdFrom: {
-      type: DataTypes.INTEGER,
-      unique: true,
-    },
-    couponIdTo: {
-      type: DataTypes.INTEGER,
-      unique: true,
-    },
-  },
-  {
-    tableName: "usercoupons",
-    timestamps: true,
-  }
-);
+    {
+      tableName: "usercoupons",
+      timestamps: true,
+    }
+  );
+  return UserCoupon;
+};
+// User.hasMany(UserCoupen, { foreignKey: "userId", as: "userCoupons" });
+// UserCoupen.belongsTo(User, { foreignKey: "userId", as: "user" });
+// Shop.hasMany(UserCoupen, { foreignKey: "shopId", as: "userCoupons" });
+// UserCoupen.belongsTo(Shop, { foreignKey: "shopId", as: "shop" });
 
-User.hasMany(UserCoupen, { foreignKey: "userId", as: "userCoupons" });
-UserCoupen.belongsTo(User, { foreignKey: "userId", as: "user" });
-Shop.hasMany(UserCoupen, { foreignKey: "shopId", as: "userCoupons" });
-UserCoupen.belongsTo(Shop, { foreignKey: "shopId", as: "shop" });
+// ShopCoupon.hasMany(UserCoupen, { foreignKey: "shopId", as: "userCoupons" });
+// UserCoupen.belongsTo(ShopCoupon, { foreignKey: "shopId", targetKey: "shopId", as: "shopCoupon" });
 
-ShopCoupon.hasMany(UserCoupen, { foreignKey: "shopId", as: "userCoupons" });
-UserCoupen.belongsTo(ShopCoupon, { foreignKey: "shopId", targetKey: "shopId", as: "shopCoupon" });
-
-module.exports = UserCoupen;
+// module.exports = UserCoupen;

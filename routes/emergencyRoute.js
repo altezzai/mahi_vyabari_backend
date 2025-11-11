@@ -4,16 +4,18 @@ const router = express.Router();
 const emergencyController = require("../controllers/emergencyController");
 const userAuth = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
-router.use(userAuth, authorizeRoles("admin"));
+const multerInstance = require("../middleware/upload");
+// router.use(userAuth, authorizeRoles("admin"));
+const emergencyUploadFields = [{ name: "icon", maxCount: 1 }];
 
 router.post(
   "/add-emergency",
-  emergencyController.upload.single("icon"),
+  multerInstance.fields(emergencyUploadFields),
   emergencyController.addEmergency
 );
 router.put(
   "/update-emergency/:id",
-  emergencyController.upload.single("icon"),
+  multerInstance.fields(emergencyUploadFields),
   emergencyController.updateEmergency
 );
 router.patch("/delete-emergency/:id", emergencyController.deleteEmergency);

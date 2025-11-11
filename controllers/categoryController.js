@@ -2,50 +2,48 @@ require("../config/database");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
-const Category = require("../models/Category");
-const Type = require("../models/Type");
-const { deleteFileWithFolderName } = require("../utils/deleteFile");
+const { Category, Type } = require("../models");
 const { Op } = require("sequelize");
+const { cleanupFiles,deleteFileWithFolderName,processImageFields } = require("../utils/fileHandler");
 
-const uploadPath = path.join(__dirname, "../public/uploads/categoryImages");
-if (!fs.existsSync(uploadPath)) {
-  fs.mkdirSync(uploadPath, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadPath);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = `${Date.now()}-${file.originalname}`;
-    cb(null, uniqueSuffix);
-  },
-});
-
-const upload = multer({ storage });
+const UPLOAD_SUBFOLDER = "categoryImages";
+const UPLOAD_PATH = process.env.UPLOAD_PATH;
+const categoryProcessingConfig = {
+  icon: { width: 150 },
+};
 
 module.exports = {
-  upload,
   addCategory: async (req, res) => {
+    let processedFiles;
     try {
-      const categoryData = {
-        ...req.body,
-        icon: req.file ? req.file.filename : null,
-      };
-      const savedCategory = await Category.create(categoryData);
-      if (!savedCategory) {
-        await deleteFileWithFolderName(uploadPath, req.file?.filename);
-        res.status(404).json({
-          success: false,
-          message: "Can't upload Category Data",
-        });
+      const { typeId, categoryName, description, userId } = req.body;
+      if (!typeId || !categoryName) {
+        return res
+          .status(400)
+          .json({ error: "typeId and categoryName are required." });
       }
-      res.status(200).json({
-        success: true,
-        data: savedCategory,
+      processedFiles = await processImageFields(
+        req.files,
+        categoryProcessingConfig,
+        UPLOAD_SUBFOLDER
+      );
+      const newCategory = await Category.creat({
+        typeId,
+        categoryName,
+        description,
+        userId,
+        icon: processedFiles.icon?.filename || null,
+        trash: false,
+      });
+      res.status(201).json({
+        message: "Category created successfully!",
+        category: newCategory,
       });
     } catch (error) {
-      await deleteFileWithFolderName(uploadPath, req.file?.filename);
+      console.error(
+        "Error during category creation, cleaning up uploaded files..."
+      );
+      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       console.log(error);
       res.status(500).json({
         success: false,
@@ -54,37 +52,42 @@ module.exports = {
     }
   },
   updateCategory: async (req, res) => {
-    const { userId, typeId, categoryName, description } = req.body;
+    let processedFiles;
     try {
       const { id } = req.params;
       const category = await Category.findByPk(id);
       if (!category) {
-        res.status(400).json({ success: false, message: "Category not found" });
+        return res
+          .status(404)
+          .json({ error: `Category with ID ${id} not found.` });
       }
-      let newIcon = null;
-      if (req.file) {
-        if (category.icon) {
-          const oldImagePath = path.join(uploadPath, category.icon);
-          if (fs.existsSync(oldImagePath)) {
-            fs.unlinkSync(oldImagePath);
-          }
+      processedFiles = await processImageFields(
+        req.files,
+        categoryProcessingConfig,
+        UPLOAD_SUBFOLDER
+      );
+      const { ...bodyData } = req.body;
+
+      if (processedFiles.icon && category.icon) {
+        const oldFilename = path.basename(category.icon);
+        const oldFilePath = path.join(UPLOAD_PATH, UPLOAD_SUBFOLDER);
+        await deleteFileWithFolderName(oldFilePath, oldFilename);
+      }
+      for (const key in bodyData) {
+        if (bodyData[key] !== null && bodyData[key] !== undefined) {
+          category[key] = bodyData[key];
         }
-        newIcon = req.file.filename;
       }
-      await category.update({
-        userId: userId || category.userId,
-        typeId: typeId || category.typeId,
-        categoryName: categoryName || category.categoryName,
-        description: description || category.description,
-        icon: newIcon,
-      });
+      if (processedFiles.icon) {
+        category.icon = processedFiles.icon.filename;
+      }
+      const updatedCategory = await category.save();
       res.status(200).json({
-        success: true,
-        message: "Category updated successfully",
-        category,
+        message: `Category ${updatedCategory.id} updated successfully!`,
+        category: updatedCategory,
       });
     } catch (error) {
-      console.error("Error updating category:", error);
+      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       res
         .status(500)
         .json({ success: false, message: "Error updating category" });

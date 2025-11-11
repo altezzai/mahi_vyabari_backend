@@ -9,6 +9,9 @@ const {
   authLimiter,
   apiLimiter,
 } = require("../middleware/rateLimiter");
+const multerInstance = require("../middleware/upload");
+
+const userUploadFields = [{ name: "image", maxCount: 1 }];
 
 router.get("/me", userAuth, userController.getCurrentUser);
 router.post("/send-register-otp", otpLimiter, userController.sendVerifyOtp);
@@ -27,9 +30,9 @@ router.post("/logout", userAuth, userController.Logout);
 // router.post("/send-login-otp", userController.sendLoginOtp);
 router.put(
   "/edit-user",
-  userAuth,
-  authorizeRoles("user", "shop"),
-  userController.upload.single("image"),
+  // userAuth,
+  // authorizeRoles("user", "shop"),
+  multerInstance.fields(userUploadFields),
   userController.editUser
 );
 // router.get(

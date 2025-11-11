@@ -11,7 +11,7 @@ const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const compression = require("compression");
 const allowOrigins = [process.env.CLIENT_URL];
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 
 const shopRouter = require("./routes/shopRoute");
 const productRouter = require("./routes/productRoute");

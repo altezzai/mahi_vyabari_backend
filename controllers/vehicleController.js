@@ -2,32 +2,27 @@ require("../config/database");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
-const VehicleSchedule = require("../models/VehicleSchedule");
-const VehicleService = require("../models/VehicleService");
-const { deleteFileWithFolderName } = require("../utils/deleteFile");
+// const VehicleSchedule = require("../models/VehicleSchedule");
+// const VehicleService = require("../models/VehicleService");
 const { Op } = require("sequelize");
-const Type = require("../models/Type");
-const Category = require("../models/Category");
+// const Type = require("../models/Type");
+// const Category = require("../models/Category");
+const {
+  VehicleSchedule,
+  VehicleService,
+  Type,
+  Category,
+} = require("../models");
+const { cleanupFiles,deleteFileWithFolderName,processImageFields } = require("../utils/fileHandler");
 
-const uploadPath = path.join(__dirname, "../public/uploads/Vehicle");
-if (!fs.existsSync(uploadPath)) {
-  fs.mkdirSync(uploadPath, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadPath);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = `${Date.now()}-${file.originalname}`;
-    cb(null, uniqueSuffix);
-  },
-});
-
-const upload = multer({ storage });
+const UPLOAD_SUBFOLDER = "vehicle";
+const UPLOAD_PATH = process.env.UPLOAD_PATH;
+const vehicleProcessingConfig = {
+  image: { width: 1024 },
+  icon: { width: 150 },
+};
 
 module.exports = {
-  upload,
   addVehicleSchedule: async (req, res) => {
     try {
       const savedSchedule = await VehicleSchedule.create(req.body);
@@ -210,11 +205,17 @@ module.exports = {
     }
   },
   addVehicleServiceProvider: async (req, res) => {
+    let processedFiles;
     try {
+      processedFiles = await processImageFields(
+        req.files,
+        vehicleProcessingConfig,
+        UPLOAD_SUBFOLDER
+      );
       const vehicleServiceData = {
         ...req.body,
-        image: req.files?.image?.[0]?.filename || null,
-        icon: req.files?.icon?.[0]?.filename || null,
+        image: processedFiles.image.filename || null,
+        icon: processedFiles.icon.filename || null,
       };
       const savedService = await VehicleService.create(vehicleServiceData);
       res.status(201).json({
@@ -222,8 +223,7 @@ module.exports = {
         result: savedService,
       });
     } catch (error) {
-      deleteFileWithFolderName(uploadPath, req.files?.image?.[0]?.filename);
-      deleteFileWithFolderName(uploadPath, req.files?.icon?.[0]?.filename);
+      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       console.log(error);
       res.status(500).json({
         success: false,
@@ -232,81 +232,49 @@ module.exports = {
     }
   },
   updateVehicleServiceProvider: async (req, res) => {
-    const {
-      ownerName,
-      category,
-      minFee,
-      vehicleNumber,
-      priority,
-      phone,
-      whatsapp,
-      description,
-      area,
-      address,
-    } = req.body;
+    let processedFiles;
     try {
       const { id } = req.params;
       const vehicleService = await VehicleService.findByPk(id);
       if (!vehicleService) {
-        await deleteFileWithFolderName(
-          uploadPath,
-          req.files?.image?.[0]?.filename
-        );
-        await deleteFileWithFolderName(
-          uploadPath,
-          req.files?.icon?.[0]?.filename
-        );
         return res
           .status(404)
           .json({ success: false, message: "Vehicle Service not found" });
       }
-      let newImage = vehicleService.image;
-      let newIcon = vehicleService.icon;
-      if (req.files?.image) {
-        if (vehicleService.image) {
-          const oldImagePath = path.join(uploadPath, vehicleService.image);
-          if (fs.existsSync(oldImagePath)) {
-            fs.unlinkSync(oldImagePath);
-          }
-        }
-        newImage = req.files.image[0].filename;
+      processedFiles = await processImageFields(
+        req.files,
+        vehicleProcessingConfig,
+        UPLOAD_SUBFOLDER
+      );
+      const { ...bodyData } = req.body;
+      if (processedFiles.image && vehicleService.image) {
+        const oldFilename = path.basename(vehicleService.image);
+        const oldFilePath = path.join(UPLOAD_PATH, UPLOAD_SUBFOLDER);
+        await deleteFileWithFolderName(oldFilePath, oldFilename);
       }
-      if (req.files?.icon) {
-        if (vehicleService.icon) {
-          const oldIconPath = path.join(uploadPath, vehicleService.icon);
-          if (fs.existsSync(oldIconPath)) {
-            fs.unlinkSync(oldIconPath);
-          }
-        }
-        newIcon = req.files.icon[0].filename;
+      if (processedFiles.icon && vehicleService.icon) {
+        const oldFilename = path.basename(vehicleService.icon);
+        const oldFilePath = path.join(UPLOAD_PATH, UPLOAD_SUBFOLDER);
+        await deleteFileWithFolderName(oldFilePath, oldFilename);
       }
-      await vehicleService.update({
-        ownerName,
-        category,
-        minFee,
-        vehicleNumber,
-        priority,
-        phone,
-        whatsapp,
-        description,
-        area,
-        address,
-        image: newImage,
-        icon: newIcon,
-      });
+      for (const key in bodyData) {
+        if (bodyData[key] !== null && bodyData[key] !== undefined) {
+          vehicleService[key] = bodyData[key];
+        }
+      }
+      if (processedFiles.image) {
+        vehicleService.image = processedFiles.image.filename;
+      }
+      if (processedFiles.icon) {
+        vehicleService.icon = processedFiles.icon.filename;
+      }
+      const updatedVehicleService = await vehicleService.save();
       return res.status(200).json({
         success: true,
-        data: vehicleService,
+        data: updatedVehicleService,
       });
     } catch (error) {
-      await deleteFileWithFolderName(
-        uploadPath,
-        req.files?.image?.[0]?.filename
-      );
-      await deleteFileWithFolderName(
-        uploadPath,
-        req.files?.icon?.[0]?.filename
-      );
+      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       console.error(error);
       return res.status(500).json({
         success: false,

@@ -4,16 +4,21 @@ const router = express.Router();
 const classifiedController = require("../controllers/classifiedController");
 const userAuth = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
-router.use(userAuth, authorizeRoles("admin"));
+const multerInstance = require("../middleware/upload");
+// router.use(userAuth, authorizeRoles("admin"));
+const classifiedUploadFields = [
+  { name: "image", maxCount: 1 },
+  { name: "icon", maxCount: 1 },
+];
 
 router.post(
   "/add-classified",
-  classifiedController.upload.fields([{ name: "image" }, { name: "icon" }]),
+  multerInstance.fields(classifiedUploadFields),
   classifiedController.addClassified
 );
 router.put(
   "/update-classified/:id",
-  classifiedController.upload.fields([{ name: "image" }, { name: "icon" }]),
+  multerInstance.fields(classifiedUploadFields),
   classifiedController.updateClassified
 );
 router.patch("/delete-classified/:id", classifiedController.deleteClassified);

@@ -1,9 +1,8 @@
 const { Op } = require("sequelize");
 const generatePassword = require("generate-password");
-const Customer = require("../models/User");
+const {Customer} = require("../models");
 const { hashData } = require("../utils/hashData");
 const { sendEmail } = require("../utils/nodemailer");
-const { use } = require("passport");
 
 module.exports = {
   getCustomers: async (req, res) => {

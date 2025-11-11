@@ -2,38 +2,29 @@ require("../config/database");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
-const Classified = require("../models/Classified");
-const Type = require("../models/Type");
-const { deleteFileWithFolderName } = require("../utils/deleteFile");
-const Category = require("../models/Category");
+const { Classified, Type, Category } = require("../models");
 const { Op } = require("sequelize");
+const { cleanupFiles,deleteFileWithFolderName ,processImageFields} = require("../utils/fileHandler");
 
-const uploadPath = path.join(__dirname, "../public/uploads/classified");
-
-if (!fs.existsSync(uploadPath)) {
-  fs.mkdirSync(uploadPath, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadPath);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = `${Date.now()}-${file.originalname}`;
-    cb(null, uniqueSuffix);
-  },
-});
-
-const upload = multer({ storage });
-
+const UPLOAD_PATH = process.env.UPLOAD_PATH;
+const UPLOAD_SUBFOLDER = "classified";
+const classifiedProcessingConfig = {
+  image: { width: 1024 },
+  icon: { width: 150 },
+};
 module.exports = {
-  upload,
   addClassified: async (req, res) => {
+    let processedFiles;
     try {
+      processedFiles = await processImageFields(
+        req.files,
+        classifiedProcessingConfig,
+        UPLOAD_SUBFOLDER
+      );
       const classifiedData = {
         ...req.body,
-        image: req.files?.image?.[0]?.filename || null,
-        icon: req.files?.icon?.[0]?.filename || null,
+        image: processedFiles.image?.filename || null,
+        icon: processedFiles.icon?.filename || null,
       };
       const savedClassified = await Classified.create(classifiedData);
       res.status(201).json({
@@ -41,14 +32,7 @@ module.exports = {
         savedShop: savedClassified,
       });
     } catch (error) {
-      await deleteFileWithFolderName(
-        uploadPath,
-        req.files?.image?.[0]?.filename
-      );
-      await deleteFileWithFolderName(
-        uploadPath,
-        req.files?.icon?.[0]?.filename
-      );
+      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       console.log(error);
       res.status(401).json({
         success: false,
@@ -57,80 +41,48 @@ module.exports = {
     }
   },
   updateClassified: async (req, res) => {
-    const {
-      category,
-      itemName,
-      price,
-      homeTown,
-      area,
-      address,
-      description,
-      priority,
-      phone,
-      whatsapp,
-    } = req.body;
+    let processedFiles;
     try {
       const { id } = req.params;
-      const item = await Classified.findByPk(id);
-      if (!item) {
-        await deleteFileWithFolderName(
-          uploadPath,
-          req.files?.image?.[0]?.filename
-        );
-        await deleteFileWithFolderName(
-          uploadPath,
-          req.files?.icon?.[0]?.filename
-        );
+      const classified = await Classified.findByPk(id);
+      if (!classified) {
         return res
           .status(404)
           .json({ success: false, message: "Item not found" });
       }
-      let newImage = item.image;
-      let newIcon = item.icon;
-      if (req.files?.image) {
-        if (item.image) {
-          const oldImagePath = path.join(uploadPath, item.image);
-          if (fs.existsSync(oldImagePath)) {
-            fs.unlinkSync(oldImagePath);
-          }
-        }
-        newImage = req.files.image[0].filename;
-      }
+      processedFiles = await processImageFields(
+        req.files,
+        classifiedProcessingConfig,
+        UPLOAD_SUBFOLDER
+      );
 
-      if (req.files?.icon) {
-        if (item.icon) {
-          const oldIconPath = path.join(uploadPath, item.icon);
-          if (fs.existsSync(oldIconPath)) {
-            fs.unlinkSync(oldIconPath);
-          }
-        }
-        newIcon = req.files.icon[0].filename;
+      if (processedFiles.image && classified.image) {
+        const oldFilename = path.basename(classified.image);
+        const oldFilePath = path.join(UPLOAD_PATH, UPLOAD_SUBFOLDER);
+        await deleteFileWithFolderName(oldFilePath, oldFilename);
       }
-      await item.update({
-        category: category || item.category,
-        itemName: itemName || item.itemName,
-        price: price || item.price,
-        homeTown: homeTown || item.homeTown,
-        area: area || item.area,
-        address: address || item.address,
-        description: description || item.description,
-        priority: priority || item.priority,
-        phone: phone || item.phone,
-        whatsapp: whatsapp || item.whatsapp,
-        image: newImage,
-        icon: newIcon,
-      });
-      return res.status(200).json({ success: true, item });
+      if (processedFiles.icon && classified.icon) {
+        const oldFilename = path.basename(classified.icon);
+        const oldFilePath = path.join(UPLOAD_PATH, UPLOAD_SUBFOLDER);
+        await deleteFileWithFolderName(oldFilePath, oldFilename);
+      }
+      const { ...bodyData } = req.body;
+      for (const key in bodyData) {
+        if (bodyData[key] !== null && bodyData[key] !== undefined) {
+          classified[key] = bodyData[key];
+        }
+      }
+      if (processedFiles.image) {
+        classified.image = processedFiles.image.filename;
+      }
+      if (processedFiles.icon) {
+        classified.icon = processedFiles.icon.filename;
+      }
+      const updatedClassified = await classified.save();
+      return res.status(200).json({ success: true, item: updatedClassified });
     } catch (error) {
       console.log(error);
-      await deleteFileWithFolderName(
-        uploadPath,
-        req.files?.image?.[0]?.filename
-      );
-      await deleteFileWithFolderName(
-        uploadPath,
-        req.files?.icon?.[0]?.filename
-      );
+      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       return res.status(500).json({ success: false, message: error.message });
     }
   },

@@ -1,10 +1,6 @@
-const Shop = require("../models/Shop");
-const ShopCoupon = require("../models/shopCoupon");
-const UserCoupon = require("../models/userCoupon");
 const sequelize = require("../config/database");
 const { Op, Sequelize, literal } = require("sequelize");
-const User = require("../models/User");
-const Tourism = require("../models/Tourism");
+const {User,ShopCoupon,UserCoupon,Shop} = require("../models");
 
 module.exports = {
   requestCoupon: async (req, res) => {
