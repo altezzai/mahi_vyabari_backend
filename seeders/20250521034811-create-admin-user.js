@@ -14,7 +14,7 @@ module.exports = {
         password: hashedPassword,
         phone: null,
         image: null,
-        area: null,
+        area_id: null,
         couponCount: 0,
         status: "active",
         role: "admin",

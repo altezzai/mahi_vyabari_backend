@@ -82,14 +82,8 @@ module.exports = (sequelize, DataTypes) => {
           isIn: [["A", "B", "C"]],
         },
       },
-      area: {
-        type: DataTypes.INTEGER.UNSIGNED,
-        references: {
-          model: "areas",
-          key: "id",
-        },
-        onDelete: "CASCADE",
-        onUpdate: "CASCADE",
+      area_id: {
+        type: DataTypes.INTEGER,
       },
       trash: {
         type: DataTypes.BOOLEAN,

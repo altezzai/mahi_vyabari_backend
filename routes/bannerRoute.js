@@ -25,7 +25,7 @@ router.put(
   // userAuth,
   // authorizeRoles("admin"),
   // uploadBannerImages,
-   multerInstance.fields(banner_uploadFields),
+  multerInstance.fields(banner_uploadFields),
   bannerController.updateBanner
 );
 router.get(

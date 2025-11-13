@@ -1,9 +1,13 @@
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
-const {Shop,Product} = require("../models");
+const { Shop, Product } = require("../models");
 const { Op } = require("sequelize");
-const { cleanupFiles,deleteFileWithFolderName,processImageFields } = require("../utils/fileHandler");
+const {
+  cleanupFiles,
+  deleteFileWithFolderName,
+  processImageFields,
+} = require("../utils/fileHandler");
 
 const UPLOAD_SUBFOLDER = "productImages";
 const UPLOAD_PATH = process.env.UPLOAD_PATH;
@@ -21,7 +25,7 @@ module.exports = {
         productProcessingConfig,
         UPLOAD_SUBFOLDER
       );
-      console.log(processedFiles)
+      console.log(processedFiles);
       const productData = {
         ...req.body,
         image: processedFiles.image[0].filename || null,
@@ -77,7 +81,7 @@ module.exports = {
       const updatedProduct = await product.save();
       return res.status(200).json({ success: true, product: updatedProduct });
     } catch (error) {
-      await cleanupFiles(processedFiles,UPLOAD_SUBFOLDER);
+      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       console.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
@@ -106,6 +110,8 @@ module.exports = {
           "productName",
           "originalPrice",
           "offerPrice",
+          "offerPercentage",
+          "image",
           "trash",
         ],
         include: [

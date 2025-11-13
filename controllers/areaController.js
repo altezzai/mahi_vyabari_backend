@@ -8,7 +8,7 @@ const { Area } = require("../models");
 const createArea = async (req, res) => {
   try {
     const { name } = req.body;
-    console.log(req.body);
+
     if (!name) {
       return res.status(400).json({ error: 'Area "name" is required.' });
     }
@@ -192,5 +192,5 @@ module.exports = {
   restoreArea,
   getAreas, // <-- Added new method
   getAllAreas, // <-- Added new method
-  getAreaById
+  getAreaById,
 };

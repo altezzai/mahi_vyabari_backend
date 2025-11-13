@@ -1,14 +1,14 @@
-'use strict';
+"use strict";
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('area', {
+    await queryInterface.createTable("areas", {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true,
       },
-      area: {
+      name: {
         type: Sequelize.STRING,
         allowNull: false,
         unique: true,
@@ -29,6 +29,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('area');
-  }
+    await queryInterface.dropTable("areas");
+  },
 };

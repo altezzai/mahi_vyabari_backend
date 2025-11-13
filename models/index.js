@@ -118,26 +118,27 @@ UserCoupon.belongsTo(ShopCoupon, {
   as: "shopCoupon",
 });
 
-Area.hasMany(Shop, { foreignKey: "area" });
-Shop.belongsTo(Area, { foreignKey: "area" });
+Area.hasMany(Shop, { foreignKey: "area_id" });
+Shop.belongsTo(Area, { foreignKey: "area_id" });
 
-Area.hasMany(Classified, { foreignKey: "area" });
-Classified.belongsTo(Area, { foreignKey: "area" });
+Area.hasMany(Classified, { foreignKey: "area_id" });
+Classified.belongsTo(Area, { foreignKey: "area_id" });
 
-Area.hasMany(HealthcareProvider, { foreignKey: "area" });
-HealthcareProvider.belongsTo(Area, { foreignKey: "area" });
+Area.hasMany(HealthcareProvider, { foreignKey: "area_id" });
+HealthcareProvider.belongsTo(Area, { foreignKey: "area_id" });
 
-Area.hasMany(Tourism, { foreignKey: "area" });
-Tourism.belongsTo(Area, { foreignKey: "area" });
+Area.hasMany(Tourism, { foreignKey: "area_id" });
+Tourism.belongsTo(Area, { foreignKey: "area_id" });
 
-Area.hasMany(VehicleService, { foreignKey: "area" });
-VehicleService.belongsTo(Area, { foreignKey: "area" });
+Area.hasMany(VehicleService, { foreignKey: "area_id" });
+VehicleService.belongsTo(Area, { foreignKey: "area_id" });
 
-Area.hasMany(Worker, { foreignKey: "area" });
-Worker.belongsTo(Area, { foreignKey: "area" });
+Area.hasMany(Worker, { foreignKey: "area_id" });
+Worker.belongsTo(Area, { foreignKey: "area_id" });
 
 // 4. (NEW) Tourism -> TourismImage (One-to-Many)
 Tourism.hasMany(TourismImage, { foreignKey: "tourismId", as: "images" });
+Tourism.belongsTo(Area, { foreignKey: "area_id" });
 TourismImage.belongsTo(Tourism, { foreignKey: "tourismId" });
 
 /**

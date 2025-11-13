@@ -57,10 +57,16 @@ module.exports = {
         type: Sequelize.STRING,
       },
       priority: {
-        type: Sequelize.ENUM("A","B","C"),
+        type: Sequelize.ENUM("A", "B", "C"),
       },
-      area: {
-        type: Sequelize.ENUM("mahe", "chokli", "palloor", "pandakkal"),
+      area_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: "areas",
+          key: "id", // Assuming 'id' is the primary key in the schools table
+        },
+        onDelete: "CASCADE",
       },
       trash: {
         type: Sequelize.BOOLEAN,
@@ -74,7 +80,9 @@ module.exports = {
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        defaultValue: Sequelize.literal(
+          "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+        ),
       },
     });
   },

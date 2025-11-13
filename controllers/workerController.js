@@ -5,7 +5,7 @@ const path = require("path");
 const { Op, where, col, Transaction } = require("sequelize");
 // const Type = require("../models/Type");
 // const Category = require("../models/Category");
-const { Type, Category, Worker, WorkerCategory } = require("../models");
+const { Type, Category, Worker, WorkerCategory, Area } = require("../models");
 const sequelize = require("../config/database");
 const {
   cleanupFiles,
@@ -163,7 +163,7 @@ module.exports = {
   },
   getWorkerProfiles: async (req, res) => {
     const search = req.query.search || "";
-    const area = req.query.area || null;
+    const area_id = req.query.area_id || null;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
@@ -172,6 +172,9 @@ module.exports = {
       whereCondition = {
         [Op.or]: [{ workerName: { [Op.like]: `%${search}%` } }],
       };
+    }
+    if (area_id) {
+      whereCondition.area_id = area_id;
     }
     try {
       const { count, rows: workers } = await Worker.findAndCountAll({
@@ -184,6 +187,10 @@ module.exports = {
             model: Category,
             attributes: ["id", "categoryName"],
             through: { attributes: [] },
+          },
+          {
+            model: Area,
+            attributes: ["id", "name"],
           },
         ],
         order: [["createdAt", "DESC"]],

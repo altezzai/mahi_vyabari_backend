@@ -7,10 +7,7 @@ const authorizeRoles = require("../middleware/roleMiddleware");
 const multerInstance = require("../middleware/upload");
 // router.use(userAuth, authorizeRoles("admin"));
 
-const categoryUploadFields = [
-  { name: "icon", maxCount: 1 },
-];
-
+const categoryUploadFields = [{ name: "icon", maxCount: 1 }];
 
 router.post("/add-type", categoryController.addType);
 router.patch("/delete-type/:id", categoryController.deleteType);

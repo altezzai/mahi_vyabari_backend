@@ -1,6 +1,6 @@
 const { Op } = require("sequelize");
 const generatePassword = require("generate-password");
-const {Customer} = require("../models");
+const { User } = require("../models");
 const { hashData } = require("../utils/hashData");
 const { sendEmail } = require("../utils/nodemailer");
 
@@ -10,7 +10,7 @@ module.exports = {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
-    let whereCondition = {role:"user"};
+    let whereCondition = { role: "user" };
     if (search) {
       whereCondition = {
         ...whereCondition,
@@ -21,7 +21,7 @@ module.exports = {
       };
     }
     try {
-      const { count, rows: customers } = await Customer.findAndCountAll({
+      const { count, rows: users } = await User.findAndCountAll({
         limit,
         offset,
         where: whereCondition,
@@ -41,7 +41,7 @@ module.exports = {
         count,
         totalPages,
         currentPage: page,
-        data: customers,
+        data: users,
       });
     } catch (error) {
       console.log(error);
@@ -51,15 +51,15 @@ module.exports = {
   getCustomerById: async (req, res) => {
     try {
       const { id } = req.params;
-      const customer = await Customer.findByPk(id, {
+      const users = await User.findByPk(id, {
         attributes: { exclude: ["password"] },
       });
-      if (!customer) {
+      if (!users) {
         return res
           .status(404)
-          .json({ success: false, message: "Customer not found" });
+          .json({ success: false, message: "users not found" });
       }
-      res.status(201).json({ success: true, customer });
+      res.status(201).json({ success: true, users });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ success: false, message: error.message });
@@ -68,10 +68,10 @@ module.exports = {
   addCustomer: async (req, res) => {
     const { userName, email } = req.body;
     try {
-      const customer = await Customer.findOne({
+      const users = await User.findOne({
         where: { email },
       });
-      if (customer) {
+      if (users) {
         return res
           .status(400)
           .json({ success: false, message: "Email already exists" });
@@ -100,8 +100,8 @@ module.exports = {
       </div>
     `;
       sendEmail(email, subject, message);
-      const newCustomer = await Customer.create(userData);
-      res.status(200).json({ success: true, newCustomer });
+      const newusers = await users.create(userData);
+      res.status(200).json({ success: true, newusers });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ success: false, message: error.message });
@@ -110,17 +110,17 @@ module.exports = {
   deleteCustomer: async (req, res) => {
     try {
       const { id } = req.params;
-      const customer = await Customer.findByPk(id);
-      if (!customer) {
+      const users = await User.findByPk(id);
+      if (!users) {
         return res
           .status(404)
-          .json({ success: true, message: "Customer Not Found" });
+          .json({ success: true, message: "users Not Found" });
       }
-      await customer.update({ trash: true });
+      await users.update({ trash: true });
       res.status(200).json({
         success: true,
-        message: "Customer deleted successfully",
-        data: customer,
+        message: "users deleted successfully",
+        data: users,
       });
     } catch (error) {
       console.log(error);
@@ -130,17 +130,17 @@ module.exports = {
   restoreCustomer: async (req, res) => {
     try {
       const { id } = req.params;
-      const customer = await Customer.findByPk(id);
-      if (!customer) {
+      const users = await User.findByPk(id);
+      if (!users) {
         return res
           .status(404)
-          .json({ success: true, message: "Customer Not Found" });
+          .json({ success: true, message: "users Not Found" });
       }
-      await customer.update({ trash: false });
+      await users.update({ trash: false });
       res.status(200).json({
         success: true,
-        message: "Customer restored successfully",
-        data: customer,
+        message: "users restored successfully",
+        data: users,
       });
     } catch (error) {
       console.log(error);

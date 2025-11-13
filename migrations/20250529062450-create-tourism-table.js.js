@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('tourism', {
+    await queryInterface.createTable("tourism", {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
@@ -14,13 +14,19 @@ module.exports = {
         allowNull: false,
       },
       images: {
-        type: Sequelize.TEXT
+        type: Sequelize.TEXT,
       },
       phone: {
         type: Sequelize.STRING,
       },
-      area: {
-        type: Sequelize.ENUM('mahe', 'chokli', 'palloor', 'pandakkal'),
+      area_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: "areas",
+          key: "id", // Assuming 'id' is the primary key in the schools table
+        },
+        onDelete: "CASCADE",
       },
       startTime: {
         type: Sequelize.STRING,
@@ -38,17 +44,17 @@ module.exports = {
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
     });
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('tourism');
+    await queryInterface.dropTable("tourism");
   },
 };

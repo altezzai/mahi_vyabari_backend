@@ -25,9 +25,11 @@ const {
   ShopCategory,
   WorkerCategory,
   Tourism,
+  TourismImage,
   Category,
   Product,
   Type,
+  Area,
 } = require("../models");
 // const { getWorkerCategory } = require("./workerController");
 
@@ -70,8 +72,19 @@ module.exports = {
       });
       const tourism = await Tourism.findAll({
         limit: 4,
-        attributes: ["id", "placeName", "image", "area"],
-        order: [["createdAt", "DESC"]],
+        attributes: ["id", "placeName"],
+        include: [
+          {
+            model: Area,
+            attributes: ["name"],
+          },
+          {
+            model: TourismImage,
+            as: "images",
+            attributes: ["image"],
+          },
+        ],
+        order: [["id", "DESC"]],
       });
       res.json({ success: true, shops: shops, tourism: tourism });
     } catch (error) {
@@ -82,7 +95,7 @@ module.exports = {
   getShops: async (req, res) => {
     try {
       const searchQuery = req.query.q || "";
-      const area = req.query.area || "";
+      const area_id = req.query.area_id || "";
       const category = req.query.category || "";
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 10;
@@ -94,10 +107,10 @@ module.exports = {
           shopName: { [Op.like]: `%${searchQuery}%` },
         };
       }
-      if (area) {
+      if (area_id) {
         whereCondition = {
           ...whereCondition,
-          area: area,
+          area_id: area_id,
         };
       }
       if (category) {
@@ -126,7 +139,7 @@ module.exports = {
           "image",
           "shopName",
           "priority",
-          "area",
+          "area_id",
           "phone",
           "openingTime",
           "closingTime",
@@ -138,12 +151,17 @@ module.exports = {
             attributes: ["id", "categoryName"],
             through: { attributes: [] },
           },
+          {
+            model: Area,
+            attributes: ["id", "name"],
+          },
         ],
         order: [["priority", "ASC"]],
       });
-      const totalPages = Math.ceil(count / limit);
+      const totalPages = Math.ceil(shops.length / limit);
       res.status(200).json({
         success: true,
+        totalCount: count,
         totalPages,
         currentPage: page,
         data: shops,
@@ -176,7 +194,7 @@ module.exports = {
           "closingTime",
           "workingDays",
           "priority",
-          "area",
+          "area_id",
           [
             Sequelize.literal(`(
               SELECT AVG(rating)
@@ -275,7 +293,7 @@ module.exports = {
   },
   getDoctors: async (req, res) => {
     const searchQuery = req.query.q || "";
-    const area = req.query.area || "";
+    const area_id = req.query.area_id || "";
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
@@ -289,10 +307,10 @@ module.exports = {
         ],
       };
     }
-    if (area) {
+    if (area_id) {
       whereCondition = {
         ...whereCondition,
-        area: area,
+        area_id: area_id,
       };
     }
     try {
@@ -305,7 +323,7 @@ module.exports = {
           "image",
           "category",
           "trash",
-          "area",
+          "area_id",
           "openingTime",
           "closingTime",
           "phone",
@@ -431,7 +449,7 @@ module.exports = {
   },
   getHospitals: async (req, res) => {
     const searchQuery = req.query.q || "";
-    const area = req.query.area || "";
+    const area_id = req.query.area_id || "";
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
@@ -445,17 +463,17 @@ module.exports = {
         ],
       };
     }
-    if (area) {
+    if (area_id) {
       whereCondition = {
         ...whereCondition,
-        area: area,
+        area_id: area_id,
       };
     }
     try {
       const { count, rows: hospitals } = await Medical.findAndCountAll({
         limit,
         offset,
-        attributes: ["id", "name", "image", "trash", "category", "area"],
+        attributes: ["id", "name", "image", "trash", "category", "area_id"],
         where: whereCondition,
         include: [
           {
@@ -527,7 +545,7 @@ module.exports = {
   },
   getVehicleServices: async (req, res) => {
     const searchQuery = req.query.q || "";
-    const area = req.query.area || "";
+    const area_id = req.query.area_id || "";
     const category = req.query.category || "";
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -539,10 +557,10 @@ module.exports = {
         ownerName: { [Op.like]: `%${searchQuery}%` },
       };
     }
-    if (area) {
+    if (area_id) {
       whereCondition = {
         ...whereCondition,
-        area: area,
+        area_id: area_id,
       };
     }
     if (category) {
@@ -605,7 +623,7 @@ module.exports = {
   },
   getLocalWorkers: async (req, res) => {
     const searchQuery = req.query.q || "";
-    const area = req.query.area || "";
+    const area_id = req.query.area_id || "";
     const category = req.query.category || "";
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -617,10 +635,10 @@ module.exports = {
         workerName: { [Op.like]: `%${searchQuery}%` },
       };
     }
-    if (area) {
+    if (area_id) {
       whereCondition = {
         ...whereCondition,
-        area: area,
+        area_id: area_id,
       };
     }
     if (category) {
@@ -644,7 +662,7 @@ module.exports = {
       const { count, rows: workers } = await Worker.findAndCountAll({
         limit,
         offset,
-        attributes: ["id", "workerName", "image", "area", "phone"],
+        attributes: ["id", "workerName", "image", "area_id", "phone"],
         where: whereCondition,
         order: [["priority", "ASC"]],
       });
@@ -674,7 +692,7 @@ module.exports = {
   },
   getClassifieds: async (req, res) => {
     const searchQuery = req.query.q || "";
-    const area = req.query.area || "";
+    const area_id = req.query.area_id || "";
     const category = req.query.category || "";
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -686,10 +704,10 @@ module.exports = {
         itemName: { [Op.like]: `%${searchQuery}%` },
       };
     }
-    if (area) {
+    if (area_id) {
       whereCondition = {
         ...whereCondition,
-        area: area,
+        area_id: area_id,
       };
     }
     if (category) {
@@ -750,30 +768,34 @@ module.exports = {
     }
   },
   getTourism: async (req, res) => {
-    const area = req.query.area || "";
+    const area_id = req.query.area_id || "";
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
     let whereCondition = { trash: false };
-    if (area) {
+    if (area_id) {
       whereCondition = {
         ...whereCondition,
-        area: area,
+        area_id: area_id,
       };
     }
     try {
       const { count, rows: tourism } = await Tourism.findAndCountAll({
         limit,
         offset,
-        attributes: [
-          "id",
-          "placeName",
-          [
-            Sequelize.literal(`JSON_UNQUOTE(JSON_EXTRACT(images, '$[0]'))`),
-            "image",
-          ],
-        ],
+        attributes: ["id", "placeName"],
         where: whereCondition,
+        include: [
+          {
+            model: TourismImage,
+            as: "images",
+            attributes: ["image"],
+          },
+          {
+            model: Area,
+            attributes: ["id", "name"],
+          },
+        ],
       });
       const totalPages = Math.ceil(count / limit);
       res
@@ -787,7 +809,16 @@ module.exports = {
   getTourismById: async (req, res) => {
     try {
       const { id } = req.params;
-      const tourism = await Tourism.findOne({ where: { id } });
+      const tourism = await Tourism.findOne({
+        where: { id },
+        include: [
+          {
+            model: TourismImage,
+            as: "images",
+            attributes: ["image"],
+          },
+        ],
+      });
       if (!tourism) {
         return res
           .status(404)
@@ -851,6 +882,19 @@ module.exports = {
         ],
       });
       return res.status(200).json({ success: true, classifiedCategories });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  getAreas: async (req, res) => {
+    try {
+      const areas = await Area.findAll({
+        where: { trash: false }, // Only get non-deleted areas
+        order: [["name", "ASC"]],
+        attributes: ["id", "name"],
+      });
+      return res.status(200).json({ success: true, areas });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ success: false, message: error.message });

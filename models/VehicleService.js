@@ -44,7 +44,7 @@ module.exports = (sequelize, DataTypes) => {
       description: {
         type: DataTypes.TEXT,
       },
-      area: {
+      area_id: {
         type: DataTypes.INTEGER.UNSIGNED,
         allowNull: false,
         references: {

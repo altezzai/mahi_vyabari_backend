@@ -46,8 +46,8 @@ module.exports = (sequelize, DataTypes) => {
       image: {
         type: DataTypes.STRING,
       },
-      area: {
-        type: DataTypes.STRING,
+      area_id: {
+        type: DataTypes.INTEGER,
       },
       couponCount: {
         type: DataTypes.INTEGER,

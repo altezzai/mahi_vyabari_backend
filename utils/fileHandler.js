@@ -50,24 +50,6 @@ const processImageFields = async (files, processingConfig, subfolder = "") => {
   const processedFiles = {};
 
   for (const fieldName in processingConfig) {
-    // if (files[fieldName] && files[fieldName][0]) {
-    //   console.log(`Found ${fieldName}, adding to processing queue.`);
-
-    //   const file = files[fieldName][0];
-    //   const resizeOptions = processingConfig[fieldName];
-    //   const originalName = file.originalname;
-    //   const promise = processImage(
-    //     file.buffer,
-    //     resizeOptions,
-    //     subfolder,
-    //     originalName
-    //   ).then((result) => {
-    //     processedFiles[fieldName] = result;
-    //   });
-    //   processingPromises.push(promise);
-    // }
-    // --- START FIX ---
-    // Check if files[fieldName] exists and is a non-empty array
     if (
       files[fieldName] &&
       Array.isArray(files[fieldName]) &&
@@ -86,7 +68,7 @@ const processImageFields = async (files, processingConfig, subfolder = "") => {
         const originalName = file.originalname;
 
         const promise = processImage(
-          file.buffer,
+          file.path,
           resizeOptions,
           subfolder,
           originalName
@@ -129,7 +111,7 @@ const cleanupFiles = async (processedFiles, subfolder) => {
   //     );
   //   }
   // }
-    // --- START FIX ---
+  // --- START FIX ---
   // Loop over each field name in the object (e.g., 'images')
   for (const fieldName in processedFiles) {
     const fileArray = processedFiles[fieldName];
@@ -139,8 +121,14 @@ const cleanupFiles = async (processedFiles, subfolder) => {
       for (const file of fileArray) {
         if (file && file.filename) {
           const filePath = path.join(UPLOAD_PATH, subfolder, file.filename);
-          console.log('Deleting orphaned file:', filePath);
-          cleanupPromises.push(fs.promises.unlink(filePath).catch(err => console.error("Cleanup failed for file:", filePath, err.message)));
+          console.log("Deleting orphaned file:", filePath);
+          cleanupPromises.push(
+            fs.promises
+              .unlink(filePath)
+              .catch((err) =>
+                console.error("Cleanup failed for file:", filePath, err.message)
+              )
+          );
         }
       }
     }
@@ -161,9 +149,37 @@ const deleteFileWithFolderName = async (uploadPath, filename) => {
     console.error("Error cleaning up" + filename + " files:", err);
   }
 };
+const compressAndSaveFile = async (file, uploadPath) => {
+  try {
+    const date = Date.now() + "-";
+    let processedFileName = `${date}${file.originalname}`;
+    let processedFile = file.buffer;
+
+    const ext = path.extname(file.originalname).toLowerCase();
+
+    if (file.mimetype.startsWith("image")) {
+      // Compress image
+      processedFileName = `${date}${file.originalname.split(".")[0]}.jpg`;
+      processedFile = await sharp(file.buffer).jpeg({ quality: 30 }).toBuffer();
+    }
+
+    const filePath = path.join(uploadPath, processedFileName);
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+
+    fs.writeFileSync(filePath, processedFile);
+
+    return processedFileName;
+  } catch (error) {
+    console.error("Error processing file:", error);
+    throw new Error("Error processing file");
+  }
+};
 module.exports = {
   processImageFields,
   cleanupFiles,
   deleteFileWithFolderName,
   processImage,
+  compressAndSaveFile,
 };

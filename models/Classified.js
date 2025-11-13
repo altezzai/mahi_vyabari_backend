@@ -29,14 +29,8 @@ module.exports = (sequelize, DataTypes) => {
       homeTown: {
         type: DataTypes.STRING,
       },
-      area: {
-        type: DataTypes.INTEGER.UNSIGNED,
-        references: {
-          model: "areas",
-          key: "id",
-        },
-        onDelete: "CASCADE",
-        onUpdate: "CASCADE",
+      area_id: {
+        type: DataTypes.INTEGER,
       },
       address: {
         type: DataTypes.TEXT,
@@ -78,4 +72,3 @@ module.exports = (sequelize, DataTypes) => {
   );
   return Classified;
 };
-

@@ -21,18 +21,17 @@
 
 // --- middleware/imageUpload.js ---
 
-const multer = require('multer');
+const multer = require("multer");
 
 const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image/')) {
+  if (file.mimetype.startsWith("image/")) {
     cb(null, true);
   } else {
-    cb(new Error('Invalid image file type'), false);
+    cb(new Error("Invalid image file type"), false);
   }
 };
-
 
 const multerInstance = multer({
   storage: storage,

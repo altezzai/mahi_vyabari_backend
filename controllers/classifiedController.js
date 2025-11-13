@@ -4,7 +4,11 @@ const fs = require("fs");
 const path = require("path");
 const { Classified, Type, Category } = require("../models");
 const { Op } = require("sequelize");
-const { cleanupFiles,deleteFileWithFolderName ,processImageFields} = require("../utils/fileHandler");
+const {
+  cleanupFiles,
+  deleteFileWithFolderName,
+  processImageFields,
+} = require("../utils/fileHandler");
 
 const UPLOAD_PATH = process.env.UPLOAD_PATH;
 const UPLOAD_SUBFOLDER = "classified";
@@ -122,7 +126,7 @@ module.exports = {
   },
   getClassifieds: async (req, res) => {
     const search = req.query.search || "";
-    const area = req.query.area || null;
+    const area_id = req.query.area_id || null;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
@@ -135,8 +139,8 @@ module.exports = {
         ],
       };
     }
-    if(area){
-      whereCondition.area = area
+    if (area_id) {
+      whereCondition.area_id = area_id;
     }
     try {
       const { count, rows: classifieds } = await Classified.findAndCountAll({

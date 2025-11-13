@@ -17,14 +17,8 @@ module.exports = (sequelize, DataTypes) => {
       phone: {
         type: DataTypes.STRING,
       },
-      area: {
-        type: DataTypes.INTEGER.UNSIGNED,
-        references: {
-          model: "areas",
-          key: "id",
-        },
-        onDelete: "CASCADE",
-        onUpdate: "CASCADE",
+      area_id: {
+        type: DataTypes.INTEGER,
       },
       startTime: {
         type: DataTypes.STRING,
@@ -46,6 +40,14 @@ module.exports = (sequelize, DataTypes) => {
       trash: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
       },
     },
     {

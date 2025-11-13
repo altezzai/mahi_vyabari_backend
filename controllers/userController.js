@@ -35,8 +35,13 @@ const {
   Feedback,
   Complaint,
   UserOtp,
+  Area,
 } = require("../models");
-const { cleanupFiles,deleteFileWithFolderName,processImageFields } = require("../utils/fileHandler");
+const {
+  cleanupFiles,
+  deleteFileWithFolderName,
+  processImageFields,
+} = require("../utils/fileHandler");
 
 const UPLOAD_SUBFOLDER = "userImages";
 const UPLOAD_PATH = process.env.UPLOAD_PATH;
@@ -316,7 +321,13 @@ module.exports = {
     try {
       const user = await User.findOne({
         where: { id },
-        attributes: ["id", "image", "userName", "email", "phone", "area"],
+        attributes: ["id", "image", "userName", "email", "phone"],
+        include: [
+          {
+            model: Area,
+            attributes: ["id", "name"],
+          },
+        ],
       });
       if (!user) {
         return res

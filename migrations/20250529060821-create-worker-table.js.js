@@ -19,10 +19,16 @@ module.exports = {
         type: Sequelize.DECIMAL(10, 2),
       },
       priority: {
-        type: Sequelize.ENUM("A","B","C"),
+        type: Sequelize.ENUM("A", "B", "C"),
       },
-      area: {
-        type: Sequelize.ENUM("mahe", "chokli", "palloor", "pandakkal"),
+      area_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: "areas",
+          key: "id", // Assuming 'id' is the primary key in the schools table
+        },
+        onDelete: "CASCADE",
       },
       phone: {
         type: Sequelize.STRING,

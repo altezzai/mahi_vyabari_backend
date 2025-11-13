@@ -4,7 +4,11 @@ const fs = require("fs");
 const path = require("path");
 const { Op } = require("sequelize");
 const { Category, Type, HealthcareProvider } = require("../models");
-const { cleanupFiles,deleteFileWithFolderName,processImageFields } = require("../utils/fileHandler");
+const {
+  cleanupFiles,
+  deleteFileWithFolderName,
+  processImageFields,
+} = require("../utils/fileHandler");
 
 const UPLOAD_SUBFOLDER = "medical";
 const UPLOAD_PATH = process.env.UPLOAD_PATH;
@@ -26,7 +30,9 @@ module.exports = {
         image: processedFiles.image?.[0].filename || null,
         icon: processedFiles.icon?.[0].filename || null,
       };
-      const savedMedicalDirectory = await HealthcareProvider.create(medDirectoryData);
+      const savedMedicalDirectory = await HealthcareProvider.create(
+        medDirectoryData
+      );
       res.status(201).json({
         success: true,
         result: savedMedicalDirectory,
@@ -137,7 +143,7 @@ module.exports = {
   },
   getMedicalDirectories: async (req, res) => {
     const search = req.query.search || "";
-    const area = req.query.area || null;
+    const area_id = req.query.area_id || null;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
@@ -150,17 +156,19 @@ module.exports = {
         ],
       };
     }
-    if(area){
-      whereCondition.area = area
+    if (area_id) {
+      whereCondition.area_id = area_id;
     }
     try {
-      const { count, rows: medical } = await HealthcareProvider.findAndCountAll({
-        limit,
-        offset,
-        attributes: ["id", "name", "priority", "category", "trash"],
-        where: whereCondition,
-        order: [["createdAt", "DESC"]],
-      });
+      const { count, rows: medical } = await HealthcareProvider.findAndCountAll(
+        {
+          limit,
+          offset,
+          attributes: ["id", "name", "priority", "category", "trash"],
+          where: whereCondition,
+          order: [["createdAt", "DESC"]],
+        }
+      );
       const totalPages = Math.ceil(count / limit);
       return res.status(200).json({
         success: true,

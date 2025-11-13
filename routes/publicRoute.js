@@ -25,5 +25,6 @@ router.get("/tourism/:id", publicController.getTourismById);
 router.get("/shop-categories", publicController.getShopCategories);
 router.get("/worker-categories", publicController.getWorkerCategory);
 router.get("/classified-categories", publicController.getClassifiedCategory);
+router.get("/areas", publicController.getAreas);
 
 module.exports = router;

@@ -33,7 +33,7 @@ const shopProcessingConfig = {
 
 module.exports = {
   addShop: async (req, res) => {
-    const { shopName, phone, areas, email } = req.body;
+    const { shopName, phone, area_id, email } = req.body;
     let processedShopFiles;
     let processedUserFiles;
     const t = await sequelize.transaction();
@@ -81,7 +81,7 @@ module.exports = {
           userName: shopName,
           email,
           phone,
-          areas,
+          area_id,
           password: await hashData(phone),
           role: "shop",
           image: processedUserFiles.image[0].filename || null,
@@ -97,10 +97,7 @@ module.exports = {
       });
 
       const finalShop = await Shop.findByPk(newShop.id, {
-        include: [
-          { model: Category },
-          { model: Area},
-        ],
+        include: [{ model: Category }, { model: Area }],
         transaction: t,
       });
       await t.commit();
@@ -121,7 +118,7 @@ module.exports = {
   },
   getShops: async (req, res) => {
     const search = req.query.search || "";
-    const area = req.query.area || null;
+    const area_id = req.query.area_id || null;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit || 0;
@@ -131,16 +128,31 @@ module.exports = {
         [Op.or]: [{ shopName: { [Op.like]: `%${search}%` } }],
       };
     }
+    if (area_id) {
+      whereCondition.area_id = area_id;
+    }
     try {
       const { count, rows: shops } = await Shop.findAndCountAll({
         limit,
         offset,
         where: whereCondition,
-        attributes: ["id", "shopName", "priority", "trash", "createdAt"],
+        attributes: [
+          "id",
+          "shopName",
+          "priority",
+          "icon",
+          "trash",
+          "createdAt",
+        ],
         include: [
           {
             model: Category,
             attributes: ["id", "categoryName"],
+            through: { attributes: [] },
+          },
+          {
+            model: Area,
+            attributes: ["id", "name"],
             through: { attributes: [] },
           },
         ],
@@ -163,6 +175,11 @@ module.exports = {
           {
             model: Category,
             attributes: ["id", "categoryName"],
+            through: { attributes: [] },
+          },
+          {
+            model: Area,
+            attributes: ["id", "name"],
             through: { attributes: [] },
           },
         ],
@@ -353,6 +370,7 @@ module.exports = {
   },
   getShopComplaints: async (req, res) => {
     const search = req.query.search || "";
+    const area_id = req.query.area_id || null;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
@@ -388,6 +406,13 @@ module.exports = {
             model: Shop,
             attributes: ["id", "shopName"],
             as: "shop",
+            where: area_id ? { area_id } : null,
+            include: [
+              {
+                model: Area,
+                attributes: ["id", "name"],
+              },
+            ],
           },
         ],
         order: [["createdAt", "DESC"]],
@@ -419,6 +444,12 @@ module.exports = {
             model: Shop,
             attributes: ["id", "shopName"],
             as: "shop",
+            include: [
+              {
+                model: Area,
+                attributes: ["id", "name"],
+              },
+            ],
           },
         ],
       });

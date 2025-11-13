@@ -64,8 +64,14 @@ module.exports = {
       priority: {
         type: Sequelize.CHAR(1),
       },
-      area: {
-        type: Sequelize.ENUM("mahe", "chokli", "palloor", "pandakkal"),
+      area_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: "areas",
+          key: "id", // Assuming 'id' is the primary key in the schools table
+        },
+        onDelete: "CASCADE",
       },
       trash: {
         type: Sequelize.BOOLEAN,
