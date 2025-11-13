@@ -19,6 +19,7 @@ const {
   cleanupFiles,
   deleteFileWithFolderName,
   processImageFields,
+  compressAndSaveFile,
 } = require("../utils/fileHandler");
 
 const UPLOAD_SUBFOLDER = "vehicle";
@@ -213,15 +214,22 @@ module.exports = {
   addVehicleServiceProvider: async (req, res) => {
     let processedFiles;
     try {
-      processedFiles = await processImageFields(
-        req.files,
-        vehicleProcessingConfig,
-        UPLOAD_SUBFOLDER
-      );
+      const iconPath = "uploads/taxi/icon/";
+      const imgPath = "uploads/taxi/";
+      let image = null;
+      let icon = null;
+
+      if (req.files?.icon) {
+        icon = await compressAndSaveFile(req.files.icon[0], iconPath);
+      }
+      if (req.files?.image) {
+        image = await compressAndSaveFile(req.files.image[0], imgPath);
+      }
+
       const vehicleServiceData = {
         ...req.body,
-        image: processedFiles.image[0].filename || null,
-        icon: processedFiles.icon[0].filename || null,
+        image: image || null,
+        icon: icon || null,
       };
       const savedService = await VehicleService.create(vehicleServiceData);
       res.status(201).json({
@@ -247,34 +255,30 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Vehicle Service not found" });
       }
-      processedFiles = await processImageFields(
-        req.files,
-        vehicleProcessingConfig,
-        UPLOAD_SUBFOLDER
-      );
+
       const { ...bodyData } = req.body;
-      if (processedFiles.image && vehicleService.image) {
-        const oldFilename = path.basename(vehicleService.image);
-        const oldFilePath = path.join(UPLOAD_PATH, UPLOAD_SUBFOLDER);
-        await deleteFileWithFolderName(oldFilePath, oldFilename);
-      }
-      if (processedFiles.icon && vehicleService.icon) {
-        const oldFilename = path.basename(vehicleService.icon);
-        const oldFilePath = path.join(UPLOAD_PATH, UPLOAD_SUBFOLDER);
-        await deleteFileWithFolderName(oldFilePath, oldFilename);
-      }
-      for (const key in bodyData) {
-        if (bodyData[key] !== null && bodyData[key] !== undefined) {
-          vehicleService[key] = bodyData[key];
+      const iconPath = "uploads/taxi/icon/";
+      const imgPath = "uploads/taxi/";
+      let icon = vehicleService.icon;
+      let image = vehicleService.image;
+      if (req.files?.icon) {
+        const oldFilename = vehicleService.icon;
+        icon = await compressAndSaveFile(req.files.icon[0], iconPath);
+        if (oldFilename) {
+          await deleteFileWithFolderName(iconPath, oldFilename);
         }
       }
-      if (processedFiles.image) {
-        vehicleService.image = processedFiles.image[0].filename;
+      if (req.files?.image) {
+        const oldFilename = vehicleService.image;
+        image = await compressAndSaveFile(req.files.image[0], imgPath);
+        await deleteFileWithFolderName(imgPath, oldFilename);
       }
-      if (processedFiles.icon) {
-        vehicleService.icon = processedFiles.icon[0].filename;
-      }
-      const updatedVehicleService = await vehicleService.save();
+
+      const updatedVehicleService = await vehicleService.update({
+        ...bodyData,
+        image: image || null,
+        icon: icon || null,
+      });
       return res.status(200).json({
         success: true,
         data: updatedVehicleService,

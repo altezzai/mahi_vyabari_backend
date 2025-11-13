@@ -11,6 +11,7 @@ const {
   cleanupFiles,
   deleteFileWithFolderName,
   processImageFields,
+  compressAndSaveFile,
 } = require("../utils/fileHandler");
 
 const UPLOAD_SUBFOLDER = "workers";
@@ -23,20 +24,36 @@ module.exports = {
   addWorkerProfile: async (req, res) => {
     let processedFiles;
     const t = await sequelize.transaction();
+    const iconPath = "uploads/taxi/icon/";
+    const imgPath = "uploads/taxi/";
     try {
-      processedFiles = await processImageFields(
-        req.files,
-        workerProcessingConfig,
-        UPLOAD_SUBFOLDER
-      );
+      let image = null;
+      let icon = null;
+
+      if (req.files?.icon) {
+        icon = await compressAndSaveFile(req.files.icon[0], iconPath);
+      }
+      if (req.files?.image) {
+        image = await compressAndSaveFile(req.files.image[0], imgPath);
+      }
+      const { categories, ...data } = req.body;
       const workerData = {
-        ...req.body,
-        image: processedFiles.image[0].filename || null,
-        icon: processedFiles.icon[0].filename || null,
+        ...data,
+        image: image || null,
+        icon: icon || null,
       };
+
       const newWorker = await Worker.create(workerData, { transaction: t });
-      if (newWorker.categories && newWorker.categories.length > 0) {
-        await newWorker.setCategories(newWorker.categories, { transaction: t });
+      let categoryList = [];
+      if (Array.isArray(req.body.categories)) {
+        categoryList = req.body.categories.map((c) => parseInt(c));
+      }
+      if (categoryList.length > 0) {
+        const workerCategoryData = categoryList.map((category_id) => ({
+          workerId: newWorker.id,
+          categoryId: category_id,
+        }));
+        await WorkerCategory.bulkCreate(workerCategoryData, { transaction: t });
       }
       await t.commit();
       res.status(201).json({
@@ -45,8 +62,6 @@ module.exports = {
       });
     } catch (error) {
       await t.rollback();
-      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
-      console.log(error);
       res.status(401).json({
         success: false,
         message: error.message,
@@ -64,44 +79,47 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Worker profile not found" });
       }
-      processedFiles = await processImageFields(
-        req.files,
-        workerProcessingConfig,
-        UPLOAD_SUBFOLDER
-      );
-      const { categories, ...bodyData } = req.body;
-      if (processedFiles.image && worker.image) {
-        const oldFilename = path.basename(worker.image);
-        const oldFilePath = path.join(UPLOAD_PATH, UPLOAD_SUBFOLDER);
-        await deleteFileWithFolderName(oldFilePath, oldFilename);
-      }
-      if (processedFiles.icon && worker.icon) {
-        const oldFilename = path.basename(worker.icon);
-        const oldFilePath = path.join(UPLOAD_PATH, UPLOAD_SUBFOLDER);
-        await deleteFileWithFolderName(oldFilePath, oldFilename);
-      }
-      for (const key in bodyData) {
-        if (bodyData[key] !== null && bodyData[key] !== undefined) {
-          worker[key] = bodyData[key];
+      const iconPath = "uploads/worker/icon/";
+      const imgPath = "uploads/worker/";
+      let icon = worker.icon;
+      let image = worker.image;
+      if (req.files?.icon) {
+        const oldFilename = worker.icon;
+        icon = await compressAndSaveFile(req.files.icon[0], iconPath);
+        if (oldFilename) {
+          await deleteFileWithFolderName(iconPath, oldFilename);
         }
       }
-      if (categories) {
-        worker.categories = categories;
+      if (req.files?.image) {
+        const oldFilename = worker.image;
+        image = await compressAndSaveFile(req.files.image[0], imgPath);
+        await deleteFileWithFolderName(imgPath, oldFilename);
       }
-      if (processedFiles.image) {
-        worker.image = processedFiles.image[0].filename;
+
+      const { ...bodyData } = req.body;
+      const categories = JSON.parse(req.body.categories);
+      const existingCategories = JSON.parse(worker.categories);
+
+      const updatedWorker = await worker.update(
+        { ...bodyData, icon, image },
+        { transaction: t }
+      );
+
+      if (JSON.stringify(categories) !== JSON.stringify(existingCategories)) {
+        await WorkerCategory.destroy({
+          where: { workerId: updatedWorker.id },
+          transaction: t,
+        });
+        await WorkerCategory.bulkCreate(
+          categories.map((category_id) => ({
+            workerId: updatedWorker.id,
+            categoryId: category_id,
+          })),
+          { transaction: t }
+        );
       }
-      if (processedFiles.icon) {
-        worker.icon = processedFiles.icon[0].filename;
-      }
-      const updatedWorker = await worker.save();
-      if (categories) {
-        updatedWorker.setCategories(categories, { Transaction: t });
-      }
-      const finalWorker = await Worker.findByPk(updatedWorker.id, {
-        include: Category,
-        transaction: t,
-      });
+      const finalWorker = await Worker.findByPk(updatedWorker.id);
+
       await t.commit();
       return res.status(200).json({
         success: true,

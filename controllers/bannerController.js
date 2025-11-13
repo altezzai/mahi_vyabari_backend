@@ -87,10 +87,12 @@ module.exports = {
 
       banner.banner_type = banner_type || banner.banner_type;
       if (processedFiles.banner_image_large) {
-        banner.banner_image_large = processedFiles.banner_image_large[0].filename;
+        banner.banner_image_large =
+          processedFiles.banner_image_large[0].filename;
       }
       if (processedFiles.banner_image_small) {
-        banner.banner_image_small = processedFiles.banner_image_small[0].filename;
+        banner.banner_image_small =
+          processedFiles.banner_image_small[0].filename;
       }
 
       const updatedBanner = await banner.sav();

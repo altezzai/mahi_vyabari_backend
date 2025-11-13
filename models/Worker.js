@@ -15,18 +15,6 @@ module.exports = (sequelize, DataTypes) => {
       },
       categories: {
         type: DataTypes.TEXT,
-        get() {
-          const rawValue = this.getDataValue("categories");
-          try {
-            const parsed = rawValue ? JSON.parse(rawValue) : [];
-            return Array.isArray(parsed) ? parsed.map(Number) : [];
-          } catch (e) {
-            return [];
-          }
-        },
-        set(value) {
-          this.setDataValue("categories", JSON.stringify(value));
-        },
       },
       minWage: {
         type: DataTypes.DECIMAL(10, 2),

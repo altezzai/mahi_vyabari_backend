@@ -13,7 +13,7 @@ const banner_uploadFields = [
 ];
 
 router.post(
-  "/upload-banner",
+  "/add-banner",
   // userAuth,
   // authorizeRoles("admin"),
   // uploadBannerImages,

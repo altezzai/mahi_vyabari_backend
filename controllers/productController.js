@@ -7,6 +7,7 @@ const {
   cleanupFiles,
   deleteFileWithFolderName,
   processImageFields,
+  compressAndSaveFile,
 } = require("../utils/fileHandler");
 
 const UPLOAD_SUBFOLDER = "productImages";
@@ -18,17 +19,17 @@ const productProcessingConfig = {
 
 module.exports = {
   addProduct: async (req, res) => {
-    let processedFiles;
     try {
-      processedFiles = await processImageFields(
-        req.files,
-        productProcessingConfig,
-        UPLOAD_SUBFOLDER
-      );
-      console.log(processedFiles);
+      console.log("helow");
+      let fileName = null;
+      if (req.file) {
+        const uploadPath = "uploads/products/";
+        fileName = await compressAndSaveFile(req.file, uploadPath);
+      }
+
       const productData = {
         ...req.body,
-        image: processedFiles.image[0].filename || null,
+        image: fileName,
       };
       const savedProduct = await Product.create(productData);
       if (!savedProduct) {
@@ -41,7 +42,6 @@ module.exports = {
         result: savedProduct,
       });
     } catch (error) {
-      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       console.log(error);
       return res.status(401).json({
         success: false,
@@ -50,8 +50,8 @@ module.exports = {
     }
   },
   updateProduct: async (req, res) => {
-    let processedFiles;
     try {
+      console.log("helow");
       const { id } = req.params;
       let product = await Product.findByPk(id);
       if (!product) {
@@ -59,26 +59,22 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Product not found" });
       }
-      processedFiles = await processImageFields(
-        req.files,
-        productProcessingConfig,
-        UPLOAD_SUBFOLDER
-      );
+
       const { ...bodyData } = req.body;
-      if (processedFiles.image && product.image) {
-        const oldFilename = path.basename(product.image);
-        const oldFilePath = path.join(UPLOAD_PATH, UPLOAD_SUBFOLDER);
-        await deleteFileWithFolderName(oldFilePath, oldFilename);
-      }
-      for (const key in bodyData) {
-        if (bodyData[key] !== null && bodyData[key] !== undefined) {
-          product[key] = bodyData[key];
+      let fileName = product.image;
+      if (req.file) {
+        const uploadPath = "uploads/products/";
+        const oldFilename = fileName;
+        fileName = await compressAndSaveFile(req.file, uploadPath);
+        if (oldFilename) {
+          await deleteFileWithFolderName(uploadPath, oldFilename);
         }
       }
-      if (processedFiles.image) {
-        product.image = processedFiles.image[0].filename;
-      }
-      const updatedProduct = await product.save();
+      const updatedProduct = await product.update({
+        ...bodyData,
+        image: fileName,
+      });
+
       return res.status(200).json({ success: true, product: updatedProduct });
     } catch (error) {
       await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);

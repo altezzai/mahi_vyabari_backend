@@ -42,14 +42,14 @@ module.exports = {
     const imgPath = "uploads/shop/";
 
     try {
-      // Validation
+      // 🔹 Validation
       if (!shopName || !phone || !email) {
         return res
           .status(400)
           .json({ error: "shopName, phone, and email are required." });
       }
 
-      // Check duplicate
+      // 🔹 Check duplicate shop email
       const existingShop = await Shop.findOne({
         where: { email },
         transaction: t,
@@ -60,7 +60,7 @@ module.exports = {
           .json({ success: false, message: "Shop Email already exists" });
       }
 
-      // Ensure folders exist
+      // 🔹 Ensure upload folders exist
       const fs = require("fs");
       if (!fs.existsSync(iconPath)) fs.mkdirSync(iconPath, { recursive: true });
       if (!fs.existsSync(imgPath)) fs.mkdirSync(imgPath, { recursive: true });
@@ -75,21 +75,32 @@ module.exports = {
         image = await compressAndSaveFile(req.files.image[0], imgPath);
       }
 
+      // 🔹 Exclude categories field
+      const { categories, ...shopBody } = req.body;
+
       const shopData = {
-        ...req.body,
+        ...shopBody,
         image: image || null,
         icon: icon || null,
       };
 
+      // 🔹 Create shop record
       const newShop = await Shop.create(shopData, { transaction: t });
-      const categories = JSON.parse(req.body.categories);
-      const shopCategoryData = categories.map((category_id) => ({
-        shopId: newShop.id,
-        categoryId: category_id,
-      }));
-      await ShopCategory.bulkCreate(shopCategoryData, { transaction: t });
 
-      // Create user login
+      // 🔹 Now handle categories separately
+      let categoryList = [];
+      if (Array.isArray(req.body.categories)) {
+        categoryList = req.body.categories.map((c) => parseInt(c));
+      }
+      if (categoryList.length > 0) {
+        const shopCategoryData = categoryList.map((category_id) => ({
+          shopId: newShop.id,
+          categoryId: category_id,
+        }));
+        await ShopCategory.bulkCreate(shopCategoryData, { transaction: t });
+      }
+
+      // 🔹 Create corresponding user login
       await User.create(
         {
           userName: shopName,
@@ -103,10 +114,10 @@ module.exports = {
         { transaction: t }
       );
 
-      // Commit before final fetch
+      // 🔹 Commit transaction
       await t.commit();
 
-      // Send welcome email (async)
+      // 🔹 Send async welcome email
       sendShopWelcomeEmail(
         newShop.shopName,
         newShop.email,
@@ -115,7 +126,7 @@ module.exports = {
         console.error("--- ASYNC EMAIL FAILED TO SEND ---", err);
       });
 
-      // Fetch with relations (outside transaction)
+      // 🔹 Fetch shop with relations
       const finalShop = await Shop.findByPk(newShop.id, {
         include: [{ model: Category }, { model: Area }],
       });
@@ -127,6 +138,7 @@ module.exports = {
     } catch (error) {
       await t.rollback();
 
+      // 🔹 Delete uploaded files if transaction fails
       if (req.files?.icon)
         await deleteFileWithFolderName(iconPath, req.files.icon[0].filename);
       if (req.files?.image)
@@ -235,7 +247,9 @@ module.exports = {
       if (req.files?.icon) {
         const oldFilename = shop.icon;
         icon = await compressAndSaveFile(req.files.icon[0], iconPath);
-        await deleteFileWithFolderName(iconPath, oldFilename);
+        if (oldFilename) {
+          await deleteFileWithFolderName(iconPath, oldFilename);
+        }
       }
       if (req.files?.image) {
         const oldFilename = shop.image;

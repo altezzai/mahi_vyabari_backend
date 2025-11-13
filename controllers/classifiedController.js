@@ -8,6 +8,7 @@ const {
   cleanupFiles,
   deleteFileWithFolderName,
   processImageFields,
+  compressAndSaveFile,
 } = require("../utils/fileHandler");
 
 const UPLOAD_PATH = process.env.UPLOAD_PATH;
@@ -20,15 +21,22 @@ module.exports = {
   addClassified: async (req, res) => {
     let processedFiles;
     try {
-      processedFiles = await processImageFields(
-        req.files,
-        classifiedProcessingConfig,
-        UPLOAD_SUBFOLDER
-      );
+      const iconPath = "uploads/classified/icon/";
+      const imgPath = "uploads/classified/";
+      let image = null;
+      let icon = null;
+
+      if (req.files?.icon) {
+        icon = await compressAndSaveFile(req.files.icon[0], iconPath);
+      }
+      if (req.files?.image) {
+        image = await compressAndSaveFile(req.files.image[0], imgPath);
+      }
+
       const classifiedData = {
         ...req.body,
-        image: processedFiles.image?.[0].filename || null,
-        icon: processedFiles.icon?.[0].filename || null,
+        image: image || null,
+        icon: icon || null,
       };
       const savedClassified = await Classified.create(classifiedData);
       res.status(201).json({
@@ -45,7 +53,6 @@ module.exports = {
     }
   },
   updateClassified: async (req, res) => {
-    let processedFiles;
     try {
       const { id } = req.params;
       const classified = await Classified.findByPk(id);
@@ -54,39 +61,32 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Item not found" });
       }
-      processedFiles = await processImageFields(
-        req.files,
-        classifiedProcessingConfig,
-        UPLOAD_SUBFOLDER
-      );
-
-      if (processedFiles.image && classified.image) {
-        const oldFilename = path.basename(classified.image);
-        const oldFilePath = path.join(UPLOAD_PATH, UPLOAD_SUBFOLDER);
-        await deleteFileWithFolderName(oldFilePath, oldFilename);
-      }
-      if (processedFiles.icon && classified.icon) {
-        const oldFilename = path.basename(classified.icon);
-        const oldFilePath = path.join(UPLOAD_PATH, UPLOAD_SUBFOLDER);
-        await deleteFileWithFolderName(oldFilePath, oldFilename);
-      }
-      const { ...bodyData } = req.body;
-      for (const key in bodyData) {
-        if (bodyData[key] !== null && bodyData[key] !== undefined) {
-          classified[key] = bodyData[key];
+      const iconPath = "uploads/classified/icon/";
+      const imgPath = "uploads/classified/";
+      let icon = classified.icon;
+      let image = classified.image;
+      if (req.files?.icon) {
+        const oldFilename = classified.icon;
+        icon = await compressAndSaveFile(req.files.icon[0], iconPath);
+        if (oldFilename) {
+          await deleteFileWithFolderName(iconPath, oldFilename);
         }
       }
-      if (processedFiles.image) {
-        classified.image = processedFiles.image?.[0].filename;
+      if (req.files?.image) {
+        const oldFilename = classified.image;
+        image = await compressAndSaveFile(req.files.image[0], imgPath);
+        await deleteFileWithFolderName(imgPath, oldFilename);
       }
-      if (processedFiles.icon) {
-        classified.icon = processedFiles.icon.filename;
-      }
-      const updatedClassified = await classified.save();
+
+      const { ...bodyData } = req.body;
+      const updatedClassified = await classified.update({
+        ...bodyData,
+        image: image || null,
+        icon: icon || null,
+      });
       return res.status(200).json({ success: true, item: updatedClassified });
     } catch (error) {
       console.log(error);
-      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
