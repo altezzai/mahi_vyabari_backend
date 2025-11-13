@@ -5,6 +5,7 @@ const shopController = require("../controllers/shopController");
 const userAuth = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
 const multerInstance = require("../middleware/upload");
+const { upload } = require("../middleware/upload2");
 // router.use(userAuth, authorizeRoles("admin"));
 
 const shopUploadFields = [
@@ -14,12 +15,12 @@ const shopUploadFields = [
 
 router.post(
   "/add-shop",
-  multerInstance.fields(shopUploadFields),
+  upload.fields(shopUploadFields),
   shopController.addShop
 );
 router.put(
   "/update-shop/:shopId",
-  multerInstance.fields(shopUploadFields),
+  upload.fields(shopUploadFields),
   shopController.updateShop
 );
 router.patch("/delete-shop/:shopId", shopController.deleteShop);

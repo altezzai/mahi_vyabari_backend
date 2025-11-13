@@ -12,6 +12,7 @@ const {
   Shop,
   Category,
   Area,
+  ShopCategory,
 } = require("../models");
 
 const { hashData } = require("../utils/hashData");
@@ -20,7 +21,9 @@ const {
   processImageFields,
   cleanupFiles,
   deleteFileWithFolderName,
+  compressAndSaveFile,
 } = require("../utils/fileHandler");
+const { Console } = require("console");
 
 const UPLOAD_SUBFOLDER = "shopImages";
 const UPLOAD_PATH = process.env.UPLOAD_PATH;
@@ -34,49 +37,60 @@ const shopProcessingConfig = {
 module.exports = {
   addShop: async (req, res) => {
     const { shopName, phone, area_id, email } = req.body;
-    let processedShopFiles;
-    let processedUserFiles;
     const t = await sequelize.transaction();
-    if (!shopName || !phone || !email) {
-      return res
-        .status(400)
-        .json({ error: "shopName, phone, and email are required." });
-    }
-    const existingShop = await Shop.findOne({
-      where: { email },
-      transaction: t,
-    });
-    if (existingShop) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Shop Email already exists" });
-    }
+    const iconPath = "uploads/shop/icon/";
+    const imgPath = "uploads/shop/";
+
     try {
-      processedShopFiles = await processImageFields(
-        req.files,
-        shopProcessingConfig,
-        UPLOAD_SUBFOLDER
-      );
-      console.log(processedShopFiles);
+      // Validation
+      if (!shopName || !phone || !email) {
+        return res
+          .status(400)
+          .json({ error: "shopName, phone, and email are required." });
+      }
+
+      // Check duplicate
+      const existingShop = await Shop.findOne({
+        where: { email },
+        transaction: t,
+      });
+      if (existingShop) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Shop Email already exists" });
+      }
+
+      // Ensure folders exist
+      const fs = require("fs");
+      if (!fs.existsSync(iconPath)) fs.mkdirSync(iconPath, { recursive: true });
+      if (!fs.existsSync(imgPath)) fs.mkdirSync(imgPath, { recursive: true });
+
+      let image = null;
+      let icon = null;
+
+      if (req.files?.icon) {
+        icon = await compressAndSaveFile(req.files.icon[0], iconPath);
+      }
+      if (req.files?.image) {
+        image = await compressAndSaveFile(req.files.image[0], imgPath);
+      }
+
       const shopData = {
         ...req.body,
-        image: processedShopFiles.image[0].filename || null,
-        icon: processedShopFiles.icon[0].filename || null,
+        image: image || null,
+        icon: icon || null,
       };
+
       const newShop = await Shop.create(shopData, { transaction: t });
-      if (newShop.categories && newShop.categories.length > 0) {
-        await newShop.setCategories(newShop.categories, { transaction: t });
-      }
-      const userImageConfig = {
-        image: { width: 500 },
-      };
-      processedUserFiles = await processImageFields(
-        req.files,
-        userImageConfig,
-        USER_PROFILE_SUBFOLDER
-      );
-      console.log(processedUserFiles);
-      await User.creat(
+      const categories = JSON.parse(req.body.categories);
+      const shopCategoryData = categories.map((category_id) => ({
+        shopId: newShop.id,
+        categoryId: category_id,
+      }));
+      await ShopCategory.bulkCreate(shopCategoryData, { transaction: t });
+
+      // Create user login
+      await User.create(
         {
           userName: shopName,
           email,
@@ -84,38 +98,47 @@ module.exports = {
           area_id,
           password: await hashData(phone),
           role: "shop",
-          image: processedUserFiles.image[0].filename || null,
+          image: icon || null,
         },
         { transaction: t }
       );
+
+      // Commit before final fetch
+      await t.commit();
+
+      // Send welcome email (async)
       sendShopWelcomeEmail(
         newShop.shopName,
         newShop.email,
         newShop.phone
-      ).catch(() => {
+      ).catch((err) => {
         console.error("--- ASYNC EMAIL FAILED TO SEND ---", err);
       });
 
+      // Fetch with relations (outside transaction)
       const finalShop = await Shop.findByPk(newShop.id, {
         include: [{ model: Category }, { model: Area }],
-        transaction: t,
       });
-      await t.commit();
+
       res.status(201).json({
         success: true,
         shop: finalShop,
       });
     } catch (error) {
       await t.rollback();
-      console.log(error);
-      await cleanupFiles(processedShopFiles, UPLOAD_SUBFOLDER);
-      await cleanupFiles(processedUserFiles, USER_PROFILE_SUBFOLDER);
+
+      if (req.files?.icon)
+        await deleteFileWithFolderName(iconPath, req.files.icon[0].filename);
+      if (req.files?.image)
+        await deleteFileWithFolderName(imgPath, req.files.image[0].filename);
+
       res.status(500).json({
         success: false,
         message: error.message,
       });
     }
   },
+
   getShops: async (req, res) => {
     const search = req.query.search || "";
     const area_id = req.query.area_id || null;
@@ -153,7 +176,6 @@ module.exports = {
           {
             model: Area,
             attributes: ["id", "name"],
-            through: { attributes: [] },
           },
         ],
         order: [["createdAt", "DESC"]],
@@ -197,6 +219,8 @@ module.exports = {
   },
   updateShop: async (req, res) => {
     let processedFiles;
+    const iconPath = "uploads/shop/icon/";
+    const imgPath = "uploads/shop/";
     const t = await sequelize.transaction();
     try {
       const { shopId } = req.params;
@@ -206,55 +230,73 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Shop not found" });
       }
-      const processedShopFiles = await processImageFields(
-        req.files,
-        shopProcessingConfig,
-        UPLOAD_SUBFOLDER
+      let icon = shop.icon;
+      let image = shop.image;
+      if (req.files?.icon) {
+        const oldFilename = shop.icon;
+        icon = await compressAndSaveFile(req.files.icon[0], iconPath);
+        await deleteFileWithFolderName(iconPath, oldFilename);
+      }
+      if (req.files?.image) {
+        const oldFilename = shop.image;
+        image = await compressAndSaveFile(req.files.image[0], imgPath);
+        await deleteFileWithFolderName(imgPath, oldFilename);
+      }
+
+      const updatedShop = await shop.update(
+        {
+          ...req.body,
+          icon,
+          image,
+        },
+        { transaction: t }
       );
-      processedFiles = processedShopFiles;
 
-      const { categories, ...bodyData } = req.body;
+      const categories = JSON.parse(req.body.categories);
 
-      if (processedFiles.image && shop.image) {
-        const oldFilename = path.basename(shop.image);
-        const oldFilePath = path.join(UPLOAD_PATH, UPLOAD_SUBFOLDER);
-        await deleteFileWithFolderName(oldFilePath, oldFilename);
-      }
-      if (processedFiles.icon && shop.icon) {
-        const oldFilename = path.basename(shop.icon);
-        const oldFilePath = path.join(UPLOAD_PATH, UPLOAD_SUBFOLDER);
-        await deleteFileWithFolderName(oldFilePath, oldFilename);
-      }
+      if (categories && Array.isArray(categories)) {
+        const existingCategories = await ShopCategory.findAll({
+          where: { shopId: shopId },
+          attributes: ["categoryId"],
+          raw: true,
+          transaction: t,
+        });
 
-      for (const key in bodyData) {
-        if (bodyData[key] !== null && bodyData[key] !== undefined) {
-          shop[key] = bodyData[key];
+        const existingCategoryIds = existingCategories.map((c) => c.categoryId);
+        const newCategoryIds = categories.map((id) => Number(id));
+
+        // Find categories to add and remove
+        const toAdd = newCategoryIds.filter(
+          (id) => !existingCategoryIds.includes(id)
+        );
+        const toRemove = existingCategoryIds.filter(
+          (id) => !newCategoryIds.includes(id)
+        );
+
+        // Add new category links
+        if (toAdd.length > 0) {
+          const insertData = toAdd.map((id) => ({
+            shopId: shopId,
+            categoryId: id,
+          }));
+          await ShopCategory.bulkCreate(insertData, { transaction: t });
+        }
+
+        // Remove old category links
+        if (toRemove.length > 0) {
+          await ShopCategory.destroy({
+            where: {
+              shopId: shopId,
+              categoryId: toRemove,
+            },
+            transaction: t,
+          });
         }
       }
-      if (categories) {
-        shop.categories = categories;
-      }
-      if (processedFiles.image) {
-        shop.image = processedFiles.image[0].filename;
-      }
-      if (processedFiles.icon) {
-        shop.icon = processedFiles.icon[0].filename;
-      }
-      const updatedShop = await shop.save({ transaction: t });
-
-      if (categories) {
-        updatedShop.setCategories(categories, { transaction: t });
-      }
-
-      console.log("Old files cleaned up.");
-      const finalShop = await Shop.findByPk(updatedShop.id, {
-        include: Category,
-        transaction: t,
-      });
       await t.commit();
       res.status(200).json({
-        message: `Shop ${finalShop.id} updated successfully!`,
-        shop: finalShop,
+        success: true,
+        shop: updatedShop,
       });
     } catch (error) {
       await t.rollback();
