@@ -4,6 +4,11 @@ module.exports = (sequelize, DataTypes) => {
   const VehicleSchedule = sequelize.define(
     "VehicleSchedule",
     {
+      id: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        autoIncrement: true,
+        primaryKey: true,
+      },
       userId: {
         type: DataTypes.INTEGER,
       },
@@ -44,4 +49,3 @@ module.exports = (sequelize, DataTypes) => {
 
   return VehicleSchedule;
 };
-// module.exports = VehicleSchedule;

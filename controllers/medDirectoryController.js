@@ -23,8 +23,8 @@ module.exports = {
       );
       const medDirectoryData = {
         ...req.body,
-        image: processedFiles.image.filename || null,
-        icon: processedFiles.icon.filename || null,
+        image: processedFiles.image?.[0].filename || null,
+        icon: processedFiles.icon?.[0].filename || null,
       };
       const savedMedicalDirectory = await HealthcareProvider.create(medDirectoryData);
       res.status(201).json({
@@ -72,10 +72,10 @@ module.exports = {
         }
       }
       if (processedFiles.image) {
-        healthcareProvider.image = processedFiles.image.filename;
+        healthcareProvider.image = processedFiles.image?.[0].filename;
       }
       if (processedFiles.icon) {
-        healthcareProvider.icon = processedFiles.icon.filename;
+        healthcareProvider.icon = processedFiles.icon?.[0].filename;
       }
       const updatedHealthCareProvider = await healthcareProvider.save();
       return res.status(200).json({
@@ -137,6 +137,7 @@ module.exports = {
   },
   getMedicalDirectories: async (req, res) => {
     const search = req.query.search || "";
+    const area = req.query.area || null;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
@@ -148,6 +149,9 @@ module.exports = {
           { category: { [Op.like]: `%${search}%` } },
         ],
       };
+    }
+    if(area){
+      whereCondition.area = area
     }
     try {
       const { count, rows: medical } = await HealthcareProvider.findAndCountAll({

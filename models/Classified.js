@@ -5,11 +5,16 @@ module.exports = (sequelize, DataTypes) => {
   const Classified = sequelize.define(
     "Classified",
     {
+      id: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        autoIncrement: true,
+        primaryKey: true,
+      },
       userId: {
         type: DataTypes.INTEGER,
       },
       category: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER.UNSIGNED,
       },
       itemName: {
         type: DataTypes.STRING,
@@ -25,10 +30,13 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
       },
       area: {
-        type: DataTypes.ENUM("mahe", "chokli", "palloor", "pandakkal"),
-        validate: {
-          isIn: [["mahe", "chokli", "palloor", "pandakkal"]],
+        type: DataTypes.INTEGER.UNSIGNED,
+        references: {
+          model: "areas",
+          key: "id",
         },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       },
       address: {
         type: DataTypes.TEXT,
@@ -70,6 +78,4 @@ module.exports = (sequelize, DataTypes) => {
   );
   return Classified;
 };
-// Category.hasMany(ItemListing,{foreignKey:"category",as:"itemCategory"})
-// ItemListing.belongsTo(Category,{foreignKey:"category",as:"itemCategory"})
-// module.exports = ItemListing;
+

@@ -1,18 +1,16 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
-
 module.exports = (sequelize, DataTypes) => {
   const Area = sequelize.define(
     "Area",
     {
-      area: {
+      id: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      name: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
-      },
-      description: {
-        type: DataTypes.TEXT,
-        allowNull: true,
       },
       trash: {
         type: DataTypes.BOOLEAN,
@@ -26,4 +24,3 @@ module.exports = (sequelize, DataTypes) => {
   );
   return Area;
 };
-// module.exports = AreaInfo;

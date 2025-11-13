@@ -5,6 +5,11 @@ module.exports = (sequelize, DataTypes) => {
   const Emergency = sequelize.define(
     "Emergency",
     {
+      id: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        autoIncrement: true,
+        primaryKey: true,
+      },
       emergencyName: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -37,4 +42,4 @@ module.exports = (sequelize, DataTypes) => {
   );
   return Emergency;
 };
-// module.exports = Emergency;
+

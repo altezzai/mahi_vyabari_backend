@@ -6,11 +6,16 @@ module.exports = (sequelize, DataTypes) => {
   const ShopCoupon = sequelize.define(
     "ShopCoupon",
     {
+      id: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        autoIncrement: true,
+        primaryKey: true,
+      },
       shopId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER.UNSIGNED,
         allowNull: false,
         references: {
-          model: Shop,
+          model: "shops",
           key: "id",
         },
         onDelete: "CASCADE",
@@ -41,7 +46,3 @@ module.exports = (sequelize, DataTypes) => {
   return ShopCoupon;
 };
 
-// Shop.hasMany(ShopCoupon, { foreignKey: "shopId", as: "shopCoupons" });
-// ShopCoupon.belongsTo(Shop, { foreignKey: "shopId", as: "shop" });
-
-// module.exports = ShopCoupon;

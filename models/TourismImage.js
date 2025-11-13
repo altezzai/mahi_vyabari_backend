@@ -1,37 +1,31 @@
+// --- models/TourismImage.js ---
+// This is a new file
+
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 
 module.exports = (sequelize, DataTypes) => {
-  const Banner = sequelize.define(
-    "Banner",
+  const TourismImage = sequelize.define(
+    "TourismImage",
     {
       id: {
         type: DataTypes.INTEGER.UNSIGNED,
         autoIncrement: true,
         primaryKey: true,
       },
-      banner_image_large: {
+      tourismId: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        allowNull: false,
+      },
+      image: {
         type: DataTypes.STRING,
         allowNull: false,
-      },
-      banner_image_small: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      banner_type: {
-        type: DataTypes.ENUM("type1", "type2"),
-        allowNull: false,
-      },
-      trash: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
       },
     },
     {
-      tableName: "banners",
+      tableName: "tourism_images",
       timestamps: true,
     }
   );
-  return Banner;
+  return TourismImage;
 };
-

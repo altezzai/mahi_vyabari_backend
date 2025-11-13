@@ -8,20 +8,25 @@ module.exports = (sequelize, DataTypes) => {
   const UserCoupon = sequelize.define(
     "UserCoupon",
     {
+      id: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        autoIncrement: true,
+        primaryKey: true,
+      },
       shopId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER.UNSIGNED,
         allowNull: false,
         references: {
-          model: Shop,
+          model: "shops",
           key: "id",
         },
         onDelete: "CASCADE",
       },
       userId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER.UNSIGNED,
         allowNull: false,
         references: {
-          model: User,
+          model: "users",
           key: "id",
         },
       },
@@ -44,12 +49,4 @@ module.exports = (sequelize, DataTypes) => {
   );
   return UserCoupon;
 };
-// User.hasMany(UserCoupen, { foreignKey: "userId", as: "userCoupons" });
-// UserCoupen.belongsTo(User, { foreignKey: "userId", as: "user" });
-// Shop.hasMany(UserCoupen, { foreignKey: "shopId", as: "userCoupons" });
-// UserCoupen.belongsTo(Shop, { foreignKey: "shopId", as: "shop" });
 
-// ShopCoupon.hasMany(UserCoupen, { foreignKey: "shopId", as: "userCoupons" });
-// UserCoupen.belongsTo(ShopCoupon, { foreignKey: "shopId", targetKey: "shopId", as: "shopCoupon" });
-
-// module.exports = UserCoupen;

@@ -7,24 +7,24 @@ module.exports = (sequelize, DataTypes) => {
     "Feedback",
     {
       id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER.UNSIGNED,
         autoIncrement: true,
         primaryKey: true,
       },
       userId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER.UNSIGNED,
         allowNull: false,
         references: {
-          model: User,
+          model: 'users',
           key: "id",
         },
         onDelete: "CASCADE",
       },
       shopId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER.UNSIGNED,
         allowNull: false,
         references: {
-          model: Shop,
+          model: 'shops',
           key: "id",
         },
         onDelete: "CASCADE",
@@ -51,8 +51,3 @@ module.exports = (sequelize, DataTypes) => {
   );
   return Feedback;
 };
-
-// User.hasMany(Feedback, { foreignKey: "userId" });
-// Feedback.belongsTo(User, { foreignKey: "userId" });
-// Shop.hasMany(Feedback, { as: "feedbacks", foreignKey: "shopId" });
-// Feedback.belongsTo(Shop, { foreignKey: "shopId" });

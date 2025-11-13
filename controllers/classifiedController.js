@@ -23,8 +23,8 @@ module.exports = {
       );
       const classifiedData = {
         ...req.body,
-        image: processedFiles.image?.filename || null,
-        icon: processedFiles.icon?.filename || null,
+        image: processedFiles.image?.[0].filename || null,
+        icon: processedFiles.icon?.[0].filename || null,
       };
       const savedClassified = await Classified.create(classifiedData);
       res.status(201).json({
@@ -73,7 +73,7 @@ module.exports = {
         }
       }
       if (processedFiles.image) {
-        classified.image = processedFiles.image.filename;
+        classified.image = processedFiles.image?.[0].filename;
       }
       if (processedFiles.icon) {
         classified.icon = processedFiles.icon.filename;
@@ -122,6 +122,7 @@ module.exports = {
   },
   getClassifieds: async (req, res) => {
     const search = req.query.search || "";
+    const area = req.query.area || null;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
@@ -133,6 +134,9 @@ module.exports = {
           { "$itemCategory.categoryName$": { [Op.like]: `%${search}%` } },
         ],
       };
+    }
+    if(area){
+      whereCondition.area = area
     }
     try {
       const { count, rows: classifieds } = await Classified.findAndCountAll({

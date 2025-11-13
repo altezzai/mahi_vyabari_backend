@@ -21,7 +21,7 @@ const processImage = async (
   const filename = `${originalBaseName}-${uniqueSuffix}.webp`;
   const outputDir = path.join(UPLOAD_PATH, subfolder);
   const outputPath = path.join(outputDir, filename);
-
+  console.log(outputPath);
   await fs.promises.mkdir(outputDir, { recursive: true });
 
   await sharp(buffer)
@@ -50,21 +50,52 @@ const processImageFields = async (files, processingConfig, subfolder = "") => {
   const processedFiles = {};
 
   for (const fieldName in processingConfig) {
-    if (files[fieldName] && files[fieldName][0]) {
-      console.log(`Found ${fieldName}, adding to processing queue.`);
+    // if (files[fieldName] && files[fieldName][0]) {
+    //   console.log(`Found ${fieldName}, adding to processing queue.`);
 
-      const file = files[fieldName][0];
-      const resizeOptions = processingConfig[fieldName];
-      const originalName = file.originalname;
-      const promise = processImage(
-        file.buffer,
-        resizeOptions,
-        subfolder,
-        originalName
-      ).then((result) => {
-        processedFiles[fieldName] = result;
-      });
-      processingPromises.push(promise);
+    //   const file = files[fieldName][0];
+    //   const resizeOptions = processingConfig[fieldName];
+    //   const originalName = file.originalname;
+    //   const promise = processImage(
+    //     file.buffer,
+    //     resizeOptions,
+    //     subfolder,
+    //     originalName
+    //   ).then((result) => {
+    //     processedFiles[fieldName] = result;
+    //   });
+    //   processingPromises.push(promise);
+    // }
+    // --- START FIX ---
+    // Check if files[fieldName] exists and is a non-empty array
+    if (
+      files[fieldName] &&
+      Array.isArray(files[fieldName]) &&
+      files[fieldName].length > 0
+    ) {
+      console.log(
+        `Found ${files[fieldName].length} file(s) for ${fieldName}, adding to processing queue.`
+      );
+
+      // Initialize an array for this field's results
+      processedFiles[fieldName] = [];
+
+      // Loop through each file uploaded for this field
+      for (const file of files[fieldName]) {
+        const resizeOptions = processingConfig[fieldName];
+        const originalName = file.originalname;
+
+        const promise = processImage(
+          file.buffer,
+          resizeOptions,
+          subfolder,
+          originalName
+        ).then((result) => {
+          // Push the result to this field's array
+          processedFiles[fieldName].push(result);
+        });
+        processingPromises.push(promise);
+      }
     }
   }
 
@@ -84,18 +115,34 @@ const cleanupFiles = async (processedFiles, subfolder) => {
   if (!processedFiles) return;
   console.error(`Cleaning up files from "${subfolder}"...`);
   const cleanupPromises = [];
+  // for (const fieldName in processedFiles) {
+  //   const file = processedFiles[fieldName];
+  //   if (file && file.filename) {
+  //     const filePath = path.join(UPLOAD_PATH, subfolder, file.filename);
+  //     console.log("Deleting orphaned file:", filePath);
+  //     cleanupPromises.push(
+  //       fs.promises
+  //         .unlink(filePath)
+  //         .catch((err) =>
+  //           console.error("Cleanup failed for file:", filePath, err.message)
+  //         )
+  //     );
+  //   }
+  // }
+    // --- START FIX ---
+  // Loop over each field name in the object (e.g., 'images')
   for (const fieldName in processedFiles) {
-    const file = processedFiles[fieldName];
-    if (file && file.filename) {
-      const filePath = path.join(UPLOAD_PATH, subfolder, file.filename);
-      console.log("Deleting orphaned file:", filePath);
-      cleanupPromises.push(
-        fs.promises
-          .unlink(filePath)
-          .catch((err) =>
-            console.error("Cleanup failed for file:", filePath, err.message)
-          )
-      );
+    const fileArray = processedFiles[fieldName];
+    // Check if it's an array of files
+    if (Array.isArray(fileArray)) {
+      // Loop through each file object in the array
+      for (const file of fileArray) {
+        if (file && file.filename) {
+          const filePath = path.join(UPLOAD_PATH, subfolder, file.filename);
+          console.log('Deleting orphaned file:', filePath);
+          cleanupPromises.push(fs.promises.unlink(filePath).catch(err => console.error("Cleanup failed for file:", filePath, err.message)));
+        }
+      }
     }
   }
   await Promise.all(cleanupPromises).catch(console.error);
@@ -105,6 +152,7 @@ const deleteFileWithFolderName = async (uploadPath, filename) => {
   try {
     if (filename) {
       const filePath = path.join(uploadPath, filename);
+      console.log(filePath);
       if (fs.existsSync(filePath)) {
         await fs.promises.unlink(filePath);
       }
@@ -117,4 +165,5 @@ module.exports = {
   processImageFields,
   cleanupFiles,
   deleteFileWithFolderName,
+  processImage,
 };

@@ -17,7 +17,6 @@ fs.readdirSync(__dirname)
     db[model.name] = model;
   });
 
-
 /**
  * ---------------------------------------------------------
  *  DEFINE ALL ASSOCIATIONS HERE
@@ -40,6 +39,9 @@ const {
   WorkerCategory,
   ShopCoupon,
   UserCoupon,
+  Area,
+  Tourism,
+  TourismImage,
 } = db;
 
 // Many-to-Many → Shop ⇄ Category
@@ -115,6 +117,28 @@ UserCoupon.belongsTo(ShopCoupon, {
   targetKey: "shopId",
   as: "shopCoupon",
 });
+
+Area.hasMany(Shop, { foreignKey: "area" });
+Shop.belongsTo(Area, { foreignKey: "area" });
+
+Area.hasMany(Classified, { foreignKey: "area" });
+Classified.belongsTo(Area, { foreignKey: "area" });
+
+Area.hasMany(HealthcareProvider, { foreignKey: "area" });
+HealthcareProvider.belongsTo(Area, { foreignKey: "area" });
+
+Area.hasMany(Tourism, { foreignKey: "area" });
+Tourism.belongsTo(Area, { foreignKey: "area" });
+
+Area.hasMany(VehicleService, { foreignKey: "area" });
+VehicleService.belongsTo(Area, { foreignKey: "area" });
+
+Area.hasMany(Worker, { foreignKey: "area" });
+Worker.belongsTo(Area, { foreignKey: "area" });
+
+// 4. (NEW) Tourism -> TourismImage (One-to-Many)
+Tourism.hasMany(TourismImage, { foreignKey: "tourismId", as: "images" });
+TourismImage.belongsTo(Tourism, { foreignKey: "tourismId" });
 
 /**
  * ---------------------------------------------------------

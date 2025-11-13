@@ -24,7 +24,7 @@ module.exports = {
       console.log(processedFiles)
       const productData = {
         ...req.body,
-        image: processedFiles.image.filename || null,
+        image: processedFiles.image[0].filename || null,
       };
       const savedProduct = await Product.create(productData);
       if (!savedProduct) {
@@ -72,7 +72,7 @@ module.exports = {
         }
       }
       if (processedFiles.image) {
-        product.image = processedFiles.image.filename;
+        product.image = processedFiles.image[0].filename;
       }
       const updatedProduct = await product.save();
       return res.status(200).json({ success: true, product: updatedProduct });

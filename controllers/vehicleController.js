@@ -13,7 +13,11 @@ const {
   Type,
   Category,
 } = require("../models");
-const { cleanupFiles,deleteFileWithFolderName,processImageFields } = require("../utils/fileHandler");
+const {
+  cleanupFiles,
+  deleteFileWithFolderName,
+  processImageFields,
+} = require("../utils/fileHandler");
 
 const UPLOAD_SUBFOLDER = "vehicle";
 const UPLOAD_PATH = process.env.UPLOAD_PATH;
@@ -214,8 +218,8 @@ module.exports = {
       );
       const vehicleServiceData = {
         ...req.body,
-        image: processedFiles.image.filename || null,
-        icon: processedFiles.icon.filename || null,
+        image: processedFiles.image[0].filename || null,
+        icon: processedFiles.icon[0].filename || null,
       };
       const savedService = await VehicleService.create(vehicleServiceData);
       res.status(201).json({
@@ -263,10 +267,10 @@ module.exports = {
         }
       }
       if (processedFiles.image) {
-        vehicleService.image = processedFiles.image.filename;
+        vehicleService.image = processedFiles.image[0].filename;
       }
       if (processedFiles.icon) {
-        vehicleService.icon = processedFiles.icon.filename;
+        vehicleService.icon = processedFiles.icon[0].filename;
       }
       const updatedVehicleService = await vehicleService.save();
       return res.status(200).json({
@@ -328,6 +332,7 @@ module.exports = {
   },
   getVehicleServiceProviders: async (req, res) => {
     const search = req.query.search || "";
+    const area = req.query.area || null;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
@@ -339,6 +344,9 @@ module.exports = {
           { "$taxiCategory.categoryName$": { [Op.like]: `%${search}%` } },
         ],
       };
+    }
+    if (area) {
+      whereCondition.area = area;
     }
     try {
       const { count, rows: vehicleServices } =

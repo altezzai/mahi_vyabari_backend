@@ -7,7 +7,11 @@ const { Op, where, col, Transaction } = require("sequelize");
 // const Category = require("../models/Category");
 const { Type, Category, Worker, WorkerCategory } = require("../models");
 const sequelize = require("../config/database");
-const { cleanupFiles,deleteFileWithFolderName,processImageFields } = require("../utils/fileHandler");
+const {
+  cleanupFiles,
+  deleteFileWithFolderName,
+  processImageFields,
+} = require("../utils/fileHandler");
 
 const UPLOAD_SUBFOLDER = "workers";
 const UPLOAD_PATH = process.env.UPLOAD_PATH;
@@ -27,8 +31,8 @@ module.exports = {
       );
       const workerData = {
         ...req.body,
-        image: processedFiles.image.filename || null,
-        icon: processedFiles.icon.filename || null,
+        image: processedFiles.image[0].filename || null,
+        icon: processedFiles.icon[0].filename || null,
       };
       const newWorker = await Worker.create(workerData, { transaction: t });
       if (newWorker.categories && newWorker.categories.length > 0) {
@@ -85,10 +89,10 @@ module.exports = {
         worker.categories = categories;
       }
       if (processedFiles.image) {
-        worker.image = processedFiles.image.filename;
+        worker.image = processedFiles.image[0].filename;
       }
       if (processedFiles.icon) {
-        worker.icon = processedFiles.icon.filename;
+        worker.icon = processedFiles.icon[0].filename;
       }
       const updatedWorker = await worker.save();
       if (categories) {
@@ -159,6 +163,7 @@ module.exports = {
   },
   getWorkerProfiles: async (req, res) => {
     const search = req.query.search || "";
+    const area = req.query.area || null;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;

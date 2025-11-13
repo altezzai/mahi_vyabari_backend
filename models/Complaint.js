@@ -1,31 +1,31 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
-const User = require("./User");
-const Shop = require("./Shop");
+// const User = require("./User");
+// const Shop = require("./Shop");
 
 module.exports = (sequelize, DataTypes) => {
   const Complaint = sequelize.define(
     "Complaint",
     {
       id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER.UNSIGNED,
         autoIncrement: true,
         primaryKey: true,
       },
       userId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER.UNSIGNED,
         allowNull: false,
         references: {
-          model: User,
+          model: "users",
           key: "id",
         },
         onDelete: "CASCADE",
       },
       shopId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER.UNSIGNED,
         allowNull: false,
         references: {
-          model: Shop,
+          model: "shops",
           key: "id",
         },
         onDelete: "CASCADE",
@@ -53,8 +53,4 @@ module.exports = (sequelize, DataTypes) => {
   return Complaint;
 };
 
-// Associations (If Needed)
-// User.hasMany(Complaint, { foreignKey: "userId"});
-// Shop.hasMany(Complaint, { foreignKey: "shopId", as: "complaints" });
-// Complaint.belongsTo(User, { foreignKey: "userId", as:"user"});
-// Complaint.belongsTo(Shop, { foreignKey: "shopId",as:"shop" });
+

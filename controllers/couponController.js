@@ -1,6 +1,6 @@
 const sequelize = require("../config/database");
 const { Op, Sequelize, literal } = require("sequelize");
-const {User,ShopCoupon,UserCoupon,Shop} = require("../models");
+const { User, ShopCoupon, UserCoupon, Shop } = require("../models");
 
 module.exports = {
   requestCoupon: async (req, res) => {
@@ -358,7 +358,7 @@ module.exports = {
     }
   },
   getUsers: async (req, res) => {
-    const search = req.query.search || "";
+    const search = req.query.search.trim() || "";
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
@@ -366,7 +366,10 @@ module.exports = {
     if (search) {
       whereCondition = {
         ...whereCondition,
-        userName: { [Op.like]: `%${search}%` },
+        [Op.or]: [
+          { userName: { [Op.like]: `%${search}%` } },
+          { phone: { [Op.like]: `%${search}%` } },
+        ],
       };
     }
     try {

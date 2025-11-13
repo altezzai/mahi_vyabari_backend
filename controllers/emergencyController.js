@@ -22,7 +22,7 @@ module.exports = {
       );
       const emergencyData = {
         ...req.body,
-        icon: processedFiles.icon.filename || null,
+        icon: processedFiles.icon[0].filename || null,
       };
       const savedEmergency = await Emergency.create(emergencyData);
       res.status(200).json({

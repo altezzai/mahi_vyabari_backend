@@ -1,9 +1,12 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
 module.exports = (sequelize, DataTypes) => {
   const WorkerProfile = sequelize.define(
     "Worker",
     {
+      id: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        autoIncrement: true,
+        primaryKey: true,
+      },
       workerName: {
         type: DataTypes.STRING,
         validate: {
@@ -35,10 +38,13 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       area: {
-        type: DataTypes.ENUM("mahe", "chokli", "palloor", "pandakkal"),
-        validate: {
-          isIn: [["mahe", "chokli", "palloor", "pandakkal"]],
+        type: DataTypes.INTEGER.UNSIGNED,
+        references: {
+          model: "areas",
+          key: "id",
         },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       },
       phone: {
         type: DataTypes.STRING,
@@ -71,4 +77,3 @@ module.exports = (sequelize, DataTypes) => {
   );
   return WorkerProfile;
 };
-

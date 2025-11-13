@@ -146,7 +146,7 @@ module.exports = {
         }
       }
       if (processedFiles.image) {
-        user.image = processedFiles.image.filename;
+        user.image = processedFiles.image[0].filename;
       }
       const updatedUser = await user.save();
       res.status(200).json({

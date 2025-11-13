@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     "ShopCategory",
     {
       id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER.UNSIGNED,
         primaryKey: true,
         autoIncrement: true,
       },
@@ -39,10 +39,3 @@ module.exports = (sequelize, DataTypes) => {
   return ShopCategory;
 };
 
-// Shop.belongsToMany(Category, { through: ShopCategory, foreignKey: "shopId" });
-// Category.belongsToMany(Shop, {
-//   through: ShopCategory,
-//   foreignKey: "categoryId",
-// });
-
-// module.exports = ShopCategory;

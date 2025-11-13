@@ -38,9 +38,9 @@ module.exports = {
           .json({ error: "Both small and large images are required." });
       }
 
-      const newBanner = await Banner.create({
-        banner_image_small: processedFiles.banner_image_large.filename,
-        banner_image_large: processedFiles.banner_image_small.filename,
+      const newBanner = await Banner.creat({
+        banner_image_small: processedFiles.banner_image_large[0].filename,
+        banner_image_large: processedFiles.banner_image_small[0].filename,
         banner_type: banner_type,
         trash: false,
       });
@@ -50,7 +50,7 @@ module.exports = {
         banner: newBanner,
       });
     } catch (error) {
-      await cleanupFiles(processImageFields, UPLOAD_SUBFOLDER);
+      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       res.status(500).json({
         message: "An error occurred on the server while uploading banners.",
       });
@@ -87,19 +87,19 @@ module.exports = {
 
       banner.banner_type = banner_type || banner.banner_type;
       if (processedFiles.banner_image_large) {
-        banner.banner_image_large = processedFiles.banner_image_large.filename;
+        banner.banner_image_large = processedFiles.banner_image_large[0].filename;
       }
       if (processedFiles.banner_image_small) {
-        banner.banner_image_small = processedFiles.banner_image_small.filename;
+        banner.banner_image_small = processedFiles.banner_image_small[0].filename;
       }
 
-      const updatedBanner = await banner.save();
+      const updatedBanner = await banner.sav();
       res.status(200).json({
         message: `Banner ${updatedBanner.id} updated successfully!`,
         banner: updatedBanner,
       });
     } catch (error) {
-      await cleanupFiles(processImageFields, UPLOAD_SUBFOLDER);
+      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       res.status(500).json({ message: "Error updating banner." });
     }
   },

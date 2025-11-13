@@ -2,9 +2,7 @@ require("../config/database");
 const fs = require("fs");
 const path = require("path");
 const sequelize = require("../config/database");
-const {
-  Op,
-} = require("sequelize");
+const { Op } = require("sequelize");
 
 const {
   User,
@@ -13,11 +11,16 @@ const {
   Type,
   Shop,
   Category,
+  Area,
 } = require("../models");
 
 const { hashData } = require("../utils/hashData");
 const { sendShopWelcomeEmail } = require("../utils/emailService");
-const { processImageFields, cleanupFiles,deleteFileWithFolderName } = require("../utils/fileHandler");
+const {
+  processImageFields,
+  cleanupFiles,
+  deleteFileWithFolderName,
+} = require("../utils/fileHandler");
 
 const UPLOAD_SUBFOLDER = "shopImages";
 const UPLOAD_PATH = process.env.UPLOAD_PATH;
@@ -54,10 +57,11 @@ module.exports = {
         shopProcessingConfig,
         UPLOAD_SUBFOLDER
       );
+      console.log(processedShopFiles);
       const shopData = {
         ...req.body,
-        image: processedShopFiles.image.filename || null,
-        icon: processedShopFiles.icon.filename || null,
+        image: processedShopFiles.image[0].filename || null,
+        icon: processedShopFiles.icon[0].filename || null,
       };
       const newShop = await Shop.create(shopData, { transaction: t });
       if (newShop.categories && newShop.categories.length > 0) {
@@ -71,7 +75,8 @@ module.exports = {
         userImageConfig,
         USER_PROFILE_SUBFOLDER
       );
-      await User.create(
+      console.log(processedUserFiles);
+      await User.creat(
         {
           userName: shopName,
           email,
@@ -79,7 +84,7 @@ module.exports = {
           areas,
           password: await hashData(phone),
           role: "shop",
-          image: processedUserFiles.image.filename || null,
+          image: processedUserFiles.image[0].filename || null,
         },
         { transaction: t }
       );
@@ -90,8 +95,12 @@ module.exports = {
       ).catch(() => {
         console.error("--- ASYNC EMAIL FAILED TO SEND ---", err);
       });
+
       const finalShop = await Shop.findByPk(newShop.id, {
-        include: Category,
+        include: [
+          { model: Category },
+          { model: Area},
+        ],
         transaction: t,
       });
       await t.commit();
@@ -112,6 +121,7 @@ module.exports = {
   },
   getShops: async (req, res) => {
     const search = req.query.search || "";
+    const area = req.query.area || null;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit || 0;
@@ -190,19 +200,13 @@ module.exports = {
 
       if (processedFiles.image && shop.image) {
         const oldFilename = path.basename(shop.image);
-        const oldFilePath = path.join(
-          UPLOAD_PATH,
-          UPLOAD_SUBFOLDER,
-        );
-        await deleteFileWithFolderName(oldFilePath,oldFilename)
+        const oldFilePath = path.join(UPLOAD_PATH, UPLOAD_SUBFOLDER);
+        await deleteFileWithFolderName(oldFilePath, oldFilename);
       }
       if (processedFiles.icon && shop.icon) {
         const oldFilename = path.basename(shop.icon);
-        const oldFilePath = path.join(
-          UPLOAD_PATH,
-          UPLOAD_SUBFOLDER,
-        );
-        await deleteFileWithFolderName(oldFilePath,oldFilename);
+        const oldFilePath = path.join(UPLOAD_PATH, UPLOAD_SUBFOLDER);
+        await deleteFileWithFolderName(oldFilePath, oldFilename);
       }
 
       for (const key in bodyData) {
@@ -214,10 +218,10 @@ module.exports = {
         shop.categories = categories;
       }
       if (processedFiles.image) {
-        shop.image = processedFiles.image.filename;
+        shop.image = processedFiles.image[0].filename;
       }
       if (processedFiles.icon) {
-        shop.icon = processedFiles.icon.filename;
+        shop.icon = processedFiles.icon[0].filename;
       }
       const updatedShop = await shop.save({ transaction: t });
 

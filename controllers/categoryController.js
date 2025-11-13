@@ -27,12 +27,12 @@ module.exports = {
         categoryProcessingConfig,
         UPLOAD_SUBFOLDER
       );
-      const newCategory = await Category.creat({
+      const newCategory = await Category.create({
         typeId,
         categoryName,
         description,
         userId,
-        icon: processedFiles.icon?.filename || null,
+        icon: processedFiles.icon?.[0]?.filename || null,
         trash: false,
       });
       res.status(201).json({
@@ -79,7 +79,7 @@ module.exports = {
         }
       }
       if (processedFiles.icon) {
-        category.icon = processedFiles.icon.filename;
+        category.icon = processedFiles.icon[0].filename;
       }
       const updatedCategory = await category.save();
       res.status(200).json({

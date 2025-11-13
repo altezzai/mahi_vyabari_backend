@@ -5,6 +5,11 @@ module.exports = (sequelize, DataTypes) => {
   const Shop = sequelize.define(
     "Shop",
     {
+      id: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        autoIncrement: true,
+        primaryKey: true,
+      },
       userId: {
         type: DataTypes.INTEGER,
       },
@@ -78,10 +83,13 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       area: {
-        type: DataTypes.ENUM("mahe", "chokli", "palloor", "pandakkal"),
-        validate: {
-          isIn: [["mahe", "chokli", "palloor", "pandakkal"]],
+        type: DataTypes.INTEGER.UNSIGNED,
+        references: {
+          model: "areas",
+          key: "id",
         },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       },
       trash: {
         type: DataTypes.BOOLEAN,

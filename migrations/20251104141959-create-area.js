@@ -13,10 +13,6 @@ module.exports = {
         allowNull: false,
         unique: true,
       },
-      description: {
-        type: Sequelize.TEXT,
-        allowNull: true,
-      },
       trash: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,

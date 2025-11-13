@@ -6,6 +6,11 @@ module.exports = (sequelize, DataTypes) => {
   const OTP = sequelize.define(
     "otps",
     {
+      id: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        autoIncrement: true,
+        primaryKey: true,
+      },
       email: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -43,4 +48,4 @@ module.exports = (sequelize, DataTypes) => {
   );
   return OTP;
 };
-// module.exports = OTP;
+

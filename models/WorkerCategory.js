@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     "WorkerCategory",
     {
       id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER.UNSIGNED,
         autoIncrement: true,
         primaryKey: true,
       },
@@ -38,13 +38,4 @@ module.exports = (sequelize, DataTypes) => {
   );
   return WorkerCategory;
 };
-// Worker.belongsToMany(Category, {
-//   through: WorkerCategory,
-//   foreignKey: "workerId",
-// });
-// Category.belongsToMany(Worker, {
-//   through: WorkerCategory,
-//   foreignKey: "categoryId",
-// });
 
-// module.exports = WorkerCategory;

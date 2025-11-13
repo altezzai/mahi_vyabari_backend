@@ -2,14 +2,19 @@ module.exports = (sequelize, DataTypes) => {
   const Category = sequelize.define(
     "Category",
     {
+      id: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        autoIncrement: true,
+        primaryKey: true,
+      },
       userId: {
         type: DataTypes.INTEGER,
       },
       typeId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER.UNSIGNED,
         allowNull: false,
         references: {
-          model:"types",
+          model: "types",
           key: "id",
         },
         validate: {

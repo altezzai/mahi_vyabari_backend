@@ -6,12 +6,17 @@ module.exports = (sequelize, DataTypes) => {
   const VehicleService = sequelize.define(
     "VehicleService",
     {
+      id: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        autoIncrement: true,
+        primaryKey: true,
+      },
       ownerName: {
         type: DataTypes.STRING,
         allowNull: false,
       },
       category: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER.UNSIGNED,
       },
       minFee: {
         type: DataTypes.DECIMAL(10, 2),
@@ -40,10 +45,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
       },
       area: {
-        type: DataTypes.ENUM("mahe", "chokli", "palloor", "pandakkal"),
-        validate: {
-          isIn: [["mahe", "chokli", "palloor", "pandakkal"]],
+        type: DataTypes.INTEGER.UNSIGNED,
+        allowNull: false,
+        references: {
+          model: "areas",
+          key: "id",
         },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       },
       address: {
         type: DataTypes.TEXT,
@@ -66,14 +75,3 @@ module.exports = (sequelize, DataTypes) => {
   );
   return VehicleService;
 };
-
-// Category.hasMany(VehicleService, {
-//   foreignKey: "category",
-//   as: "taxiCategory",
-// });
-// VehicleService.belongsTo(Category, {
-//   foreignKey: "category",
-//   as: "taxiCategory",
-// });
-
-// module.exports = VehicleService;

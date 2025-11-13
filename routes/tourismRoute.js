@@ -4,18 +4,31 @@ const router = express.Router();
 const tourismController = require("../controllers/tourismController");
 const userAuth = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
-router.use(userAuth, authorizeRoles("admin"));
+const multerInstance = require("../middleware/upload");
+// router.use(userAuth, authorizeRoles("admin"));
+const tourismUploadFields = [{ name: "images", maxCount: 5 }];
 
 router.post(
   "/add-tourist-place",
-  tourismController.upload.array("images", 4),
+  multerInstance.fields(tourismUploadFields),
   tourismController.addTouristPlace
 );
 router.put(
   "/update-tourist-place/:id",
-  tourismController.upload.array("images", 4),
+  multerInstance.none(),
   tourismController.updateTouristPlace
 );
+// --- Add ONE image to an existing spot ---
+// POST /tourism/image/add/:id
+router.post(
+  "/image/add/:id",
+  multerInstance.single("image"), // Use .single() for one file
+  tourismController.addTourismImage
+);
+
+// --- Delete ONE image from a spot ---
+// POST /tourism/image/delete/:id
+router.post("/image/delete/:id", tourismController.deleteTourismImage);
 router.patch("/delete-tourist-place/:id", tourismController.deleteTouristPlace);
 router.patch(
   "/restore-tourist-place/:id",

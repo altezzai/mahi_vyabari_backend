@@ -5,28 +5,26 @@ module.exports = (sequelize, DataTypes) => {
   const Tourism = sequelize.define(
     "Tourism",
     {
+      id: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        autoIncrement: true,
+        primaryKey: true,
+      },
       placeName: {
         type: DataTypes.STRING,
         allowNull: false,
-      },
-      images: {
-        type: DataTypes.TEXT,
-        get() {
-          const rawValue = this.getDataValue("images");
-          return rawValue ? JSON.parse(rawValue) : [];
-        },
-        set(value) {
-          this.setDataValue("images", JSON.stringify(value));
-        },
       },
       phone: {
         type: DataTypes.STRING,
       },
       area: {
-        type: DataTypes.ENUM("mahe", "chokli", "palloor", "pandakkal"),
-        validate: {
-          isIn: [["mahe", "chokli", "palloor", "pandakkal"]],
+        type: DataTypes.INTEGER.UNSIGNED,
+        references: {
+          model: "areas",
+          key: "id",
         },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       },
       startTime: {
         type: DataTypes.STRING,
@@ -57,5 +55,3 @@ module.exports = (sequelize, DataTypes) => {
   );
   return Tourism;
 };
-
-// module.exports = Tourism;
