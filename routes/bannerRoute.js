@@ -5,7 +5,6 @@ const userAuth = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
 const bannerController = require("../controllers/bannerController");
 const { uploadBannerImages } = require("../middleware/multer");
-const multerInstance = require("../middleware/upload");
 const { upload } = require("../middleware/upload2");
 
 const banner_uploadFields = [
@@ -26,7 +25,7 @@ router.put(
   // userAuth,
   // authorizeRoles("admin"),
   // uploadBannerImages,
-  multerInstance.fields(banner_uploadFields),
+  upload.fields(banner_uploadFields),
   bannerController.updateBanner
 );
 router.get(

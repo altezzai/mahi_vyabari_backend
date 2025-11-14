@@ -2,11 +2,8 @@ require("../config/database");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
-// const VehicleSchedule = require("../models/VehicleSchedule");
-// const VehicleService = require("../models/VehicleService");
 const { Op } = require("sequelize");
-// const Type = require("../models/Type");
-// const Category = require("../models/Category");
+
 const {
   VehicleSchedule,
   VehicleService,
@@ -16,18 +13,12 @@ const {
   User,
 } = require("../models");
 const {
-  cleanupFiles,
   deleteFileWithFolderName,
-  processImageFields,
   compressAndSaveFile,
 } = require("../utils/fileHandler");
 
-const UPLOAD_SUBFOLDER = "vehicle";
-const UPLOAD_PATH = process.env.UPLOAD_PATH;
-const vehicleProcessingConfig = {
-  image: { width: 1024 },
-  icon: { width: 150 },
-};
+const iconPath = "uploads/taxi/icon/";
+const imgPath = "uploads/taxi/";
 
 module.exports = {
   addVehicleSchedule: async (req, res) => {
@@ -220,10 +211,7 @@ module.exports = {
     }
   },
   addVehicleServiceProvider: async (req, res) => {
-    let processedFiles;
     try {
-      const iconPath = "uploads/taxi/icon/";
-      const imgPath = "uploads/taxi/";
       let image = null;
       let icon = null;
 
@@ -245,7 +233,6 @@ module.exports = {
         result: savedService,
       });
     } catch (error) {
-      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       console.log(error);
       res.status(500).json({
         success: false,
@@ -254,7 +241,6 @@ module.exports = {
     }
   },
   updateVehicleServiceProvider: async (req, res) => {
-    let processedFiles;
     try {
       const { id } = req.params;
       const vehicleService = await VehicleService.findByPk(id);
@@ -265,8 +251,7 @@ module.exports = {
       }
 
       const { ...bodyData } = req.body;
-      const iconPath = "uploads/taxi/icon/";
-      const imgPath = "uploads/taxi/";
+
       let icon = vehicleService.icon;
       let image = vehicleService.image;
       if (req.files?.icon) {
@@ -292,7 +277,6 @@ module.exports = {
         data: updatedVehicleService,
       });
     } catch (error) {
-      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       console.error(error);
       return res.status(500).json({
         success: false,

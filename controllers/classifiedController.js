@@ -11,9 +11,7 @@ const {
 } = require("../models");
 const { Op } = require("sequelize");
 const {
-  cleanupFiles,
   deleteFileWithFolderName,
-  processImageFields,
   compressAndSaveFile,
 } = require("../utils/fileHandler");
 

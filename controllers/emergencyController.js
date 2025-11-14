@@ -1,28 +1,30 @@
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
-const {Emergency} = require("../models");
+const { Emergency } = require("../models");
 const { Op } = require("sequelize");
-const { cleanupFiles,deleteFileWithFolderName ,processImageFields} = require("../utils/fileHandler");
+const {
+  deleteFileWithFolderName,
+  compressAndSaveFile,
+} = require("../utils/fileHandler");
 
 const UPLOAD_SUBFOLDER = "emergency";
 const UPLOAD_PATH = process.env.UPLOAD_PATH;
 const emergencyProcessingConfig = {
-  icon: { width: 150 }, 
+  icon: { width: 150 },
 };
 
 module.exports = {
   addEmergency: async (req, res) => {
-    let processedFiles;
     try {
-      processedFiles = await processImageFields(
-        req.files,
-        emergencyProcessingConfig,
-        UPLOAD_SUBFOLDER
-      );
+      let fileName = null;
+      if (req.file) {
+        const uploadPath = "uploads/emergency/";
+        fileName = await compressAndSaveFile(req.file, uploadPath);
+      }
       const emergencyData = {
         ...req.body,
-        icon: processedFiles.icon[0].filename || null,
+        icon: fileName,
       };
       const savedEmergency = await Emergency.create(emergencyData);
       res.status(200).json({
@@ -31,7 +33,6 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       res.status(500).json({
         success: false,
         message: error.message,
@@ -39,7 +40,6 @@ module.exports = {
     }
   },
   updateEmergency: async (req, res) => {
-    let processedFiles;
     try {
       const { id } = req.params;
       const emergency = await Emergency.findByPk(id);
@@ -48,32 +48,29 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Emergency record not found" });
       }
-      processedFiles = await processImageFields(
-        req.files,
-        emergencyProcessingConfig,
-        UPLOAD_SUBFOLDER
-      );
+
       const { ...bodyData } = req.body;
-      if (processedFiles.icon && emergency.icon) {
-        const oldFilename = path.basename(emergency.icon);
-        const oldFilePath = path.join(UPLOAD_PATH, UPLOAD_SUBFOLDER);
-        await deleteFileWithFolderName(oldFilePath, oldFilename);
-      }
-      for (const key in bodyData) {
-        if (bodyData[key] !== null && bodyData[key] !== undefined) {
-          emergency[key] = bodyData[key];
+
+      let fileName = emergency.icon;
+      if (req.file) {
+        const uploadPath = "uploads/emergency/";
+        const oldFilename = fileName;
+        fileName = await compressAndSaveFile(req.file, uploadPath);
+        if (oldFilename) {
+          await deleteFileWithFolderName(uploadPath, oldFilename);
         }
       }
-      if (processedFiles.icon) {
-        emergency.icon = processedFiles.icon.filename;
-      }
-      const updatedEmergency = await emergency.save();
+
+      const updatedEmergency = await emergency.update({
+        ...bodyData,
+        icon: fileName,
+      });
+
       return res.status(200).json({
         success: true,
         data: updatedEmergency,
       });
     } catch (error) {
-      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       console.error(error);
       return res.status(500).json({
         success: false,

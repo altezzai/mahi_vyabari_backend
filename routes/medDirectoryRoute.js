@@ -4,7 +4,6 @@ const router = express.Router();
 const medDirectoryController = require("../controllers/medDirectoryController");
 const userAuth = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
-const multerInstance = require("../middleware/upload");
 const { upload } = require("../middleware/upload2");
 // router.use(userAuth, authorizeRoles("admin"));
 const medicalUploadFields = [

@@ -5,6 +5,7 @@ const categoryController = require("../controllers/categoryController");
 const userAuth = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
 const multerInstance = require("../middleware/upload");
+const { upload } = require("../middleware/upload2");
 // router.use(userAuth, authorizeRoles("admin"));
 
 const categoryUploadFields = [{ name: "icon", maxCount: 1 }];
@@ -17,12 +18,12 @@ router.get("/get-type/:id", categoryController.getTypeById);
 
 router.post(
   "/add-category",
-  multerInstance.fields(categoryUploadFields),
+  upload.single("icon"),
   categoryController.addCategory
 );
 router.put(
   "/update-category/:id",
-  multerInstance.fields(categoryUploadFields),
+  upload.single("icon"),
   categoryController.updateCategory
 );
 router.patch("/delete-category/:id", categoryController.deleteCategory);

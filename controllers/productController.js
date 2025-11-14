@@ -4,18 +4,9 @@ const path = require("path");
 const { Shop, Product } = require("../models");
 const { Op } = require("sequelize");
 const {
-  cleanupFiles,
   deleteFileWithFolderName,
-  processImageFields,
   compressAndSaveFile,
 } = require("../utils/fileHandler");
-
-const UPLOAD_SUBFOLDER = "productImages";
-const UPLOAD_PATH = process.env.UPLOAD_PATH;
-
-const productProcessingConfig = {
-  image: { width: 1024 },
-};
 
 module.exports = {
   addProduct: async (req, res) => {
@@ -51,7 +42,6 @@ module.exports = {
   },
   updateProduct: async (req, res) => {
     try {
-      console.log("helow");
       const { id } = req.params;
       let product = await Product.findByPk(id);
       if (!product) {
@@ -77,7 +67,6 @@ module.exports = {
 
       return res.status(200).json({ success: true, product: updatedProduct });
     } catch (error) {
-      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       console.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }

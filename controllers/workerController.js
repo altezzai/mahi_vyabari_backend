@@ -8,23 +8,16 @@ const { Op, where, col, Transaction } = require("sequelize");
 const { Type, Category, Worker, WorkerCategory, Area } = require("../models");
 const sequelize = require("../config/database");
 const {
-  cleanupFiles,
   deleteFileWithFolderName,
-  processImageFields,
   compressAndSaveFile,
 } = require("../utils/fileHandler");
 
-const UPLOAD_SUBFOLDER = "workers";
-const UPLOAD_PATH = process.env.UPLOAD_PATH;
-const workerProcessingConfig = {
-  image: { width: 1024 },
-  icon: { width: 150 },
-};
+const iconPath = "uploads/workers/icon/";
+const imgPath = "uploads/workers/";
 module.exports = {
   addWorkerProfile: async (req, res) => {
     const t = await sequelize.transaction();
-    const iconPath = "uploads/taxi/icon/";
-    const imgPath = "uploads/taxi/";
+
     try {
       let image = null;
       let icon = null;
@@ -78,8 +71,6 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Worker profile not found" });
       }
-      const iconPath = "uploads/worker/icon/";
-      const imgPath = "uploads/worker/";
       let icon = worker.icon;
       let image = worker.image;
       if (req.files?.icon) {

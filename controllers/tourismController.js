@@ -6,10 +6,8 @@ const { Tourism, TourismImage, Category, Area } = require("../models");
 const { Op } = require("sequelize");
 const sequelize = require("../config/database");
 const {
-  processImage,
   cleanupFiles,
   deleteFileWithFolderName,
-  processImageFields,
   compressAndSaveFile,
 } = require("../utils/fileHandler");
 
@@ -26,7 +24,6 @@ const tourismAddImageConfig = {
 
 module.exports = {
   addTouristPlace: async (req, res) => {
-    let processedFiles;
     const t = await sequelize.transaction();
     try {
       const newSpot = await Tourism.create(
@@ -67,7 +64,6 @@ module.exports = {
     } catch (error) {
       await t.rollback();
       console.log(error);
-      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       console.error("Error in createTourismSpot:", error);
       res.status(500).json({
         error: "Failed to create tourism spot",

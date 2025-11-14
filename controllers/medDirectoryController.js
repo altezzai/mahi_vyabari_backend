@@ -5,9 +5,7 @@ const path = require("path");
 const { Op } = require("sequelize");
 const { Category, Type, HealthcareProvider, Area } = require("../models");
 const {
-  cleanupFiles,
   deleteFileWithFolderName,
-  processImageFields,
   compressAndSaveFile,
 } = require("../utils/fileHandler");
 
@@ -54,7 +52,6 @@ module.exports = {
     }
   },
   updateMedicalDirectory: async (req, res) => {
-    let processedFiles;
     try {
       const { id } = req.params;
       const healthcareProvider = await HealthcareProvider.findByPk(id);
@@ -92,7 +89,6 @@ module.exports = {
         data: updatedHealthCareProvider,
       });
     } catch (error) {
-      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       console.error(error);
       return res.status(500).json({
         success: false,

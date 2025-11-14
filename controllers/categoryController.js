@@ -5,20 +5,12 @@ const path = require("path");
 const { Category, Type } = require("../models");
 const { Op } = require("sequelize");
 const {
-  cleanupFiles,
   deleteFileWithFolderName,
-  processImageFields,
+  compressAndSaveFile,
 } = require("../utils/fileHandler");
-
-const UPLOAD_SUBFOLDER = "categoryImages";
-const UPLOAD_PATH = process.env.UPLOAD_PATH;
-const categoryProcessingConfig = {
-  icon: { width: 150 },
-};
 
 module.exports = {
   addCategory: async (req, res) => {
-    let processedFiles;
     try {
       const { typeId, categoryName, description, userId } = req.body;
       if (!typeId || !categoryName) {
@@ -26,17 +18,17 @@ module.exports = {
           .status(400)
           .json({ error: "typeId and categoryName are required." });
       }
-      processedFiles = await processImageFields(
-        req.files,
-        categoryProcessingConfig,
-        UPLOAD_SUBFOLDER
-      );
+      let fileName = null;
+      if (req.file) {
+        const uploadPath = "uploads/category/";
+        fileName = await compressAndSaveFile(req.file, uploadPath);
+      }
       const newCategory = await Category.create({
         typeId,
         categoryName,
         description,
         userId,
-        icon: processedFiles.icon?.[0]?.filename || null,
+        icon: fileName,
         trash: false,
       });
       res.status(201).json({
@@ -47,7 +39,6 @@ module.exports = {
       console.error(
         "Error during category creation, cleaning up uploaded files..."
       );
-      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       console.log(error);
       res.status(500).json({
         success: false,
@@ -56,7 +47,6 @@ module.exports = {
     }
   },
   updateCategory: async (req, res) => {
-    let processedFiles;
     try {
       const { id } = req.params;
       const category = await Category.findByPk(id);
@@ -65,33 +55,29 @@ module.exports = {
           .status(404)
           .json({ error: `Category with ID ${id} not found.` });
       }
-      processedFiles = await processImageFields(
-        req.files,
-        categoryProcessingConfig,
-        UPLOAD_SUBFOLDER
-      );
+
       const { ...bodyData } = req.body;
 
-      if (processedFiles.icon && category.icon) {
-        const oldFilename = path.basename(category.icon);
-        const oldFilePath = path.join(UPLOAD_PATH, UPLOAD_SUBFOLDER);
-        await deleteFileWithFolderName(oldFilePath, oldFilename);
-      }
-      for (const key in bodyData) {
-        if (bodyData[key] !== null && bodyData[key] !== undefined) {
-          category[key] = bodyData[key];
+      let fileName = category.icon;
+      if (req.file) {
+        const uploadPath = "uploads/category/";
+        const oldFilename = fileName;
+        fileName = await compressAndSaveFile(req.file, uploadPath);
+        if (oldFilename) {
+          await deleteFileWithFolderName(uploadPath, oldFilename);
         }
       }
-      if (processedFiles.icon) {
-        category.icon = processedFiles.icon[0].filename;
-      }
-      const updatedCategory = await category.save();
+
+      const updatedCategory = await category.update({
+        ...bodyData,
+        icon: fileName,
+      });
+
       res.status(200).json({
         message: `Category ${updatedCategory.id} updated successfully!`,
         category: updatedCategory,
       });
     } catch (error) {
-      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       res
         .status(500)
         .json({ success: false, message: "Error updating category" });

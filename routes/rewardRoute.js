@@ -4,7 +4,6 @@ const router = express.Router();
 const rewardController = require("../controllers/rewardController");
 const userAuth = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
-const multerInstance = require("../middleware/upload");
 // router.use(userAuth, authorizeRoles("admin"));
 const { upload } = require("../middleware/upload2");
 

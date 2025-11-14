@@ -6,22 +6,12 @@ const bcrypt = require("bcrypt");
 const { startOfMonth, endOfMonth, subMonths } = require("date-fns");
 const createToken = require("../utils/createToken");
 
-// const User = require("../models/User");
-// const Feedback = require("../models/Feedback");
-// const Complaint = require("../models/Complaint");
 // const UserOtp = require("../models/Otp");
 const { sendEmail } = require("../utils/nodemailer");
 const { hashData } = require("../utils/hashData");
 const { where, Op, fn, literal, col } = require("sequelize");
 const sendSMS = require("../utils/tiwilio");
-// const Shop = require("../models/Shop");
-// const HealthcareProvider = require("../models/MedDirectory");
-// const VehicleService = require("../models/VehicleService");
-// const Worker = require("../models/Worker");
-// const Classified = require("../models/Classified");
-// const Type = require("../models/Type");
-// const Category = require("../models/Category");
-// const UserCoupon = require("../models/userCoupon");
+
 const {
   Shop,
   HealthcareProvider,
@@ -38,9 +28,8 @@ const {
   Area,
 } = require("../models");
 const {
-  cleanupFiles,
   deleteFileWithFolderName,
-  processImageFields,
+  compressAndSaveFile,
 } = require("../utils/fileHandler");
 
 const UPLOAD_SUBFOLDER = "userImages";
@@ -125,42 +114,42 @@ module.exports = {
     }
   },
   editUser: async (req, res) => {
-    let processedFiles;
     try {
-      const user = await User.findByPk(39);
+      const id = req.user.id;
+      console.log(id);
+      const user = await User.findOne({
+        where: { id },
+      });
       if (!user) {
         res.status(409).json({
           success: false,
           message: "user not found",
         });
       }
-      processedFiles = await processImageFields(
-        req.files,
-        userProcessingConfig,
-        UPLOAD_SUBFOLDER
-      );
+
       const { ...bodyData } = req.body;
-      if (processedFiles.image && user.image) {
-        const oldFilename = path.basename(user.image);
-        const oldFilePath = path.join(UPLOAD_PATH, UPLOAD_SUBFOLDER);
-        await deleteFileWithFolderName(oldFilePath, oldFilename);
-      }
-      for (const key in bodyData) {
-        if (bodyData[key] !== null && bodyData[key] !== undefined) {
-          user[key] = bodyData[key];
+
+      let fileName = user.image;
+      if (req.file) {
+        const uploadPath = "uploads/userImages/";
+        const oldFilename = fileName;
+        fileName = await compressAndSaveFile(req.file, uploadPath);
+        if (oldFilename) {
+          await deleteFileWithFolderName(uploadPath, oldFilename);
         }
       }
-      if (processedFiles.image) {
-        user.image = processedFiles.image[0].filename;
-      }
-      const updatedUser = await user.save();
+      const updatedData = {
+        ...bodyData,
+        image: fileName,
+      };
+
+      const updatedUser = await user.update(updatedData);
       res.status(200).json({
         success: true,
         user: updatedUser,
         message: "User updated successfully",
       });
     } catch (error) {
-      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       console.log(error);
       res.status(500).json({
         success: false,
@@ -857,14 +846,6 @@ module.exports = {
         grandTotal += count;
       }
 
-      // for (const [typeName, count] of Object.entries(counts)) {
-      //   const percentage =
-      //     grandTotal === 0 ? 0 : ((count / grandTotal) * 100).toFixed(2);
-      //   results[typeName] = {
-      //     total: count,
-      //     percentage: `${percentage}%`,
-      //   };
-      // }
       for (const [typeName, count] of Object.entries(counts)) {
         const percentage =
           grandTotal === 0 ? 0 : ((count / grandTotal) * 100).toFixed(2);

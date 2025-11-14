@@ -1,21 +1,7 @@
-// const Shop = require("../models/Shop");
-// const Feedback = require("../models/Feedback");
-// const Medical = require("../models/MedDirectory");
-// const VehicleSchedule = require("../models/VehicleSchedule");
-// const Emergency = require("../models/Emergency");
-// const VehicleService = require("../models/VehicleService");
-// const Worker = require("../models/Worker");
-// const Classified = require("../models/Classified");
-// const ShopCategory = require("../models/ShopCategory");
-// const WorkerCategory = require("../models/WorkerCategory");
-// const Tourism = require("../models/Tourism");
 const { Sequelize } = require("sequelize");
-// const Category = require("../models/Category");
-// const Product = require("../models/Product");
-// const Type = require("../models/Type");
+
 const {
   Shop,
-  Medical,
   Feedback,
   VehicleSchedule,
   Emergency,

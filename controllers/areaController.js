@@ -1,10 +1,5 @@
-// --- controllers/areaController.js ---
-// This is the new controller for managing Areas (CRUD + Restore)
-
 const { Area } = require("../models");
 
-// --- CREATE AREA ---
-// ... (createArea function - no changes)
 const createArea = async (req, res) => {
   try {
     const { name } = req.body;

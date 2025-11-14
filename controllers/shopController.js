@@ -18,28 +18,17 @@ const {
 const { hashData } = require("../utils/hashData");
 const { sendShopWelcomeEmail } = require("../utils/emailService");
 const {
-  processImageFields,
-  cleanupFiles,
   deleteFileWithFolderName,
   compressAndSaveFile,
 } = require("../utils/fileHandler");
 const { Console } = require("console");
 
-const UPLOAD_SUBFOLDER = "shopImages";
-const UPLOAD_PATH = process.env.UPLOAD_PATH;
-const USER_PROFILE_SUBFOLDER = "userImages";
-
-const shopProcessingConfig = {
-  image: { width: 1024 },
-  icon: { width: 150 },
-};
-
+const iconPath = "uploads/shop/icon/";
+const imgPath = "uploads/shop/";
 module.exports = {
   addShop: async (req, res) => {
     const { shopName, phone, area_id, email } = req.body;
     const t = await sequelize.transaction();
-    const iconPath = "uploads/shop/icon/";
-    const imgPath = "uploads/shop/";
 
     try {
       // 🔹 Validation
@@ -230,9 +219,6 @@ module.exports = {
     }
   },
   updateShop: async (req, res) => {
-    let processedFiles;
-    const iconPath = "uploads/shop/icon/";
-    const imgPath = "uploads/shop/";
     const t = await sequelize.transaction();
     try {
       const { shopId } = req.params;
@@ -309,7 +295,6 @@ module.exports = {
       });
     } catch (error) {
       await t.rollback();
-      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       console.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }

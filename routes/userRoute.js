@@ -10,6 +10,7 @@ const {
   apiLimiter,
 } = require("../middleware/rateLimiter");
 const multerInstance = require("../middleware/upload");
+const { upload } = require("../middleware/upload2");
 
 const userUploadFields = [{ name: "image", maxCount: 1 }];
 
@@ -30,9 +31,9 @@ router.post("/logout", userAuth, userController.Logout);
 // router.post("/send-login-otp", userController.sendLoginOtp);
 router.put(
   "/edit-user",
-  // userAuth,
-  // authorizeRoles("user", "shop"),
-  multerInstance.fields(userUploadFields),
+  userAuth,
+  authorizeRoles("user", "shop"),
+  upload.single("image"),
   userController.editUser
 );
 // router.get(

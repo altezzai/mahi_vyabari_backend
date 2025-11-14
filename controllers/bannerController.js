@@ -3,19 +3,9 @@ const fs = require("fs");
 const { Banner } = require("../models");
 const sequelize = require("../config/database");
 const {
-  processImageFields,
   deleteFileWithFolderName,
-  cleanupFiles,
   compressAndSaveFile,
 } = require("../utils/fileHandler");
-
-const UPLOAD_SUBFOLDER = "banner";
-const UPLOAD_PATH = process.env.UPLOAD_PATH;
-
-const bannerProcessingConfig = {
-  banner_image_small: { width: 480 },
-  banner_image_large: { width: 1200 },
-};
 
 module.exports = {
   uploadBanners: async (req, res) => {
@@ -61,12 +51,10 @@ module.exports = {
     }
   },
   updateBanner: async (req, res) => {
-    let processedFiles;
     try {
       const { id } = req.params;
       const banner = await Banner.findByPk(id);
       if (!banner) {
-        cleanupFiles(req.files);
         return res.status(404).json({ message: "Banner not found." });
       }
 
