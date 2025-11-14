@@ -169,7 +169,15 @@ module.exports = {
           limit,
           offset,
           where: whereCondition,
-          attributes: ["id", "vehicleName", "category", "via", "to", "trash"],
+          attributes: [
+            "id",
+            "vehicleName",
+            "category",
+            "via",
+            "to",
+            "vehicleNumber",
+            "trash",
+          ],
           order: [["createdAt", "DESC"]],
         });
       if (!vehicleSchedules) {
@@ -342,6 +350,7 @@ module.exports = {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
+    const category = req.query.category || null;
     let whereCondition = {};
     if (search) {
       whereCondition = {
@@ -354,13 +363,24 @@ module.exports = {
     if (area_id) {
       whereCondition.area_id = area_id;
     }
+    if (category) {
+      whereCondition.category = category;
+    }
     try {
       const { count, rows: vehicleServices } =
         await VehicleService.findAndCountAll({
           limit,
           offset,
           where: whereCondition,
-          attributes: ["id", "ownerName", "priority", "trash"],
+          attributes: [
+            "id",
+            "ownerName",
+            "priority",
+            "image",
+            "icon",
+            "minFee",
+            "vehicleNumber",
+          ],
           include: [
             {
               model: Category,

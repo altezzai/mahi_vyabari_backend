@@ -3,7 +3,7 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const { Op } = require("sequelize");
-const { Category, Type, HealthcareProvider } = require("../models");
+const { Category, Type, HealthcareProvider, Area } = require("../models");
 const {
   cleanupFiles,
   deleteFileWithFolderName,
@@ -150,6 +150,8 @@ module.exports = {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
+    const category = req.query.category || null;
+    const subCategory = req.query.subCategory || null;
     let whereCondition = {};
     if (search) {
       whereCondition = {
@@ -162,13 +164,39 @@ module.exports = {
     if (area_id) {
       whereCondition.area_id = area_id;
     }
+    if (category) {
+      whereCondition.category = category;
+    }
+    if (subCategory) {
+      whereCondition.subCategory = subCategory;
+    }
     try {
       const { count, rows: medical } = await HealthcareProvider.findAndCountAll(
         {
           limit,
           offset,
-          attributes: ["id", "name", "priority", "category", "trash"],
+          attributes: [
+            "id",
+            "name",
+            "priority",
+            "category",
+            "subCategory",
+            "image",
+            "icon",
+            "trash",
+          ],
           where: whereCondition,
+          include: [
+            {
+              model: Category,
+              attributes: ["id", "categoryName"],
+              as: "categoryInfo",
+            },
+            {
+              model: Area,
+              attributes: ["id", "name"],
+            },
+          ],
           order: [["createdAt", "DESC"]],
         }
       );

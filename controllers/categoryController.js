@@ -4,7 +4,11 @@ const fs = require("fs");
 const path = require("path");
 const { Category, Type } = require("../models");
 const { Op } = require("sequelize");
-const { cleanupFiles,deleteFileWithFolderName,processImageFields } = require("../utils/fileHandler");
+const {
+  cleanupFiles,
+  deleteFileWithFolderName,
+  processImageFields,
+} = require("../utils/fileHandler");
 
 const UPLOAD_SUBFOLDER = "categoryImages";
 const UPLOAD_PATH = process.env.UPLOAD_PATH;

@@ -202,7 +202,7 @@ module.exports = {
         limit,
         offset,
         where: whereCondition,
-        attributes: ["id", "placeName", "phone", "trash"],
+        attributes: ["id", "placeName", "entryFee", "phone", "trash"],
         order: [["id", "DESC"]],
         include: [
           {

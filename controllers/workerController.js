@@ -202,6 +202,7 @@ module.exports = {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
+
     let whereCondition = {};
     if (search) {
       whereCondition = {
@@ -211,12 +212,21 @@ module.exports = {
     if (area_id) {
       whereCondition.area_id = area_id;
     }
+
     try {
       const { count, rows: workers } = await Worker.findAndCountAll({
         limit,
         offset,
         where: whereCondition,
-        attributes: ["id", "workerName", "priority", "trash", "createdAt"],
+        attributes: [
+          "id",
+          "workerName",
+          "priority",
+          "icon",
+          "minWage",
+          "trash",
+          "createdAt",
+        ],
         include: [
           {
             model: Category,
