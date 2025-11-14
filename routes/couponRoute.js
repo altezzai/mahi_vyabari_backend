@@ -3,7 +3,7 @@ const router = express.Router();
 const couponController = require("../controllers/couponController");
 const userAuth = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
-const {couponRequestLimiter} = require("../middleware/rateLimiter");
+const { couponRequestLimiter } = require("../middleware/rateLimiter");
 
 router.post(
   "/request-coupon",
@@ -83,6 +83,24 @@ router.get(
   userAuth,
   authorizeRoles("admin"),
   couponController.getCouponHistory
+);
+router.get(
+  "/getCouponRange",
+  userAuth,
+  authorizeRoles("admin"),
+  couponController.getCouponRange
+);
+router.get(
+  "/luckDraw",
+  userAuth,
+  authorizeRoles("admin"),
+  couponController.luckDraw
+);
+router.get(
+  "/get-user-milestone-status",
+  userAuth,
+  authorizeRoles("user"),
+  couponController.getUserMilestone
 );
 
 module.exports = router;

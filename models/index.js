@@ -43,9 +43,13 @@ const {
   Area,
   Tourism,
   TourismImage,
+  CouponMilestone,
+  Rewards,
 } = db;
 
 // Many-to-Many → Shop ⇄ Category
+User.belongsTo(Area, { foreignKey: "area_id" });
+Area.hasMany(User, { foreignKey: "area_id" });
 
 Shop.belongsToMany(Category, {
   through: ShopCategory,
@@ -148,6 +152,10 @@ Worker.belongsTo(Area, { foreignKey: "area_id" });
 Tourism.hasMany(TourismImage, { foreignKey: "tourismId", as: "images" });
 Tourism.belongsTo(Area, { foreignKey: "area_id" });
 TourismImage.belongsTo(Tourism, { foreignKey: "tourismId" });
+
+Rewards.belongsTo(User, { foreignKey: "user_id" });
+Rewards.belongsTo(CouponMilestone, { foreignKey: "milestone_id" });
+Rewards.belongsTo(UserCoupon, { foreignKey: "coupon_id" });
 
 /**
  * ---------------------------------------------------------

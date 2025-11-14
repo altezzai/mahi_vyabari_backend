@@ -55,6 +55,7 @@ const couponRouter = require("./routes/couponRoute");
 const tourismRouter = require("./routes/tourismRoute");
 const bannerRouter = require("./routes/bannerRoute");
 const areaRouter = require("./routes/areaRoute");
+const rewardRouter = require("./routes/rewardRoute");
 
 // app.use(
 //   session({
@@ -91,6 +92,7 @@ app.use("/api/coupon", couponRouter);
 app.use("/api/tourism", tourismRouter);
 app.use("/api/banners", bannerRouter);
 app.use("/api/area", areaRouter);
+app.use("/api/reward", rewardRouter);
 
 app.listen(PORT, () => {
   console.log(`server started on port number ${PORT}`);

@@ -1,6 +1,13 @@
 const sequelize = require("../config/database");
-const { Op, Sequelize, literal } = require("sequelize");
-const { User, ShopCoupon, UserCoupon, Shop } = require("../models");
+const { Op, fn, col, Sequelize, literal } = require("sequelize");
+const {
+  User,
+  ShopCoupon,
+  UserCoupon,
+  Shop,
+  Rewards,
+  CouponMilestone,
+} = require("../models");
 
 module.exports = {
   requestCoupon: async (req, res) => {
@@ -30,7 +37,6 @@ module.exports = {
     console.log(assignedCount);
     try {
       const { id } = req.params;
-      console.log(id);
       const shopCoupon = await ShopCoupon.findByPk(id);
       if (!shopCoupon) {
         return res
@@ -507,6 +513,171 @@ module.exports = {
       res
         .status(200)
         .json({ success: true, data: { totalCouponCount, userCouponStatus } });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  getCouponRange: async (req, res) => {
+    try {
+      const { startDate, endDate } = req.query;
+
+      if (!startDate || !endDate) {
+        return res
+          .status(400)
+          .json({ error: "startDate and endDate required" });
+      }
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+
+      end.setHours(23, 59, 59, 999);
+
+      const data = await UserCoupon.findOne({
+        attributes: [
+          [fn("MIN", col("couponIdFrom")), "firstCouponIdFrom"],
+          [fn("MAX", col("couponIdTo")), "lastCouponIdTo"],
+        ],
+        where: {
+          createdAt: {
+            [Op.between]: [start, end],
+          },
+        },
+        raw: true,
+      });
+      if (!data || data.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "No coupons found in date range" });
+      }
+
+      return res.status(200).json({
+        startDate,
+        endDate,
+        data,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: "Something went wrong" });
+    }
+  },
+  luckDraw: async (req, res) => {
+    try {
+      const { couponIdFrom, couponIdTo } = req.body;
+
+      if (!couponIdFrom || !couponIdTo) {
+        return res
+          .status(400)
+          .json({ error: "couponIdFrom and couponIdTo required" });
+      }
+
+      // 1️⃣ Generate random coupon number
+      const randomCouponId =
+        Math.floor(Math.random() * (couponIdTo - couponIdFrom + 1)) +
+        couponIdFrom;
+
+      console.log("Selected Random Coupon:", randomCouponId);
+
+      // 2️⃣ Find the user who owns this coupon
+      const result = await UserCoupon.findOne({
+        where: {
+          couponIdFrom: { [Op.lte]: randomCouponId }, // <= random number
+          couponIdTo: { [Op.gte]: randomCouponId }, // >= random number
+        },
+        include: [
+          {
+            model: User,
+            attributes: ["id", "userName", "email", "phone", "image"],
+            as: "user",
+          },
+          {
+            model: Shop,
+            attributes: ["id", "shopName", "image"],
+            as: "shop",
+          },
+        ],
+      });
+
+      if (!result) {
+        return res.status(404).json({
+          message: "No user matched with the selected coupon number.",
+          randomCouponId,
+        });
+      }
+
+      return res.status(200).json({
+        message: "Luck draw success!",
+        randomCouponId,
+        userDetails: result.user,
+        shopId: result.shop,
+        couponId: result.id,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: "Something went wrong" });
+    }
+  },
+  getUserMilestone: async (req, res) => {
+    const { id } = req.user;
+
+    try {
+      // 1. Get last achieved milestone (highest createdAt)
+      const lastMilestone = await Rewards.findOne({
+        where: { user_id: id },
+        attributes: ["coupon_Number", "milestone_id", "createdAt"],
+        include: [
+          {
+            model: CouponMilestone,
+            attributes: [
+              "id",
+              "required_coupons",
+              "gift_image",
+              "gift_description",
+            ],
+          },
+        ],
+        order: [["createdAt", "DESC"]],
+      });
+
+      // If user has no milestones yet
+      if (!lastMilestone) {
+        const nextMilestone = await CouponMilestone.findOne({
+          order: [["required_coupons", "ASC"]],
+        });
+
+        return res.status(200).json({
+          success: true,
+          data: {
+            lastMilestone: null,
+            nextMilestone,
+          },
+        });
+      }
+      if (!lastMilestone.CouponMilestone.id) {
+        return res.status(200).json({
+          success: true,
+          data: {
+            lastMilestone: null,
+            nextMilestone: null,
+          },
+        });
+      }
+
+      const achievedMilestoneId = lastMilestone.CouponMilestone.id;
+
+      const nextMilestone = await CouponMilestone.findOne({
+        where: {
+          id: { [Op.gt]: achievedMilestoneId }, // NEXT milestone ID
+        },
+        order: [["id", "ASC"]],
+      });
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          lastMilestone,
+          nextMilestone: nextMilestone || null, // if last milestone reached
+        },
+      });
     } catch (error) {
       console.log(error);
       res.status(500).json({ success: false, message: error.message });
