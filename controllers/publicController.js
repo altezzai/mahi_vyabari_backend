@@ -30,6 +30,8 @@ const {
   Product,
   Type,
   Area,
+  ClassifiedImage,
+  HealthcareProvider,
 } = require("../models");
 // const { getWorkerCategory } = require("./workerController");
 
@@ -217,6 +219,10 @@ module.exports = {
             through: { attributes: [] },
           },
           {
+            model: Area,
+            attributes: ["id", "name"],
+          },
+          {
             model: Product,
             as: "products",
             attributes: [
@@ -314,30 +320,36 @@ module.exports = {
       };
     }
     try {
-      const { count, rows: doctors } = await Medical.findAndCountAll({
-        limit,
-        offset,
-        attributes: [
-          "id",
-          "name",
-          "image",
-          "category",
-          "trash",
-          "area_id",
-          "openingTime",
-          "closingTime",
-          "phone",
-        ],
-        where: whereCondition,
-        include: [
-          {
-            model: Category,
-            attributes: ["id", "categoryName"],
-            as: "categoryInfo",
-          },
-        ],
-        order: [["priority", "ASC"]],
-      });
+      const { count, rows: doctors } = await HealthcareProvider.findAndCountAll(
+        {
+          limit,
+          offset,
+          attributes: [
+            "id",
+            "name",
+            "image",
+            "category",
+            "trash",
+            "area_id",
+            "openingTime",
+            "closingTime",
+            "phone",
+          ],
+          where: whereCondition,
+          include: [
+            {
+              model: Category,
+              attributes: ["id", "categoryName"],
+              as: "categoryInfo",
+            },
+            {
+              model: Area,
+              attributes: ["id", "name"],
+            },
+          ],
+          order: [["priority", "ASC"]],
+        }
+      );
       const totalPages = Math.ceil(count / limit);
       res.status(200).json({
         success: true,
@@ -353,13 +365,17 @@ module.exports = {
   getDoctorById: async (req, res) => {
     try {
       const { id } = req.params;
-      const doctor = await Medical.findOne({
+      const doctor = await HealthcareProvider.findOne({
         where: { id },
         include: [
           {
             model: Category,
             attributes: ["id", "categoryName"],
             as: "categoryInfo",
+          },
+          {
+            model: Area,
+            attributes: ["id", "name"],
           },
         ],
       });
@@ -470,20 +486,33 @@ module.exports = {
       };
     }
     try {
-      const { count, rows: hospitals } = await Medical.findAndCountAll({
-        limit,
-        offset,
-        attributes: ["id", "name", "image", "trash", "category", "area_id"],
-        where: whereCondition,
-        include: [
-          {
-            model: Category,
-            attributes: ["id", "categoryName"],
-            as: "categoryInfo",
-          },
-        ],
-        order: [["priority", "ASC"]],
-      });
+      const { count, rows: hospitals } =
+        await HealthcareProvider.findAndCountAll({
+          limit,
+          offset,
+          attributes: [
+            "id",
+            "name",
+            "image",
+            "icon",
+            "trash",
+            "category",
+            "area_id",
+          ],
+          where: whereCondition,
+          include: [
+            {
+              model: Category,
+              attributes: ["id", "categoryName"],
+              as: "categoryInfo",
+            },
+            {
+              model: Area,
+              attributes: ["id", "name"],
+            },
+          ],
+          order: [["priority", "ASC"]],
+        });
       const totalPages = Math.ceil(count / limit);
       res.status(200).json({
         success: true,
@@ -499,8 +528,19 @@ module.exports = {
   getHospitalsById: async (req, res) => {
     try {
       const { id } = req.params;
-      const hospital = await Medical.findOne({
+      const hospital = await HealthcareProvider.findOne({
         where: { id },
+        include: [
+          {
+            model: Category,
+            attributes: ["id", "categoryName"],
+            as: "categoryInfo",
+          },
+          {
+            model: Area,
+            attributes: ["id", "name"],
+          },
+        ],
       });
       if (!hospital) {
         return res
@@ -582,6 +622,10 @@ module.exports = {
               as: "taxiCategory",
               attributes: ["categoryName", "id"],
             },
+            {
+              model: Area,
+              attributes: ["id", "name"],
+            },
           ],
           order: [["priority", "ASC"]],
         });
@@ -607,6 +651,10 @@ module.exports = {
             model: Category,
             as: "taxiCategory",
             attributes: ["categoryName", "id"],
+          },
+          {
+            model: Area,
+            attributes: ["id", "name"],
           },
         ],
       });
@@ -664,6 +712,12 @@ module.exports = {
         offset,
         attributes: ["id", "workerName", "image", "area_id", "phone"],
         where: whereCondition,
+        include: [
+          {
+            model: Area,
+            attributes: ["id", "name"],
+          },
+        ],
         order: [["priority", "ASC"]],
       });
       const totalPages = Math.ceil(count / limit);
@@ -728,6 +782,10 @@ module.exports = {
             as: "itemCategory",
             attributes: ["id", "categoryName"],
           },
+          {
+            model: Area,
+            attributes: ["id", "name"],
+          },
         ],
         order: [["priority", "ASC"]],
       });
@@ -753,6 +811,14 @@ module.exports = {
             model: Category,
             as: "itemCategory",
             attributes: ["id", "categoryName"],
+          },
+          {
+            model: ClassifiedImage,
+            attributes: ["image"],
+          },
+          {
+            model: Area,
+            attributes: ["id", "name"],
           },
         ],
       });
