@@ -1,7 +1,7 @@
 require("dotenv").config();
 require("./utils/passport");
 require("./config/database");
-const fs = require('fs')
+const fs = require("fs");
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
@@ -89,8 +89,8 @@ app.use("/api/public", publicRouter);
 app.use("/api/customer", customerRouter);
 app.use("/api/coupon", couponRouter);
 app.use("/api/tourism", tourismRouter);
-app.use("/api/banners",bannerRouter);
-app.use("/api/area",areaRouter);
+app.use("/api/banners", bannerRouter);
+app.use("/api/area", areaRouter);
 
 app.listen(PORT, () => {
   console.log(`server started on port number ${PORT}`);

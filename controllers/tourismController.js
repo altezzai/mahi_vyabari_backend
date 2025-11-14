@@ -103,7 +103,6 @@ module.exports = {
         entryFee,
         location,
       });
-      console.log(updatedTourism);
       if (req.files?.images) {
         console.log(req.files.images);
         const imageRecords = [];

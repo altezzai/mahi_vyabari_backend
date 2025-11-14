@@ -5,6 +5,7 @@ const medDirectoryController = require("../controllers/medDirectoryController");
 const userAuth = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
 const multerInstance = require("../middleware/upload");
+const { upload } = require("../middleware/upload2");
 // router.use(userAuth, authorizeRoles("admin"));
 const medicalUploadFields = [
   { name: "image", maxCount: 1 },
@@ -13,12 +14,12 @@ const medicalUploadFields = [
 
 router.post(
   "/add-medicalDirectory",
-  multerInstance.fields(medicalUploadFields),
+  upload.fields(medicalUploadFields),
   medDirectoryController.addMedicalDirectory
 );
 router.put(
   "/update-medicalDirectory/:id",
-  multerInstance.fields(medicalUploadFields),
+  upload.fields(medicalUploadFields),
   medDirectoryController.updateMedicalDirectory
 );
 router.patch(

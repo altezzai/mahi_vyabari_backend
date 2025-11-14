@@ -6,6 +6,7 @@ const {
   processImageFields,
   deleteFileWithFolderName,
   cleanupFiles,
+  compressAndSaveFile,
 } = require("../utils/fileHandler");
 
 const UPLOAD_SUBFOLDER = "banner";
@@ -18,29 +19,33 @@ const bannerProcessingConfig = {
 
 module.exports = {
   uploadBanners: async (req, res) => {
-    let processedFiles;
     try {
-      processedFiles = await processImageFields(
-        req.files,
-        bannerProcessingConfig,
-        UPLOAD_SUBFOLDER
-      );
       const { banner_type } = req.body;
       if (!banner_type) {
         return res.status(400).json({ error: "banner_type is required." });
       }
-      if (
-        !processedFiles.banner_image_large ||
-        !processedFiles.banner_image_small
-      ) {
-        return res
-          .status(400)
-          .json({ error: "Both small and large images are required." });
+      const BannerSmlPath = "uploads/banner/small/";
+      const BannerLrgPath = "uploads/banner/";
+
+      let banner_image_small = null;
+      let banner_image_large = null;
+
+      if (req.files?.banner_image_small) {
+        banner_image_small = await compressAndSaveFile(
+          req.files.banner_image_small[0],
+          BannerSmlPath
+        );
+      }
+      if (req.files?.banner_image_large) {
+        banner_image_large = await compressAndSaveFile(
+          req.files.banner_image_large[0],
+          BannerLrgPath
+        );
       }
 
-      const newBanner = await Banner.creat({
-        banner_image_small: processedFiles.banner_image_large[0].filename,
-        banner_image_large: processedFiles.banner_image_small[0].filename,
+      const newBanner = await Banner.create({
+        banner_image_small: banner_image_small,
+        banner_image_large: banner_image_large,
         banner_type: banner_type,
         trash: false,
       });
@@ -50,7 +55,6 @@ module.exports = {
         banner: newBanner,
       });
     } catch (error) {
-      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       res.status(500).json({
         message: "An error occurred on the server while uploading banners.",
       });
@@ -68,40 +72,47 @@ module.exports = {
 
       const { banner_type } = req.body;
 
-      processedFiles = await processImageFields(
-        req.files,
-        bannerProcessingConfig,
-        UPLOAD_SUBFOLDER
-      );
+      const BannerSmlPath = "uploads/banner/small/";
+      const BannerLrgPath = "uploads/banner/";
 
-      if (processedFiles.banner_image_large && banner.banner_image_large) {
-        const oldFileName = path.basename(banner.banner_image_large);
-        const oldFilePath = path.join(UPLOAD_PATH, UPLOAD_SUBFOLDER);
-        await deleteFileWithFolderName(oldFilePath, oldFileName);
+      let banner_image_small = banner.banner_image_small;
+      let banner_image_large = banner.banner_image_large;
+
+      if (req.files?.banner_image_small) {
+        banner_image_small = await compressAndSaveFile(
+          req.files.banner_image_small[0],
+          BannerSmlPath
+        );
+        if (banner.banner_image_small) {
+          await deleteFileWithFolderName(
+            BannerSmlPath,
+            banner.banner_image_small
+          );
+        }
       }
-      if (processedFiles.banner_image_small && banner.banner_image_small) {
-        const oldFileName = path.basename(banner.banner_image_small);
-        const oldFilePath = path.join(UPLOAD_PATH, UPLOAD_SUBFOLDER);
-        await deleteFileWithFolderName(oldFilePath, oldFileName);
+      if (req.files?.banner_image_large) {
+        banner_image_large = await compressAndSaveFile(
+          req.files.banner_image_large[0],
+          BannerLrgPath
+        );
+        if (banner.banner_image_large) {
+          await deleteFileWithFolderName(
+            BannerLrgPath,
+            banner.banner_image_large
+          );
+        }
       }
 
-      banner.banner_type = banner_type || banner.banner_type;
-      if (processedFiles.banner_image_large) {
-        banner.banner_image_large =
-          processedFiles.banner_image_large[0].filename;
-      }
-      if (processedFiles.banner_image_small) {
-        banner.banner_image_small =
-          processedFiles.banner_image_small[0].filename;
-      }
-
-      const updatedBanner = await banner.sav();
+      const updatedBanner = await banner.update({
+        banner_image_small: banner_image_small,
+        banner_image_large: banner_image_large,
+        banner_type: banner_type,
+      });
       res.status(200).json({
         message: `Banner ${updatedBanner.id} updated successfully!`,
         banner: updatedBanner,
       });
     } catch (error) {
-      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       res.status(500).json({ message: "Error updating banner." });
     }
   },

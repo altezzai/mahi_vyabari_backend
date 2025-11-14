@@ -2,7 +2,13 @@ require("../config/database");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
-const { Classified, Type, Category } = require("../models");
+const {
+  Classified,
+  Type,
+  Category,
+  Area,
+  ClassifiedImage,
+} = require("../models");
 const { Op } = require("sequelize");
 const {
   cleanupFiles,
@@ -17,34 +23,43 @@ const classifiedProcessingConfig = {
   image: { width: 1024 },
   icon: { width: 150 },
 };
+const sequelize = require("../config/database");
 module.exports = {
   addClassified: async (req, res) => {
-    let processedFiles;
+    const t = await sequelize.transaction();
     try {
       const iconPath = "uploads/classified/icon/";
       const imgPath = "uploads/classified/";
-      let image = null;
+
       let icon = null;
 
       if (req.files?.icon) {
         icon = await compressAndSaveFile(req.files.icon[0], iconPath);
       }
-      if (req.files?.image) {
-        image = await compressAndSaveFile(req.files.image[0], imgPath);
-      }
-
       const classifiedData = {
         ...req.body,
-        image: image || null,
         icon: icon || null,
       };
+
       const savedClassified = await Classified.create(classifiedData);
+      if (req.files?.images) {
+        const imageRecords = [];
+
+        for (const img of req.files.images) {
+          const compressedName = await compressAndSaveFile(img, imgPath);
+          imageRecords.push({
+            classifiedId: savedClassified.id,
+            image: compressedName,
+          });
+        }
+        await ClassifiedImage.bulkCreate(imageRecords);
+      }
+
       res.status(201).json({
         success: true,
         savedShop: savedClassified,
       });
     } catch (error) {
-      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       console.log(error);
       res.status(401).json({
         success: false,
@@ -64,7 +79,6 @@ module.exports = {
       const iconPath = "uploads/classified/icon/";
       const imgPath = "uploads/classified/";
       let icon = classified.icon;
-      let image = classified.image;
       if (req.files?.icon) {
         const oldFilename = classified.icon;
         icon = await compressAndSaveFile(req.files.icon[0], iconPath);
@@ -72,18 +86,25 @@ module.exports = {
           await deleteFileWithFolderName(iconPath, oldFilename);
         }
       }
-      if (req.files?.image) {
-        const oldFilename = classified.image;
-        image = await compressAndSaveFile(req.files.image[0], imgPath);
-        await deleteFileWithFolderName(imgPath, oldFilename);
-      }
 
       const { ...bodyData } = req.body;
       const updatedClassified = await classified.update({
         ...bodyData,
-        image: image || null,
         icon: icon || null,
       });
+      if (req.files?.images) {
+        const imageRecords = [];
+
+        for (const img of req.files.images) {
+          const compressedName = await compressAndSaveFile(img, imgPath);
+          imageRecords.push({
+            classifiedId: id,
+            image: compressedName,
+          });
+        }
+        await ClassifiedImage.bulkCreate(imageRecords);
+      }
+
       return res.status(200).json({ success: true, item: updatedClassified });
     } catch (error) {
       console.log(error);

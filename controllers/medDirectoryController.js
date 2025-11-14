@@ -8,6 +8,7 @@ const {
   cleanupFiles,
   deleteFileWithFolderName,
   processImageFields,
+  compressAndSaveFile,
 } = require("../utils/fileHandler");
 
 const UPLOAD_SUBFOLDER = "medical";
@@ -18,27 +19,33 @@ const medicalProcessingConfig = {
 };
 module.exports = {
   addMedicalDirectory: async (req, res) => {
-    let processedFiles;
     try {
-      processedFiles = await processImageFields(
-        req.files,
-        medicalProcessingConfig,
-        UPLOAD_SUBFOLDER
-      );
-      const medDirectoryData = {
+      const iconPath = "uploads/healthcareProvider/icon/";
+      const imgPath = "uploads/healthcareProvider/";
+      let image = null;
+      let icon = null;
+
+      if (req.files?.icon) {
+        icon = await compressAndSaveFile(req.files.icon[0], iconPath);
+      }
+      if (req.files?.image) {
+        image = await compressAndSaveFile(req.files.image[0], imgPath);
+      }
+
+      const medicalDirectoryData = {
         ...req.body,
-        image: processedFiles.image?.[0].filename || null,
-        icon: processedFiles.icon?.[0].filename || null,
+        image: image || null,
+        icon: icon || null,
       };
+
       const savedMedicalDirectory = await HealthcareProvider.create(
-        medDirectoryData
+        medicalDirectoryData
       );
       res.status(201).json({
         success: true,
         result: savedMedicalDirectory,
       });
     } catch (error) {
-      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       console.log(error);
       res.status(500).json({
         success: false,
@@ -56,34 +63,30 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Healthcare Provider not found" });
       }
-      processedFiles = await processImageFields(
-        req.files,
-        medicalProcessingConfig,
-        UPLOAD_SUBFOLDER
-      );
-      const { ...bodyData } = req.body;
-      if (processedFiles.image && healthcareProvider.image) {
-        const oldFilename = path.basename(healthcareProvider.image);
-        const oldFilePath = path.join(UPLOAD_PATH, UPLOAD_SUBFOLDER);
-        await deleteFileWithFolderName(oldFilePath, oldFilename);
-      }
-      if (processedFiles.icon && healthcareProvider.icon) {
-        const oldFilename = path.basename(healthcareProvider.icon);
-        const oldFilePath = path.join(UPLOAD_PATH, UPLOAD_SUBFOLDER);
-        await deleteFileWithFolderName(oldFilePath, oldFilename);
-      }
-      for (const key in bodyData) {
-        if (bodyData[key] !== null && bodyData[key] !== undefined) {
-          healthcareProvider[key] = bodyData[key];
+      const iconPath = "uploads/healthcareProvider/icon/";
+      const imgPath = "uploads/healthcareProvider/";
+      let icon = healthcareProvider.icon;
+      let image = healthcareProvider.image;
+      if (req.files?.icon) {
+        const oldFilename = healthcareProvider.icon;
+        icon = await compressAndSaveFile(req.files.icon[0], iconPath);
+        if (oldFilename) {
+          await deleteFileWithFolderName(iconPath, oldFilename);
         }
       }
-      if (processedFiles.image) {
-        healthcareProvider.image = processedFiles.image?.[0].filename;
+      if (req.files?.image) {
+        const oldFilename = healthcareProvider.image;
+        image = await compressAndSaveFile(req.files.image[0], imgPath);
+        if (oldFilename) {
+          await deleteFileWithFolderName(imgPath, oldFilename);
+        }
       }
-      if (processedFiles.icon) {
-        healthcareProvider.icon = processedFiles.icon?.[0].filename;
-      }
-      const updatedHealthCareProvider = await healthcareProvider.save();
+      const { categories, ...updateBody } = req.body;
+      const updatedHealthCareProvider = await healthcareProvider.update({
+        ...updateBody,
+        image: image || null,
+        icon: icon || null,
+      });
       return res.status(200).json({
         success: true,
         data: updatedHealthCareProvider,

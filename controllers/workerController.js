@@ -22,7 +22,6 @@ const workerProcessingConfig = {
 };
 module.exports = {
   addWorkerProfile: async (req, res) => {
-    let processedFiles;
     const t = await sequelize.transaction();
     const iconPath = "uploads/taxi/icon/";
     const imgPath = "uploads/taxi/";
@@ -69,10 +68,10 @@ module.exports = {
     }
   },
   updateWorkerProfile: async (req, res) => {
-    let processedFiles;
     const t = await sequelize.transaction();
     try {
       const { id } = req.params;
+      const workerId = id;
       const worker = await Worker.findByPk(id);
       if (!worker) {
         return res
@@ -93,30 +92,49 @@ module.exports = {
       if (req.files?.image) {
         const oldFilename = worker.image;
         image = await compressAndSaveFile(req.files.image[0], imgPath);
-        await deleteFileWithFolderName(imgPath, oldFilename);
+        if (oldFilename) {
+          await deleteFileWithFolderName(imgPath, oldFilename);
+        }
       }
-
-      const { ...bodyData } = req.body;
-      const categories = JSON.parse(req.body.categories);
-      const existingCategories = JSON.parse(worker.categories);
-
+      const { categories, ...bodyData } = req.body;
       const updatedWorker = await worker.update(
         { ...bodyData, icon, image },
         { transaction: t }
       );
+      let categoryList = [];
 
-      if (JSON.stringify(categories) !== JSON.stringify(existingCategories)) {
-        await WorkerCategory.destroy({
-          where: { workerId: updatedWorker.id },
+      if (Array.isArray(categories)) {
+        categoryList = categories.map((c) => Number(c));
+      }
+
+      if (categoryList.length > 0) {
+        const existingCategories = await WorkerCategory.findAll({
+          where: {
+            workerId: workerId,
+          },
           transaction: t,
         });
-        await WorkerCategory.bulkCreate(
-          categories.map((category_id) => ({
-            workerId: updatedWorker.id,
-            categoryId: category_id,
-          })),
-          { transaction: t }
-        );
+
+        const existingIds = existingCategories.map((c) => c.categoryId);
+        const newIds = categoryList;
+
+        const toAdd = newIds.filter((id) => !existingIds.includes(id));
+        const toRemove = existingIds.filter((id) => !newIds.includes(id));
+
+        if (toAdd.length > 0) {
+          const insertData = toAdd.map((id) => ({
+            workerId: workerId,
+            categoryId: id,
+          }));
+          await WorkerCategory.bulkCreate(insertData, { transaction: t });
+        }
+
+        if (toRemove.length > 0) {
+          await WorkerCategory.destroy({
+            where: { workerId: workerId, categoryId: toRemove },
+            transaction: t,
+          });
+        }
       }
       const finalWorker = await Worker.findByPk(updatedWorker.id);
 
@@ -127,7 +145,6 @@ module.exports = {
       });
     } catch (error) {
       await t.rollback();
-      await cleanupFiles(processedFiles, UPLOAD_SUBFOLDER);
       console.error(error);
       return res.status(500).json({
         success: false,

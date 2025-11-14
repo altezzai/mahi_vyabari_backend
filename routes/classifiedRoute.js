@@ -8,7 +8,7 @@ const multerInstance = require("../middleware/upload");
 const { upload } = require("../middleware/upload2");
 // router.use(userAuth, authorizeRoles("admin"));
 const classifiedUploadFields = [
-  { name: "image", maxCount: 1 },
+  { name: "images", maxCount: 5 },
   { name: "icon", maxCount: 1 },
 ];
 

@@ -256,38 +256,37 @@ module.exports = {
         image = await compressAndSaveFile(req.files.image[0], imgPath);
         await deleteFileWithFolderName(imgPath, oldFilename);
       }
+      const { categories, ...updateBody } = req.body;
 
       const updatedShop = await shop.update(
         {
-          ...req.body,
+          ...updateBody,
           icon,
           image,
         },
         { transaction: t }
       );
 
-      const categories = JSON.parse(req.body.categories);
+      let categoryList = [];
 
-      if (categories && Array.isArray(categories)) {
+      if (Array.isArray(categories)) {
+        categoryList = categories.map((c) => Number(c));
+      }
+
+      if (categoryList.length > 0) {
         const existingCategories = await ShopCategory.findAll({
-          where: { shopId: shopId },
-          attributes: ["categoryId"],
-          raw: true,
+          where: {
+            shopId: shopId,
+          },
           transaction: t,
         });
 
-        const existingCategoryIds = existingCategories.map((c) => c.categoryId);
-        const newCategoryIds = categories.map((id) => Number(id));
+        const existingIds = existingCategories.map((c) => c.categoryId);
+        const newIds = categoryList;
 
-        // Find categories to add and remove
-        const toAdd = newCategoryIds.filter(
-          (id) => !existingCategoryIds.includes(id)
-        );
-        const toRemove = existingCategoryIds.filter(
-          (id) => !newCategoryIds.includes(id)
-        );
+        const toAdd = newIds.filter((id) => !existingIds.includes(id));
+        const toRemove = existingIds.filter((id) => !newIds.includes(id));
 
-        // Add new category links
         if (toAdd.length > 0) {
           const insertData = toAdd.map((id) => ({
             shopId: shopId,
@@ -296,13 +295,9 @@ module.exports = {
           await ShopCategory.bulkCreate(insertData, { transaction: t });
         }
 
-        // Remove old category links
         if (toRemove.length > 0) {
           await ShopCategory.destroy({
-            where: {
-              shopId: shopId,
-              categoryId: toRemove,
-            },
+            where: { shopId: shopId, categoryId: toRemove },
             transaction: t,
           });
         }
