@@ -18,6 +18,7 @@ router.get("/me", userAuth, userController.getCurrentUser);
 router.post("/send-register-otp", otpLimiter, userController.sendVerifyOtp);
 router.post("/register-user", authLimiter, userController.registerUser);
 router.post("/login-user", authLimiter, userController.userLogin);
+router.get("/refresh-token",userController.refreshAccessToken)
 router.post(
   "/send-reset-otp",
   otpLimiter,

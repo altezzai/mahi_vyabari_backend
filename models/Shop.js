@@ -68,7 +68,7 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       area_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER.UNSIGNED,
       },
       trash: {
         type: DataTypes.BOOLEAN,

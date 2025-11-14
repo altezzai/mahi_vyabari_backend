@@ -25,6 +25,7 @@ const { Console } = require("console");
 
 const iconPath = "uploads/shop/icon/";
 const imgPath = "uploads/shop/";
+
 module.exports = {
   addShop: async (req, res) => {
     const { shopName, phone, area_id, email } = req.body;
@@ -66,7 +67,7 @@ module.exports = {
 
       // 🔹 Exclude categories field
       const { categories, ...shopBody } = req.body;
-
+      
       const shopData = {
         ...shopBody,
         image: image || null,
@@ -75,7 +76,6 @@ module.exports = {
 
       // 🔹 Create shop record
       const newShop = await Shop.create(shopData, { transaction: t });
-
       // 🔹 Now handle categories separately
       let categoryList = [];
       if (Array.isArray(req.body.categories)) {
@@ -86,6 +86,7 @@ module.exports = {
           shopId: newShop.id,
           categoryId: category_id,
         }));
+
         await ShopCategory.bulkCreate(shopCategoryData, { transaction: t });
       }
 

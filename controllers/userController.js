@@ -4,14 +4,17 @@ const fs = require("fs");
 const path = require("path");
 const bcrypt = require("bcrypt");
 const { startOfMonth, endOfMonth, subMonths } = require("date-fns");
-const createToken = require("../utils/createToken");
+const {
+  generateAccessToken,
+  generateRefreshToken,
+} = require("../utils/tokenService");
 
 // const UserOtp = require("../models/Otp");
 const { sendEmail } = require("../utils/nodemailer");
 const { hashData } = require("../utils/hashData");
 const { where, Op, fn, literal, col } = require("sequelize");
 const sendSMS = require("../utils/tiwilio");
-
+const jwt = require("jsonwebtoken");
 const {
   Shop,
   HealthcareProvider,
@@ -195,14 +198,16 @@ module.exports = {
         role: user.role,
         shopId: shopId?.id,
       };
-      const token = await createToken(tokenData);
-      if (!token) {
+      const accessToken = await generateAccessToken(tokenData);
+      if (!accessToken) {
         return res.status(401).json({
           success: false,
-          message: "An error occured while creating jwt Token",
+          message: "An error occurred while creating jwt Token",
         });
       }
-      res.cookie("token", token, {
+      const tokenVersion = Date.now();
+      const refreshToken = await generateRefreshToken(user.id, tokenVersion);
+      res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
@@ -211,6 +216,7 @@ module.exports = {
       res.status(200).json({
         success: true,
         message: "User Logged In Successfully",
+        accessToken,
       });
     } catch (error) {
       console.log(error);
@@ -329,9 +335,48 @@ module.exports = {
       res.status(500).json({ success: false, message: error.message });
     }
   },
+  refreshAccessToken: async (req, res) => {
+    const token = req.cookies.refreshToken;
+    if (!token) return res.status(401).json({ message: "No refresh token" });
+    try {
+      const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+      const user = await User.findOne({ where: { id: decoded.id } });
+
+      let shopId;
+      if (user.role === "shop") {
+        shopId = await Shop.findOne({
+          where: { email: user.email },
+          attributes: ["id"],
+        });
+      }
+      const tokenData = {
+        id: decoded.id,
+        userName: user?.userName,
+        email: user?.email,
+        role: User?.role,
+        shopId: shopId?.id,
+      };
+      const accessToken = await generateAccessToken(tokenData);
+      const newRefreshToken = await generateRefreshToken(
+        decoded.id,
+        Date.now()
+      ); 
+      res.cookie("refreshToken", newRefreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+      return res.status(200).json({ accessToken });
+    } catch (error) {
+      return res
+        .status(403)
+        .json({ message: "Invalid or expired refresh token" });
+    }
+  },
   Logout: async (req, res) => {
     try {
-      res.clearCookie("token", {
+      res.clearCookie("refreshToken", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",

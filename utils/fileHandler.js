@@ -1,4 +1,3 @@
-// --- utils/imageProcessor.js ---
 const sharp = require("sharp");
 const path = require("path");
 const fs = require("fs");
@@ -58,11 +57,7 @@ const processImageFields = async (files, processingConfig, subfolder = "") => {
       console.log(
         `Found ${files[fieldName].length} file(s) for ${fieldName}, adding to processing queue.`
       );
-
-      // Initialize an array for this field's results
       processedFiles[fieldName] = [];
-
-      // Loop through each file uploaded for this field
       for (const file of files[fieldName]) {
         const resizeOptions = processingConfig[fieldName];
         const originalName = file.originalname;
@@ -73,7 +68,6 @@ const processImageFields = async (files, processingConfig, subfolder = "") => {
           subfolder,
           originalName
         ).then((result) => {
-          // Push the result to this field's array
           processedFiles[fieldName].push(result);
         });
         processingPromises.push(promise);
@@ -97,31 +91,12 @@ const cleanupFiles = async (processedFiles, subfolder) => {
   if (!processedFiles) return;
   console.error(`Cleaning up files from "${subfolder}"...`);
   const cleanupPromises = [];
-  // for (const fieldName in processedFiles) {
-  //   const file = processedFiles[fieldName];
-  //   if (file && file.filename) {
-  //     const filePath = path.join(UPLOAD_PATH, subfolder, file.filename);
-  //     console.log("Deleting orphaned file:", filePath);
-  //     cleanupPromises.push(
-  //       fs.promises
-  //         .unlink(filePath)
-  //         .catch((err) =>
-  //           console.error("Cleanup failed for file:", filePath, err.message)
-  //         )
-  //     );
-  //   }
-  // }
-  // --- START FIX ---
-  // Loop over each field name in the object (e.g., 'images')
   for (const fieldName in processedFiles) {
     const fileArray = processedFiles[fieldName];
-    // Check if it's an array of files
     if (Array.isArray(fileArray)) {
-      // Loop through each file object in the array
       for (const file of fileArray) {
         if (file && file.filename) {
           const filePath = path.join(UPLOAD_PATH, subfolder, file.filename);
-          console.log("Deleting orphaned file:", filePath);
           cleanupPromises.push(
             fs.promises
               .unlink(filePath)
@@ -140,7 +115,6 @@ const deleteFileWithFolderName = async (uploadPath, filename) => {
   try {
     if (filename) {
       const filePath = path.join(uploadPath, filename);
-      // console.log(filePath);
       if (fs.existsSync(filePath)) {
         await fs.promises.unlink(filePath);
       }
@@ -149,6 +123,7 @@ const deleteFileWithFolderName = async (uploadPath, filename) => {
     console.error("Error cleaning up" + filename + " files:", err);
   }
 };
+
 const compressAndSaveFile = async (file, uploadPath) => {
   try {
     const date = Date.now() + "-";
@@ -158,11 +133,9 @@ const compressAndSaveFile = async (file, uploadPath) => {
     const ext = path.extname(file.originalname).toLowerCase();
 
     if (file.mimetype.startsWith("image")) {
-      // Compress image
       processedFileName = `${date}${file.originalname.split(".")[0]}.jpg`;
       processedFile = await sharp(file.buffer).jpeg({ quality: 30 }).toBuffer();
     }
-
     const filePath = path.join(uploadPath, processedFileName);
     if (!fs.existsSync(uploadPath)) {
       fs.mkdirSync(uploadPath, { recursive: true });
