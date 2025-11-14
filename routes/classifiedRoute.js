@@ -30,5 +30,9 @@ router.get(
   "/get-classified-categories",
   classifiedController.getClassifiedCategories
 );
+router.delete(
+  "/delete-classified-image/:id",
+  classifiedController.deleteClassifiedImage
+);
 
 module.exports = router;

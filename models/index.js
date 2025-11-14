@@ -33,6 +33,7 @@ const {
   Feedback,
   Product,
   Classified,
+  ClassifiedImage,
   HealthcareProvider,
   VehicleService,
   Worker,
@@ -76,6 +77,13 @@ Product.belongsTo(Shop, { foreignKey: "shopId", as: "shop" });
 
 Category.hasMany(Classified, { foreignKey: "category", as: "itemCategory" });
 Classified.belongsTo(Category, { foreignKey: "category", as: "itemCategory" });
+
+Classified.hasMany(ClassifiedImage, {
+  foreignKey: "classifiedId",
+});
+ClassifiedImage.belongsTo(Classified, {
+  foreignKey: "classifiedId",
+});
 
 Category.hasMany(HealthcareProvider, {
   foreignKey: "subCategory",

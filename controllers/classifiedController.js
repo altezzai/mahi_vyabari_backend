@@ -175,8 +175,12 @@ module.exports = {
             attributes: ["id", "categoryName"],
             as: "itemCategory",
           },
+          {
+            model: Area,
+            attributes: ["id", "name"],
+          },
         ],
-        order: [["createdAt", "DESC"]],
+        order: [["id", "DESC"]],
       });
       if (!classifieds) {
         return res
@@ -205,6 +209,14 @@ module.exports = {
             model: Category,
             attributes: ["id", "categoryName"],
             as: "itemCategory",
+          },
+          {
+            model: ClassifiedImage,
+            attributes: ["image"],
+          },
+          {
+            model: Area,
+            attributes: ["id", "name"],
           },
         ],
       });
@@ -237,6 +249,28 @@ module.exports = {
         success: false,
         message: error.message,
       });
+    }
+  },
+  deleteClassifiedImage: async (req, res) => {
+    try {
+      const { id } = req.params; // ID of the ClassifiedImage
+
+      // 1. Find the image record
+      const image = await ClassifiedImage.findByPk(id);
+      if (!image) {
+        return res.status(404).json({ error: "Image not found." });
+      }
+      const fileName = image.image;
+      const uploadPath = "uploads/classified/";
+      if (fileName) {
+        await deleteFileWithFolderName(uploadPath, fileName);
+      }
+      await image.destroy();
+
+      res.status(200).json({ message: "Image deleted successfully!" });
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      res.status(500).json({ error: "Failed to delete image" });
     }
   },
 };
