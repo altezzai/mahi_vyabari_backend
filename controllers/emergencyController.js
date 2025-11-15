@@ -8,7 +8,7 @@ const {
   compressAndSaveFile,
 } = require("../utils/fileHandler");
 
-const uploadPath = "uploads/emergency/";
+const uploadPath = "public/uploads/emergency/";
 module.exports = {
   addEmergency: async (req, res) => {
     try {

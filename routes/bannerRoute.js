@@ -14,44 +14,55 @@ const banner_uploadFields = [
 
 router.post(
   "/add-banner",
-  // userAuth,
-  // authorizeRoles("admin"),
+  userAuth,
+  authorizeRoles("admin"),
   // uploadBannerImages,
   upload.fields(banner_uploadFields),
   bannerController.uploadBanners
 );
 router.put(
   "/update/:id",
-  // userAuth,
-  // authorizeRoles("admin"),
+  userAuth,
+  authorizeRoles("admin"),
   // uploadBannerImages,
   upload.fields(banner_uploadFields),
   bannerController.updateBanner
 );
 router.get(
   "/get-all",
-  // userAuth,
-  // authorizeRoles("admin"),
+  userAuth,
+  authorizeRoles("admin"),
   bannerController.getAllBannersAdmin
 );
 router.get("/latest-by-type", bannerController.getLatestBannersByType);
 router.patch(
   "/soft-delete/:id",
-  // userAuth,
-  // authorizeRoles("admin"),
+  userAuth,
+  authorizeRoles("admin"),
   bannerController.softDeleteBanner
 );
 router.patch(
   "/restore-banner/:id",
-  // userAuth,
-  // authorizeRoles("admin"),
+  userAuth,
+  authorizeRoles("admin"),
   bannerController.restoreBanner
 );
 router.delete(
   "/hard-delete/:id",
-  // userAuth,
-  // authorizeRoles("admin"),
+  userAuth,
+  authorizeRoles("admin"),
   bannerController.hardDeleteBanner
 );
-
+router.get(
+  "/get-banner/:id",
+  userAuth,
+  authorizeRoles("admin"),
+  bannerController.getBannerById
+);
+router.delete(
+  "/delete-banner/:id",
+  userAuth,
+  authorizeRoles("admin"),
+  bannerController.deleteBannerById
+);
 module.exports = router;
