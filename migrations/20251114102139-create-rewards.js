@@ -16,12 +16,12 @@ module.exports = {
       },
 
       milestone_id: {
-        type: Sequelize.INTEGER.UNSIGNED,
-        allowNull: false,
+        type: Sequelize.INTEGER,
+        allowNull: true,
       },
       coupon_id: {
-        type: Sequelize.INTEGER.UNSIGNED,
-        allowNull: false,
+        type: Sequelize.INTEGER,
+        allowNull: true,
       },
 
       coupon_Number: {

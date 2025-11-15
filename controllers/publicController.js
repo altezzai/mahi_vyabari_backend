@@ -19,7 +19,6 @@ const {
   ClassifiedImage,
   HealthcareProvider,
 } = require("../models");
-// const { getWorkerCategory } = require("./workerController");
 
 module.exports = {
   homePage: async (req, res) => {

@@ -145,7 +145,7 @@ module.exports = {
         user_address,
       } = req.body;
 
-      if (!user_id || !milestone_id) {
+      if (!user_id) {
         return res
           .status(400)
           .json({ error: "user_id and milestone_id are required" });
