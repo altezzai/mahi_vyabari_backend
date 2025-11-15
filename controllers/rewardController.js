@@ -148,9 +148,7 @@ module.exports = {
       } = req.body;
 
       if (!user_id) {
-        return res
-          .status(400)
-          .json({ error: "user_id and milestone_id are required" });
+        return res.status(400).json({ error: "user_id  are required" });
       }
 
       const newReward = await Rewards.create({
