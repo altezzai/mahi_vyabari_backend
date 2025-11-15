@@ -563,7 +563,7 @@ module.exports = {
   },
   luckDraw: async (req, res) => {
     try {
-      let { couponIdFrom, couponIdTo } = req.body;
+      let { couponIdFrom, couponIdTo } = req.query;
 
       if (!couponIdFrom || !couponIdTo) {
         return res
