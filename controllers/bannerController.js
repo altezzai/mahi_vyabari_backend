@@ -6,17 +6,15 @@ const {
   deleteFileWithFolderName,
   compressAndSaveFile,
 } = require("../utils/fileHandler");
-
+const BannerSmlPath = "public/uploads/banner/small/";
+const BannerLrgPath = "public/uploads/banner/";
 module.exports = {
   uploadBanners: async (req, res) => {
     try {
-      const { banner_type } = req.body;
+      const { banner_type, url } = req.body;
       if (!banner_type) {
         return res.status(400).json({ error: "banner_type is required." });
       }
-      const BannerSmlPath = "uploads/banner/small/";
-      const BannerLrgPath = "uploads/banner/";
-
       let banner_image_small = null;
       let banner_image_large = null;
 
@@ -37,6 +35,7 @@ module.exports = {
         banner_image_small: banner_image_small,
         banner_image_large: banner_image_large,
         banner_type: banner_type,
+        url: url,
         trash: false,
       });
 
@@ -58,10 +57,7 @@ module.exports = {
         return res.status(404).json({ message: "Banner not found." });
       }
 
-      const { banner_type } = req.body;
-
-      const BannerSmlPath = "uploads/banner/small/";
-      const BannerLrgPath = "uploads/banner/";
+      const { banner_type, url } = req.body;
 
       let banner_image_small = banner.banner_image_small;
       let banner_image_large = banner.banner_image_large;
@@ -95,6 +91,7 @@ module.exports = {
         banner_image_small: banner_image_small,
         banner_image_large: banner_image_large,
         banner_type: banner_type,
+        url: url,
       });
       res.status(200).json({
         message: `Banner ${updatedBanner.id} updated successfully!`,
@@ -258,6 +255,38 @@ module.exports = {
         .json({ message: "Banner permanently deleted successfully." });
     } catch (error) {
       res.status(500).json({ message: "Error hard-deleting banner." });
+    }
+  },
+  getBannerById: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const banner = await Banner.findByPk(id);
+      if (!banner) {
+        return res.status(404).json({ message: "Banner not found." });
+      }
+      res.status(200).json(banner);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching banner." });
+    }
+  },
+  deleteBannerById: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const banner = await Banner.findByPk(id);
+      if (!banner) {
+        return res.status(404).json({ message: "Banner not found." });
+      }
+      if (banner.banner_image_large) {
+        await deleteFileWithFolderName(uploadDir, banner.banner_image_large);
+      }
+      if (banner.banner_image_small) {
+        await deleteFileWithFolderName(uploadDir, banner.banner_image_small);
+      }
+
+      await banner.destroy();
+      res.status(200).json({ message: "Banner deleted successfully." });
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting banner." });
     }
   },
 };

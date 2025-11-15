@@ -17,8 +17,8 @@ const {
   compressAndSaveFile,
 } = require("../utils/fileHandler");
 
-const iconPath = "uploads/taxi/icon/";
-const imgPath = "uploads/taxi/";
+const iconPath = "public/uploads/taxi/icon/";
+const imgPath = "public/uploads/taxi/";
 
 module.exports = {
   addVehicleSchedule: async (req, res) => {

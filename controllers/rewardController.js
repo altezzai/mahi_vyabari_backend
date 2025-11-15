@@ -11,6 +11,7 @@ const {
   compressAndSaveFile,
   deleteFileWithFolderName,
 } = require("../utils/fileHandler");
+const uploadPath = "public/uploads/gifts/";
 
 module.exports = {
   // ➤ CREATE
@@ -20,7 +21,6 @@ module.exports = {
 
       let fileName = null;
       if (req.file) {
-        const uploadPath = "uploads/gifts/";
         fileName = await compressAndSaveFile(req.file, uploadPath);
       }
       if (!required_coupons) {
@@ -89,7 +89,6 @@ module.exports = {
 
       let fileName = milestone.gift_image;
       if (req.file) {
-        const uploadPath = "uploads/products/";
         const oldFilename = fileName;
         fileName = await compressAndSaveFile(req.file, uploadPath);
         if (oldFilename) {
@@ -122,6 +121,9 @@ module.exports = {
 
       if (!milestone) {
         return res.status(404).json({ error: "Milestone not found" });
+      }
+      if (milestone.gift_image) {
+        await deleteFileWithFolderName(uploadPath, milestone.gift_image);
       }
 
       await milestone.destroy();

@@ -400,10 +400,10 @@ module.exports = {
     }
   },
   getRecentUserCoupons: async (req, res) => {
-    const { shopId } = req.user;
+    const { id } = req.user;
     try {
       const couponHistory = await UserCoupon.findAndCountAll({
-        where: { shopId },
+        where: { shopId: id },
         limit: 20,
         attributes: ["id", "couponIdFrom", "couponIdTo"],
         include: [
@@ -425,7 +425,7 @@ module.exports = {
     }
   },
   getCurrentShopCouponStatus: async (req, res) => {
-    const { shopId } = req.user;
+    const shopId = req.user.id;
     try {
       if (!shopId) {
         return res
@@ -544,7 +544,7 @@ module.exports = {
         },
         raw: true,
       });
-      if (!data || data.length === 0) {
+      if (!data || data.firstCouponIdFrom === null) {
         return res
           .status(404)
           .json({ message: "No coupons found in date range" });

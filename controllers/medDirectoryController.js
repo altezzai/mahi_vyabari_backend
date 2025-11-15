@@ -9,17 +9,11 @@ const {
   compressAndSaveFile,
 } = require("../utils/fileHandler");
 
-const UPLOAD_SUBFOLDER = "medical";
-const UPLOAD_PATH = process.env.UPLOAD_PATH;
-const medicalProcessingConfig = {
-  image: { width: 1024 },
-  icon: { width: 150 },
-};
+const iconPath = "public/uploads/healthcareProvider/icon/";
+const imgPath = "public/uploads/healthcareProvider/";
 module.exports = {
   addMedicalDirectory: async (req, res) => {
     try {
-      const iconPath = "uploads/healthcareProvider/icon/";
-      const imgPath = "uploads/healthcareProvider/";
       let image = null;
       let icon = null;
 
@@ -60,8 +54,7 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Healthcare Provider not found" });
       }
-      const iconPath = "uploads/healthcareProvider/icon/";
-      const imgPath = "uploads/healthcareProvider/";
+
       let icon = healthcareProvider.icon;
       let image = healthcareProvider.image;
       if (req.files?.icon) {

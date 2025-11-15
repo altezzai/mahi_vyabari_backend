@@ -7,6 +7,7 @@ const {
   deleteFileWithFolderName,
   compressAndSaveFile,
 } = require("../utils/fileHandler");
+const uploadPath = "public/uploads/products/";
 
 module.exports = {
   addProduct: async (req, res) => {
@@ -14,7 +15,6 @@ module.exports = {
       console.log("helow");
       let fileName = null;
       if (req.file) {
-        const uploadPath = "uploads/products/";
         fileName = await compressAndSaveFile(req.file, uploadPath);
       }
 
@@ -53,7 +53,6 @@ module.exports = {
       const { ...bodyData } = req.body;
       let fileName = product.image;
       if (req.file) {
-        const uploadPath = "uploads/products/";
         const oldFilename = fileName;
         fileName = await compressAndSaveFile(req.file, uploadPath);
         if (oldFilename) {

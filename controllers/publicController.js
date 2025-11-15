@@ -18,6 +18,7 @@ const {
   Area,
   ClassifiedImage,
   HealthcareProvider,
+  Banner,
 } = require("../models");
 
 module.exports = {
@@ -946,6 +947,22 @@ module.exports = {
         attributes: ["id", "name"],
       });
       return res.status(200).json({ success: true, areas });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  getBanners: async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit) || 10;
+      const type = req.query.type || "type1";
+      const banners = await Banner.findAll({
+        limit,
+        where: { banner_type: type, trash: false },
+        attributes: ["id", "banner_image_large", "banner_image_small", "url"],
+        order: [["createdAt", "DESC"]],
+      });
+      return res.status(200).json({ success: true, banners });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ success: false, message: error.message });
