@@ -100,7 +100,7 @@ module.exports = {
       </div>
     `;
       sendEmail(email, subject, message);
-      const newusers = await users.create(userData);
+      const newusers = await User.create(userData);
       res.status(200).json({ success: true, newusers });
     } catch (error) {
       console.log(error);

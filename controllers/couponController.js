@@ -8,6 +8,7 @@ const {
   Rewards,
   CouponMilestone,
 } = require("../models");
+const { parse } = require("dotenv");
 
 module.exports = {
   requestCoupon: async (req, res) => {
@@ -400,10 +401,10 @@ module.exports = {
     }
   },
   getRecentUserCoupons: async (req, res) => {
-    const { shopId } = req.user;
+    const { id } = req.user;
     try {
       const couponHistory = await UserCoupon.findAndCountAll({
-        where: { shopId },
+        where: { shopId: id },
         limit: 20,
         attributes: ["id", "couponIdFrom", "couponIdTo"],
         include: [
@@ -425,7 +426,7 @@ module.exports = {
     }
   },
   getCurrentShopCouponStatus: async (req, res) => {
-    const { shopId } = req.user;
+    const shopId = req.user.id;
     try {
       if (!shopId) {
         return res
@@ -544,7 +545,7 @@ module.exports = {
         },
         raw: true,
       });
-      if (!data || data.length === 0) {
+      if (!data || data.firstCouponIdFrom === null) {
         return res
           .status(404)
           .json({ message: "No coupons found in date range" });
@@ -562,26 +563,23 @@ module.exports = {
   },
   luckDraw: async (req, res) => {
     try {
-      const { couponIdFrom, couponIdTo } = req.body;
+      let { couponIdFrom, couponIdTo } = req.query;
 
       if (!couponIdFrom || !couponIdTo) {
         return res
           .status(400)
           .json({ error: "couponIdFrom and couponIdTo required" });
       }
+      couponIdFrom = parseInt(couponIdFrom);
+      couponIdTo = parseInt(couponIdTo);
 
-      // 1️⃣ Generate random coupon number
       const randomCouponId =
         Math.floor(Math.random() * (couponIdTo - couponIdFrom + 1)) +
         couponIdFrom;
-
-      console.log("Selected Random Coupon:", randomCouponId);
-
-      // 2️⃣ Find the user who owns this coupon
       const result = await UserCoupon.findOne({
         where: {
-          couponIdFrom: { [Op.lte]: randomCouponId }, // <= random number
-          couponIdTo: { [Op.gte]: randomCouponId }, // >= random number
+          couponIdFrom: { [Op.lte]: randomCouponId },
+          couponIdTo: { [Op.gte]: randomCouponId },
         },
         include: [
           {
@@ -620,7 +618,6 @@ module.exports = {
     const { id } = req.user;
 
     try {
-      // 1. Get last achieved milestone (highest createdAt)
       const lastMilestone = await Rewards.findOne({
         where: { user_id: id },
         attributes: ["coupon_Number", "milestone_id", "createdAt"],
@@ -638,7 +635,6 @@ module.exports = {
         order: [["createdAt", "DESC"]],
       });
 
-      // If user has no milestones yet
       if (!lastMilestone) {
         const nextMilestone = await CouponMilestone.findOne({
           order: [["required_coupons", "ASC"]],
@@ -666,7 +662,7 @@ module.exports = {
 
       const nextMilestone = await CouponMilestone.findOne({
         where: {
-          id: { [Op.gt]: achievedMilestoneId }, // NEXT milestone ID
+          id: { [Op.gt]: achievedMilestoneId },
         },
         order: [["id", "ASC"]],
       });
@@ -675,7 +671,7 @@ module.exports = {
         success: true,
         data: {
           lastMilestone,
-          nextMilestone: nextMilestone || null, // if last milestone reached
+          nextMilestone: nextMilestone || null,
         },
       });
     } catch (error) {

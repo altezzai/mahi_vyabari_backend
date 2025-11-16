@@ -8,7 +8,7 @@ const {
   deleteFileWithFolderName,
   compressAndSaveFile,
 } = require("../utils/fileHandler");
-
+const uploadPath = "public/uploads/category/";
 module.exports = {
   addCategory: async (req, res) => {
     try {
@@ -20,7 +20,6 @@ module.exports = {
       }
       let fileName = null;
       if (req.file) {
-        const uploadPath = "uploads/category/";
         fileName = await compressAndSaveFile(req.file, uploadPath);
       }
       const newCategory = await Category.create({
@@ -60,7 +59,6 @@ module.exports = {
 
       let fileName = category.icon;
       if (req.file) {
-        const uploadPath = "uploads/category/";
         const oldFilename = fileName;
         fileName = await compressAndSaveFile(req.file, uploadPath);
         if (oldFilename) {

@@ -26,5 +26,6 @@ router.get("/shop-categories", publicController.getShopCategories);
 router.get("/worker-categories", publicController.getWorkerCategory);
 router.get("/classified-categories", publicController.getClassifiedCategory);
 router.get("/areas", publicController.getAreas);
+router.get("/banners", publicController.getBanners);
 
 module.exports = router;

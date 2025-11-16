@@ -15,20 +15,13 @@ const {
   compressAndSaveFile,
 } = require("../utils/fileHandler");
 
-const UPLOAD_PATH = process.env.UPLOAD_PATH;
-const UPLOAD_SUBFOLDER = "classified";
-const classifiedProcessingConfig = {
-  image: { width: 1024 },
-  icon: { width: 150 },
-};
+const iconPath = "public/uploads/classified/icon/";
+const imgPath = "public/uploads/classified/";
 const sequelize = require("../config/database");
 module.exports = {
   addClassified: async (req, res) => {
     const t = await sequelize.transaction();
     try {
-      const iconPath = "uploads/classified/icon/";
-      const imgPath = "uploads/classified/";
-
       let icon = null;
 
       if (req.files?.icon) {
@@ -74,8 +67,6 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Item not found" });
       }
-      const iconPath = "uploads/classified/icon/";
-      const imgPath = "uploads/classified/";
       let icon = classified.icon;
       if (req.files?.icon) {
         const oldFilename = classified.icon;

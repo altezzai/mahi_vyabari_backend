@@ -19,6 +19,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.ENUM("type1", "type2"),
         allowNull: false,
       },
+      url: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       trash: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,

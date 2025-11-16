@@ -11,17 +11,7 @@ const {
   compressAndSaveFile,
 } = require("../utils/fileHandler");
 
-const UPLOAD_SUBFOLDER = "tourism";
-const UPLOAD_PATH = process.env.UPLOAD_PATH;
-
-const tourismCreateConfig = {
-  images: { width: 1080 },
-};
-
-const tourismAddImageConfig = {
-  image: { width: 1080 },
-};
-
+const uploadPath = "public/uploads/tourism/";
 module.exports = {
   addTouristPlace: async (req, res) => {
     const t = await sequelize.transaction();
@@ -37,10 +27,7 @@ module.exports = {
         const imageRecords = [];
 
         for (const img of req.files.images) {
-          const compressedName = await compressAndSaveFile(
-            img,
-            "uploads/tourism/"
-          );
+          const compressedName = await compressAndSaveFile(img, uploadPath);
           imageRecords.push({
             tourismId: newSpot.id,
             image: compressedName,
@@ -104,10 +91,7 @@ module.exports = {
         const imageRecords = [];
 
         for (const img of req.files.images) {
-          const compressedName = await compressAndSaveFile(
-            img,
-            "uploads/tourism/"
-          );
+          const compressedName = await compressAndSaveFile(img, uploadPath);
           imageRecords.push({
             tourismId: tourism.id,
             image: compressedName,
@@ -135,7 +119,7 @@ module.exports = {
         return res.status(404).json({ error: "Image not found." });
       }
       const fileName = image.image;
-      const uploadPath = "uploads/tourism/";
+
       if (fileName) {
         await deleteFileWithFolderName(uploadPath, fileName);
       }

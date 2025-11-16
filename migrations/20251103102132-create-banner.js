@@ -16,6 +16,10 @@ module.exports = {
         type: Sequelize.ENUM("type1", "type2"),
         allowNull: false,
       },
+      url: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       trash: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,

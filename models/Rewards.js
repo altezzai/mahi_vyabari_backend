@@ -14,12 +14,12 @@ module.exports = (sequelize, DataTypes) => {
       },
 
       milestone_id: {
-        type: DataTypes.INTEGER.UNSIGNED,
-        allowNull: false,
+        type: DataTypes.INTEGER,
+        allowNull: true,
       },
       coupon_id: {
-        type: DataTypes.INTEGER.UNSIGNED,
-        allowNull: false,
+        type: DataTypes.INTEGER,
+        allowNull: true,
       },
 
       coupon_Number: {

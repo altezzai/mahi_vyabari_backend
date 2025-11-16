@@ -8,18 +8,12 @@ const {
   compressAndSaveFile,
 } = require("../utils/fileHandler");
 
-const UPLOAD_SUBFOLDER = "emergency";
-const UPLOAD_PATH = process.env.UPLOAD_PATH;
-const emergencyProcessingConfig = {
-  icon: { width: 150 },
-};
-
+const uploadPath = "public/uploads/emergency/";
 module.exports = {
   addEmergency: async (req, res) => {
     try {
       let fileName = null;
       if (req.file) {
-        const uploadPath = "uploads/emergency/";
         fileName = await compressAndSaveFile(req.file, uploadPath);
       }
       const emergencyData = {
@@ -53,7 +47,6 @@ module.exports = {
 
       let fileName = emergency.icon;
       if (req.file) {
-        const uploadPath = "uploads/emergency/";
         const oldFilename = fileName;
         fileName = await compressAndSaveFile(req.file, uploadPath);
         if (oldFilename) {

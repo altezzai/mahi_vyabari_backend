@@ -12,8 +12,8 @@ const {
   compressAndSaveFile,
 } = require("../utils/fileHandler");
 
-const iconPath = "uploads/workers/icon/";
-const imgPath = "uploads/workers/";
+const iconPath = "public/uploads/workers/icon/";
+const imgPath = "public/uploads/workers/";
 module.exports = {
   addWorkerProfile: async (req, res) => {
     const t = await sequelize.transaction();

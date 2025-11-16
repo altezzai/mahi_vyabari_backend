@@ -35,11 +35,7 @@ const {
   compressAndSaveFile,
 } = require("../utils/fileHandler");
 
-const UPLOAD_SUBFOLDER = "userImages";
-const UPLOAD_PATH = process.env.UPLOAD_PATH;
-const userProcessingConfig = {
-  image: { width: 1024 },
-};
+const uploadPath = "public/uploads/userImages/";
 module.exports = {
   registerUser: async (req, res) => {
     try {
@@ -143,7 +139,6 @@ module.exports = {
 
       let fileName = user.image;
       if (req.file) {
-        const uploadPath = "uploads/userImages/";
         const oldFilename = fileName;
         fileName = await compressAndSaveFile(req.file, uploadPath);
         if (oldFilename) {

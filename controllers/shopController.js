@@ -23,9 +23,8 @@ const {
 } = require("../utils/fileHandler");
 const { Console } = require("console");
 
-const iconPath = "uploads/shop/icon/";
-const imgPath = "uploads/shop/";
-
+const iconPath = "public/uploads/shop/icon/";
+const imgPath = "public/uploads/shop/";
 module.exports = {
   addShop: async (req, res) => {
     const { shopName, phone, area_id, email } = req.body;
@@ -204,7 +203,6 @@ module.exports = {
           {
             model: Area,
             attributes: ["id", "name"],
-            through: { attributes: [] },
           },
         ],
       });
