@@ -167,22 +167,22 @@ module.exports = {
       } else if (status === "trashed") {
         whereClause.trash = true;
       }
-      const { count, rows } = await Banner.findAndCountAll({
+      const { count, rows: banners } = await Banner.findAndCountAll({
         where: whereClause,
         limit: limitNum,
         offset: offset,
         order: [["createdAt", "DESC"]],
       });
 
-      const addFullUrl = (banner) => ({
-        ...banner.toJSON(),
-        banner_image_large: `${req.protocol}://${req.get(
-          "host"
-        )}/public/uploads/banners/${banner.banner_image_large}`,
-        banner_image_small: `${req.protocol}://${req.get(
-          "host"
-        )}/public/uploads/banners/${banner.banner_image_small}`,
-      });
+      // const addFullUrl = (banner) => ({
+      //   ...banner.toJSON(),
+      //   banner_image_large: `${req.protocol}://${req.get(
+      //     "host"
+      //   )}/public/uploads/banners/${banner.banner_image_large}`,
+      //   banner_image_small: `${req.protocol}://${req.get(
+      //     "host"
+      //   )}/public/uploads/banners/${banner.banner_image_small}`,
+      // });
 
       const totalPages = Math.ceil(count / limitNum);
 
@@ -190,7 +190,7 @@ module.exports = {
         totalItems: count,
         totalPages: totalPages,
         currentPage: pageNum,
-        banners: rows.map(addFullUrl),
+        banners: banners,
       });
     } catch (error) {
       console.error("Error fetching admin banners:", error);
