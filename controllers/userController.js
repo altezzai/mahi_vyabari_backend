@@ -89,14 +89,22 @@ module.exports = {
           role: savedUser.role,
           userName: savedUser.userName,
         };
-        const token = await createToken(tokenData);
+        const accessToken = await generateAccessToken(tokenData);
+        if (!accessToken) {
+          return res.status(401).json({
+            success: false,
+            message: "An error occurred while creating jwt Token",
+          });
+        }
+        const tokenVersion = Date.now();
+        const refreshToken = await generateRefreshToken(user.id, tokenVersion);
         if (!token) {
           return res.status(401).json({
             success: false,
             message: "An error occured while creating jwt Token",
           });
         }
-        res.cookie("token", token, {
+        res.cookie("refreshToken", refreshToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
@@ -106,6 +114,7 @@ module.exports = {
         return res.status(200).json({
           success: true,
           message: "User Registered Successfully",
+          accessToken,
         });
       }
     } catch (error) {
@@ -360,7 +369,7 @@ module.exports = {
       const newRefreshToken = await generateRefreshToken(
         decoded.id,
         Date.now()
-      ); 
+      );
       res.cookie("refreshToken", newRefreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
