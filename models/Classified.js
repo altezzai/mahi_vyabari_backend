@@ -1,6 +1,3 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
-
 module.exports = (sequelize, DataTypes) => {
   const Classified = sequelize.define(
     "Classified",
@@ -14,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
       },
       category: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
       },
       itemName: {
         type: DataTypes.STRING,
@@ -30,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
       },
       area_id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
       },
       address: {
         type: DataTypes.TEXT,

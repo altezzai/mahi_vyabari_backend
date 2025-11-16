@@ -1,9 +1,3 @@
-// --- models/ClassifiedImage.js ---
-// This is a new file
-
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
-
 module.exports = (sequelize, DataTypes) => {
   const ClassifiedImage = sequelize.define(
     "ClassifiedImage",

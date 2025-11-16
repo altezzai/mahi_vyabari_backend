@@ -1,6 +1,3 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
-
 module.exports = (sequelize, DataTypes) => {
   const Tourism = sequelize.define(
     "Tourism",
@@ -18,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
       },
       area_id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
       },
       startTime: {
         type: DataTypes.STRING,

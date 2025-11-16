@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       area_id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
       },
       phone: {
         type: DataTypes.STRING,

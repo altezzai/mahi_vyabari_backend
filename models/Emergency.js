@@ -1,6 +1,3 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
-
 module.exports = (sequelize, DataTypes) => {
   const Emergency = sequelize.define(
     "Emergency",
@@ -42,4 +39,3 @@ module.exports = (sequelize, DataTypes) => {
   );
   return Emergency;
 };
-

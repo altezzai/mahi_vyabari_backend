@@ -1,9 +1,3 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
-const Shop = require("./Shop");
-const User = require("./User");
-const ShopCoupon = require("./shopCoupon");
-
 module.exports = (sequelize, DataTypes) => {
   const UserCoupon = sequelize.define(
     "UserCoupon",
@@ -49,4 +43,3 @@ module.exports = (sequelize, DataTypes) => {
   );
   return UserCoupon;
 };
-

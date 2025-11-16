@@ -27,9 +27,6 @@ router.post(
 );
 router.post("/reset-password", userAuth, userController.resetPassword);
 router.post("/logout", userAuth, userController.Logout);
-// router.post("/verify-account", userAuth, userController.verifyAccount);
-// router.post("/is-auth", userAuth, userController.isAuthenticated);
-// router.post("/send-login-otp", userController.sendLoginOtp);
 router.put(
   "/edit-user",
   userAuth,
@@ -37,18 +34,6 @@ router.put(
   upload.single("image"),
   userController.editUser
 );
-// router.get(
-//   "/auth/google",
-//   passport.authenticate("google", { scope: ["profile", "email"] })
-// );
-// router.get(
-//   "/auth/google/callback",
-//   passport.authenticate("google", {
-//     successRedirect: "/api/user/dashboard",
-//     failureRedirect: "/login",
-//   })
-// );
-// router.get("/dashboard", userController.getDashboard);
 router.get(
   "/personal-details",
   userAuth,
@@ -105,11 +90,5 @@ router.get(
   authorizeRoles("admin"),
   userController.getTopShopUserCoupon
 );
-// router.get(
-//   "/get-complaints/:id",
-//   userAuth,
-//   autherizeRoles("admin"),
-//   userController.getComplaintsById
-// );
 
 module.exports = router;

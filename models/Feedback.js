@@ -1,7 +1,3 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
-const User = require("./User");
-const Shop = require("./Shop");
 module.exports = (sequelize, DataTypes) => {
   const Feedback = sequelize.define(
     "Feedback",

@@ -1,5 +1,3 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
 module.exports = (sequelize, DataTypes) => {
   const VehicleSchedule = sequelize.define(
     "VehicleSchedule",

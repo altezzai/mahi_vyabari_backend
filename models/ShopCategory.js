@@ -1,5 +1,3 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
 const Shop = require("./Shop");
 const Category = require("./Category");
 
@@ -38,4 +36,3 @@ module.exports = (sequelize, DataTypes) => {
   );
   return ShopCategory;
 };
-

@@ -1,8 +1,3 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
-// const User = require("./User");
-// const Shop = require("./Shop");
-
 module.exports = (sequelize, DataTypes) => {
   const Complaint = sequelize.define(
     "Complaint",
@@ -52,5 +47,4 @@ module.exports = (sequelize, DataTypes) => {
   );
   return Complaint;
 };
-
 

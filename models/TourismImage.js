@@ -1,9 +1,3 @@
-// --- models/TourismImage.js ---
-// This is a new file
-
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
-
 module.exports = (sequelize, DataTypes) => {
   const TourismImage = sequelize.define(
     "TourismImage",

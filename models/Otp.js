@@ -1,7 +1,3 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
-const User = require("./User");
-
 module.exports = (sequelize, DataTypes) => {
   const OTP = sequelize.define(
     "otps",
@@ -48,4 +44,3 @@ module.exports = (sequelize, DataTypes) => {
   );
   return OTP;
 };
-
