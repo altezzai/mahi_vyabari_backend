@@ -890,6 +890,7 @@ module.exports = {
         include: [
           {
             model: Category,
+            where: { trash: false },
             attributes: ["id", "categoryName", "icon"],
             as: "category",
           },
@@ -909,6 +910,7 @@ module.exports = {
         include: [
           {
             model: Category,
+            where: { trash: false },
             attributes: ["id", "categoryName", "icon"],
             as: "category",
           },
@@ -928,6 +930,7 @@ module.exports = {
         include: [
           {
             model: Category,
+            where: { trash: false },
             attributes: ["id", "categoryName", "icon"],
             as: "category",
           },

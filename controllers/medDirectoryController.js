@@ -240,6 +240,7 @@ module.exports = {
         attributes: [],
         include: {
           model: Category,
+          where: { trash: false },
           attributes: ["id", "categoryName"],
           as: "category",
         },
