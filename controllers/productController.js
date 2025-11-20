@@ -18,8 +18,10 @@ module.exports = {
         fileName = await compressAndSaveFile(req.file, uploadPath);
       }
       const { offerPrice, originalPrice, ...bodyData } = req.body;
-      if (originalPrice && offerPrice) {
-        if (offerPrice > originalPrice) {
+      const offerPriceFloat = parseFloat(offerPrice) || 0;
+      const originalPriceFloat = parseFloat(originalPrice) || 0;
+      if (offerPriceFloat && originalPriceFloat) {
+        if (offerPriceFloat > originalPriceFloat) {
           return res.status(400).json({
             success: false,
             message: "Offer Price cannot be greater than Original Price",
@@ -28,10 +30,10 @@ module.exports = {
       }
 
       const productData = {
-        ...req.body,
+        ...bodyData,
         image: fileName,
-        offerPrice: parseFloat(offerPrice) || 0,
-        originalPrice: parseFloat(originalPrice) || 0,
+        offerPrice: offerPriceFloat,
+        originalPrice: offerPriceFloat,
       };
       const savedProduct = await Product.create(productData);
       if (!savedProduct) {
