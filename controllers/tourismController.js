@@ -59,6 +59,7 @@ module.exports = {
     }
   },
   updateTouristPlace: async (req, res) => {
+    const t = await sequelize.transaction();
     const {
       placeName,
       phone,
@@ -77,15 +78,18 @@ module.exports = {
           .json({ success: false, message: "Tourism not found" });
       }
 
-      const updatedTourism = await tourism.update({
-        placeName,
-        phone,
-        area_id,
-        startTime,
-        endTime,
-        entryFee,
-        location,
-      });
+      const updatedTourism = await tourism.update(
+        {
+          placeName,
+          phone,
+          area_id,
+          startTime,
+          endTime,
+          entryFee,
+          location,
+        },
+        { transaction: t }
+      );
       if (req.files?.images) {
         console.log(req.files.images);
         const imageRecords = [];
