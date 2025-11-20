@@ -17,10 +17,21 @@ module.exports = {
       if (req.file) {
         fileName = await compressAndSaveFile(req.file, uploadPath);
       }
+      const { offerPrice, originalPrice, ...bodyData } = req.body;
+      if (originalPrice && offerPrice) {
+        if (offerPrice > originalPrice) {
+          return res.status(400).json({
+            success: false,
+            message: "Offer Price cannot be greater than Original Price",
+          });
+        }
+      }
 
       const productData = {
         ...req.body,
         image: fileName,
+        offerPrice: parseFloat(offerPrice) || 0,
+        originalPrice: parseFloat(originalPrice) || 0,
       };
       const savedProduct = await Product.create(productData);
       if (!savedProduct) {
@@ -51,6 +62,18 @@ module.exports = {
       }
 
       const { ...bodyData } = req.body;
+      const offerPrice = parseFloat(bodyData.offerPrice) || product.offerPrice;
+      const originalPrice =
+        parseFloat(bodyData.originalPrice) || product.originalPrice;
+
+      if (originalPrice && offerPrice) {
+        if (offerPrice > originalPrice) {
+          return res.status(400).json({
+            success: false,
+            message: "Offer Price cannot be greater than Original Price",
+          });
+        }
+      }
       let fileName = product.image;
       if (req.file) {
         const oldFilename = fileName;
@@ -62,6 +85,8 @@ module.exports = {
       const updatedProduct = await product.update({
         ...bodyData,
         image: fileName,
+        offerPrice,
+        originalPrice,
       });
 
       return res.status(200).json({ success: true, product: updatedProduct });

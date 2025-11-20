@@ -18,7 +18,7 @@ const db = require("./models"); // This loads index.js which loads all models
 
 (async () => {
   try {
-    await db.sequelize.sync({force:true});
+    // await db.sequelize.sync({ alter: true });
     console.log("✅ All models were synchronized successfully.");
   } catch (error) {
     console.error("❌ Error synchronizing models:", error);

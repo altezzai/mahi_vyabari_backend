@@ -131,6 +131,7 @@ module.exports = {
           "phone",
           "openingTime",
           "closingTime",
+          "priority",
         ],
         where: whereCondition,
         include: [
@@ -319,6 +320,7 @@ module.exports = {
             "area_id",
             "openingTime",
             "closingTime",
+            "priority",
             "phone",
           ],
           where: whereCondition,
@@ -483,6 +485,7 @@ module.exports = {
             "icon",
             "trash",
             "category",
+            "priority",
             "area_id",
           ],
           where: whereCondition,
@@ -600,7 +603,7 @@ module.exports = {
         await VehicleService.findAndCountAll({
           limit,
           offset,
-          attributes: ["id", "ownerName", "vehicleNumber", "image"],
+          attributes: ["id", "ownerName", "vehicleNumber", "image", "priority"],
           where: whereCondition,
           include: [
             {
@@ -696,7 +699,14 @@ module.exports = {
       const { count, rows: workers } = await Worker.findAndCountAll({
         limit,
         offset,
-        attributes: ["id", "workerName", "image", "area_id", "phone"],
+        attributes: [
+          "id",
+          "workerName",
+          "image",
+          "area_id",
+          "phone",
+          "priority",
+        ],
         where: whereCondition,
         include: [
           {
@@ -760,7 +770,7 @@ module.exports = {
       const { count, rows: classifieds } = await Classified.findAndCountAll({
         limit,
         offset,
-        attributes: ["id", "itemName", "price", "image", "phone"],
+        attributes: ["id", "itemName", "price", "image", "phone", "priority"],
         where: whereCondition,
         include: [
           {
