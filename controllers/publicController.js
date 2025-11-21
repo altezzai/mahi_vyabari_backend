@@ -782,6 +782,10 @@ module.exports = {
             model: Area,
             attributes: ["id", "name"],
           },
+          {
+            model: ClassifiedImage,
+            attributes: ["image"],
+          },
         ],
         order: [["priority", "ASC"]],
       });
