@@ -655,8 +655,8 @@ module.exports = {
       });
 
       if (!result) {
-        return res.status(404).json({
-          message: "No user matched with the selected coupon number.",
+        return res.status(400).json({
+          message: " invalid coupon number selected. Please try again.",
           randomCouponId,
         });
       }
