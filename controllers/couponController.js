@@ -13,7 +13,9 @@ const { parse } = require("dotenv");
 module.exports = {
   requestCoupon: async (req, res) => {
     const { requestedCount } = req.body;
-    const { shopId } = req.user;
+    const { id } = req.user;
+    const shopDetails = await Shop.findOne({ where: { userId: id } });
+    const shopId = shopDetails.id;
     const couponData = {
       status: "pending",
       requestedCount,
@@ -90,7 +92,9 @@ module.exports = {
   },
   assignUserCoupon: async (req, res) => {
     const { userId, assignedCount } = req.body;
-    const { shopId } = req.user;
+    const { id } = req.user;
+    const shopDetails = await Shop.findOne({ where: { userId: id } });
+    const shopId = shopDetails.id;
     const t = await sequelize.transaction();
     try {
       const shopBatches = await ShopCoupon.findAll({
@@ -254,6 +258,48 @@ module.exports = {
       return res.status(500).json({ success: false, message: error.message });
     }
   },
+  getShopCouponsHistory: async (req, res) => {
+    const userId = req.user.id;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const shopDetails = await Shop.findOne({ where: { userId } });
+    const shopId = shopDetails.id;
+    let whereCondition = { shopId };
+
+    try {
+      const { count, rows: ShopCouponHistory } =
+        await ShopCoupon.findAndCountAll({
+          limit,
+          offset,
+          where: whereCondition,
+          attributes: {
+            exclude: ["createdAt", "updatedAt"],
+          },
+          include: [
+            {
+              model: Shop,
+              attributes: ["id", "shopName"],
+              as: "shop",
+            },
+          ],
+          order: [["createdAt", "DESC"]],
+        });
+      const totalPages = Math.ceil(count / limit);
+      return res.status(200).json({
+        success: true,
+        count,
+        totalPages,
+        currentPage: page,
+        ShopCouponHistory,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+
   getAssignedCoupon: async (req, res) => {
     const searchQuery = req.query.q || "";
     const page = parseInt(req.query.page) || 1;
@@ -411,9 +457,11 @@ module.exports = {
   },
   getRecentUserCoupons: async (req, res) => {
     const { id } = req.user;
+    const shopDetails = await Shop.findOne({ where: { userId: id } });
+    const shopId = shopDetails.id;
     try {
       const couponHistory = await UserCoupon.findAndCountAll({
-        where: { shopId: id },
+        where: { shopId: shopId },
         limit: 20,
         attributes: ["id", "couponIdFrom", "couponIdTo"],
         include: [
@@ -485,7 +533,9 @@ module.exports = {
     }
   },
   getPendingCoupons: async (req, res) => {
-    const { shopId } = req.user;
+    const { id } = req.user;
+    const shopDetails = await Shop.findOne({ where: { userId: id } });
+    const shopId = shopDetails.id;
     try {
       const pendingCoupons = await ShopCoupon.sum("requestedCount", {
         where: { status: "pending", shopId },
@@ -503,7 +553,7 @@ module.exports = {
         attributes: ["couponCount"],
       });
       const userCouponStatus = await UserCoupon.findAll({
-        where: { id },
+        where: { userId: id },
         attributes: [
           "id",
           "couponIdFrom",

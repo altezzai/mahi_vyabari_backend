@@ -4,7 +4,7 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.bulkInsert("shops", [
       {
-        userId: 1,
+        userId: 3,
         image: "shop1.jpg",
         icon: "icon1.png",
         shopName: "TechZone Electronics",
@@ -27,7 +27,7 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
-        userId: 2,
+        userId: 4,
         image: "shop2.jpg",
         icon: "icon2.png",
         shopName: "GreenMart Organics",
@@ -49,7 +49,7 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
-        userId: 3,
+        userId: 5,
         image: "shop3.jpg",
         icon: "icon3.png",
         shopName: "StyleHub Fashion Store",

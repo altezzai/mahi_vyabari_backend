@@ -67,6 +67,12 @@ router.get(
   couponController.getPendingCoupons
 );
 router.get(
+  "/get-shop-coupon-history",
+  userAuth,
+  authorizeRoles("shop"),
+  couponController.getShopCouponsHistory
+);
+router.get(
   "/get-coupon-requests",
   userAuth,
   authorizeRoles("admin"),
