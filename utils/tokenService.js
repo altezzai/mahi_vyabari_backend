@@ -13,6 +13,7 @@ const generateAccessToken = async (
 ) => {
   try {
     const accessToken = await jwt.sign(tokenData, tokenKey, { expiresIn });
+    console.log(accessToken);
     return accessToken;
   } catch (error) {
     throw error;

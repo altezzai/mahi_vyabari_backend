@@ -169,9 +169,17 @@ module.exports = {
   getTouristPlaces: async (req, res) => {
     const search = req.query.search || "";
     const area_id = req.query.area_id || null;
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const offset = (page - 1) * limit || 0;
+    const download = req.query.download || "";
+    let { page = 1, limit = 10 } = req.query;
+    if (download === "true") {
+      page = null;
+      limit = null;
+    } else {
+      page = parseInt(page) || 1;
+      limit = parseInt(limit) || 10;
+    }
+    const offset = page && limit ? (page - 1) * limit : 0;
+
     let whereCondition = {};
     if (search) {
       whereCondition = {
@@ -192,7 +200,7 @@ module.exports = {
           {
             model: TourismImage,
             as: "images",
-            attributes: ["image"],
+            attributes: ["id", "image"],
           },
           {
             model: Area,
@@ -204,8 +212,8 @@ module.exports = {
       return res.status(200).json({
         success: true,
         count,
-        totalPages,
-        currentPage: page,
+        totalPages: download === "true" ? null : totalPages,
+        currentPage: download === "true" ? null : page,
         data: tourism,
       });
     } catch (error) {
@@ -223,7 +231,7 @@ module.exports = {
           {
             model: TourismImage,
             as: "images",
-            attributes: ["image"],
+            attributes: ["id", "image"],
           },
           {
             model: Area,
