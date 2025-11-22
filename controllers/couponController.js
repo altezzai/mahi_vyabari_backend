@@ -431,6 +431,7 @@ module.exports = {
         [Op.or]: [
           { userName: { [Op.like]: `%${search}%` } },
           { phone: { [Op.like]: `%${search}%` } },
+          { id: { [Op.like]: `%${search}%` } },
         ],
       };
     }
@@ -439,7 +440,7 @@ module.exports = {
         limit,
         offset,
         where: whereCondition,
-        attributes: ["id", "userName"],
+        attributes: ["id", "userName", "phone"],
         order: [["createdAt", "DESC"]],
       });
       const totalPages = Math.ceil(count / limit);
