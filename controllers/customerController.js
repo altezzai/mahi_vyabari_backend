@@ -26,6 +26,7 @@ module.exports = {
         [Op.or]: [
           { userName: { [Op.like]: `%${search}%` } },
           { phone: { [Op.like]: `%${search}%` } },
+          { id: { [Op.like]: `%${search}%` } },
         ],
       };
     }
