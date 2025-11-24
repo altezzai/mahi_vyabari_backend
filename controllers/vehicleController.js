@@ -155,6 +155,28 @@ module.exports = {
       });
     }
   },
+  permanentDeleteVehicleSchedule: async (req, res) => {
+    try {
+      const { id } = req.params;
+      let vehicleSchedule = await VehicleSchedule.findByPk(id);
+      if (!vehicleSchedule) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Vehicle Schedule not found" });
+      }
+      await vehicleSchedule.destroy();
+      return res.status(200).json({
+        success: true,
+        vehicleSchedule,
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  },
   getVehicleSchedules: async (req, res) => {
     const search = req.query.search || "";
     const page = parseInt(req.query.page) || 1;

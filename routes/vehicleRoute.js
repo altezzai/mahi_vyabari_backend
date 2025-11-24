@@ -24,6 +24,10 @@ router.patch(
   "/restore-vehicleSchedule/:id",
   vehicleController.restoreVehicleSchedule
 );
+router.delete(
+  "/permanent-delete-vehicleSchedule/:id",
+  vehicleController.permanentDeleteVehicleSchedule
+);
 router.get("/get-vehicleSchedules", vehicleController.getVehicleSchedules);
 router.get(
   "/get-vehicleSchedule/:id",
