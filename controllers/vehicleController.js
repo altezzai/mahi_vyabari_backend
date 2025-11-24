@@ -23,7 +23,25 @@ const imgPath = "public/uploads/taxi/";
 module.exports = {
   addVehicleSchedule: async (req, res) => {
     try {
-      const savedSchedule = await VehicleSchedule.create(req.body);
+      const {
+        userId,
+        vehicleName,
+        vehicleNumber,
+        via,
+        to,
+        departureTime,
+        arrivalTime,
+      } = req.body;
+      const savedSchedule = await VehicleSchedule.create({
+        userId,
+        vehicleName,
+        vehicleNumber,
+        category: "bus",
+        via,
+        to,
+        departureTime,
+        arrivalTime,
+      });
       if (!savedSchedule) {
         res.status(404).json({
           success: false,
@@ -47,7 +65,6 @@ module.exports = {
       const { id } = req.params;
       const {
         userId,
-        category,
         vehicleName,
         vehicleNumber,
         via,
@@ -73,7 +90,7 @@ module.exports = {
       }
       await vehicleSchedule.update({
         userId,
-        category,
+        category: "bus",
         vehicleName,
         vehicleNumber,
         via,
