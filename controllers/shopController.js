@@ -14,6 +14,7 @@ const {
   Area,
   ShopCategory,
 } = require("../models");
+const Sequelize = require("sequelize");
 
 const { hashData } = require("../utils/hashData");
 const { sendShopWelcomeEmail } = require("../utils/emailService");

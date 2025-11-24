@@ -23,7 +23,7 @@ const {
   Classified,
   Type,
   Category,
-  UserCoupen,
+  UserCoupon,
   User,
   Feedback,
   Complaint,
@@ -1086,7 +1086,7 @@ module.exports = {
   },
   getTopShopUserCoupon: async (req, res) => {
     try {
-      const topShops = await UserCoupen.findAll({
+      const topShops = await UserCoupon.findAll({
         attributes: [
           "shopId",
           [fn("SUM", col("assignedCount")), "totalCoupons"],
@@ -1104,7 +1104,7 @@ module.exports = {
         raw: true,
         nest: true,
       });
-      const topUsers = await UserCoupen.findAll({
+      const topUsers = await UserCoupon.findAll({
         attributes: [
           "userId",
           [fn("SUM", col("assignedCount")), "totalCoupons"],
