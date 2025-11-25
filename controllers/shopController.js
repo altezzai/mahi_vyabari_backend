@@ -423,10 +423,17 @@ module.exports = {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
+    const dateFrom = req.query.dateFrom || null;
+    const dateTo = req.query.dateTo || null;
     let whereCondition = {};
     if (search) {
       whereCondition = {
         shopName: { [Op.like]: `%${search}%` },
+      };
+    }
+    if (dateFrom && dateTo) {
+      whereCondition.createdAt = {
+        [Op.between]: [new Date(dateFrom), new Date(dateTo)],
       };
     }
     try {
@@ -443,7 +450,7 @@ module.exports = {
               "totalComplaints",
             ],
           ],
-          exclude: ["userId", "shopId", "resolution", "createdAt", "updatedAt"],
+          exclude: ["userId", "shopId", "updatedAt"],
         },
         include: [
           {

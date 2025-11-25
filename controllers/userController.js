@@ -357,7 +357,7 @@ module.exports = {
         id: decoded.id,
         userName: user?.userName,
         email: user?.email,
-        role: User?.role,
+        role: user?.role,
         shopId: shopId?.id,
       };
       const accessToken = await generateAccessToken(tokenData);
