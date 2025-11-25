@@ -9,11 +9,11 @@ const {
   generateRefreshToken,
 } = require("../utils/tokenService");
 
-// const UserOtp = require("../models/Otp");
+// const Otp = require("../models/Otp");
 const { sendEmail } = require("../utils/nodemailer");
 const { hashData } = require("../utils/hashData");
 const { where, Op, fn, literal, col } = require("sequelize");
-const sendSMS = require("../utils/tiwilio");
+const { sendSMS } = require("../utils/smsService");
 const jwt = require("jsonwebtoken");
 const {
   Shop,
@@ -27,7 +27,7 @@ const {
   User,
   Feedback,
   Complaint,
-  UserOtp,
+  Otp,
   Area,
 } = require("../models");
 const {
@@ -55,9 +55,9 @@ module.exports = {
           message: "User is already existing",
         });
       } else {
-        const otpEntry = await UserOtp.findOne({
+        const otpEntry = await Otp.findOne({
           where: {
-            email,
+            phone,
           },
           order: [["createdAt", "DESC"]],
         });
@@ -68,7 +68,7 @@ module.exports = {
             message: "Invalid OTP",
           });
         }
-        if (UserOtp.expiresAt < Date.now()) {
+        if (Otp.expiresAt < Date.now()) {
           return res.status(410).json({
             success: false,
             message: "OTP Expired",
@@ -82,6 +82,7 @@ module.exports = {
         const tokenData = {
           id: savedUser.id,
           email: savedUser.email,
+          phone: savedUser.phone,
           role: savedUser.role,
           userName: savedUser.userName,
         };
@@ -106,7 +107,7 @@ module.exports = {
           sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
           maxAge: 1000 * 60 * 60 * 24 * 7,
         });
-        await UserOtp.destroy({ where: { email } });
+        await Otp.destroy({ where: { email } });
         return res.status(200).json({
           success: true,
           message: "User Registered Successfully",
@@ -395,41 +396,28 @@ module.exports = {
   },
   sendVerifyOtp: async (req, res) => {
     try {
-      const { email } = req.body;
-      const user = await User.findOne({ where: { email } });
+      const { phone } = req.body;
+      const user = await User.findOne({ where: { phone } });
       if (user) {
         return res
           .status(400)
           .json({ success: false, message: "User already registered...!" });
       }
       const otp = String(Math.floor(100000 + Math.random() * 900000));
-      await UserOtp.create({
-        email,
+      await Otp.create({
+        phone,
         otp: await hashData(otp),
       });
-      const subject = "Email Verification OTP";
       const message = `
-      <div style="font-family: Arial, sans-serif; padding: 20px;">
-        <h2>OTP Verification</h2>
-        <p>Your OTP code is:</p>
-        <div style="
-          font-size: 24px;
-          font-weight: bold;
-          color: #007bff;
-          padding: 10px 0;
-        ">
-          ${otp}
-        </div>
-        <p>This OTP is valid for 10 minutes.</p>
-        <p>Please Verify Your Email.</p>
-        <br />
-        <p style="font-size: 14px; color: #999;">Mahe Vyapari</p>
-      </div>
-    `;
-      await sendEmail(email, subject, message);
+      OTP Verification
+      Your OTP code is: ${otp}
+      This OTP is valid for 10 minutes.
+      Please Verify Your account.
+      - Ente Mahe`;
+      await sendSMS(phone, message);
       res
         .status(200)
-        .json({ success: true, message: "Verification OTP Send on Email" });
+        .json({ success: true, message: "Verification OTP Send on Phone" });
     } catch (error) {
       console.log(error);
       res.status(500).json({ success: false, message: error.message });
@@ -451,10 +439,10 @@ module.exports = {
         });
       }
       // const isMatch = await bcrypt.compare(password, user.password);
-      const otpEntry = await UserOtp.findOne({
+      const otpEntry = await Otp.findOne({
         where: {
-          userId,
-          verificationOTP,
+          phone: user.phone,
+          otp: verificationOTP,
         },
       });
       if (!otpEntry) {
@@ -463,7 +451,7 @@ module.exports = {
           message: "Invalid OTP",
         });
       }
-      if (UserOtp.expiresAt < Date.now()) {
+      if (Otp.expiresAt < Date.now()) {
         return res.status(410).json({
           success: false,
           message: "OTP Expired",
@@ -482,15 +470,15 @@ module.exports = {
     }
   },
   sendResetOtp: async (req, res) => {
-    const { email } = req.body;
-    if (!email) {
+    const { phone } = req.body;
+    if (!phone) {
       return res
         .status(404)
         .json({ success: false, message: "Email is Required" });
     }
     try {
       const user = await User.findOne({
-        where: { email },
+        where: { phone },
       });
       if (!user) {
         return res
@@ -498,31 +486,18 @@ module.exports = {
           .json({ success: false, message: "User Not Found" });
       }
       const otp = String(Math.floor(100000 + Math.random() * 900000));
-      await UserOtp.create({
-        email,
+      await Otp.create({
+        phone,
         otp: await hashData(otp),
       });
-      const subject = "Password Reset OTP";
       const message = `
-      <div style="font-family: Arial, sans-serif; padding: 20px;">
-        <h2>OTP Verification</h2>
-        <p>Hello <strong>${user.userName}</strong>,</p>
-        <p>Your OTP code is:</p>
-        <div style="
-          font-size: 24px;
-          font-weight: bold;
-          color: #007bff;
-          padding: 10px 0;
-        ">
-          ${otp}
-        </div>
-        <p>This OTP is valid for 10 minutes.</p>
-        <p>Please Verify Your Email.</p>
-        <br />
-        <p style="font-size: 14px; color: #999;">Mahe Vyapari</p>
-      </div>
-    `;
-      await sendEmail(user.email, subject, message);
+      OTP Verification
+      Your OTP code is: ${otp}
+      This OTP is valid for 10 minutes.
+      Please Verify Your account.
+      - Ente Mahe`;
+      await sendSMS(phone, message);
+
       return res.status(200).json({
         success: true,
         message: "sent password reset OTP to your Email",
@@ -533,8 +508,8 @@ module.exports = {
     }
   },
   resetPassword: async (req, res) => {
-    const { email, otp, newPassword } = req.body;
-    if (!email || !otp || !newPassword) {
+    const { phone, otp, newPassword } = req.body;
+    if (!phone || !otp || !newPassword) {
       return res.status(410).json({
         success: false,
         message: "Email,OTP and new password are required",
@@ -542,16 +517,16 @@ module.exports = {
     }
     try {
       const user = await User.findOne({
-        where: { email },
+        where: { phone },
       });
       if (!user) {
         return res
           .status(401)
           .json({ success: false, message: "User Not Found" });
       }
-      const otpEntry = await UserOtp.findOne({
+      const otpEntry = await Otp.findOne({
         where: {
-          email,
+          phone,
         },
         order: [["createdAt", "DESC"]],
       });
@@ -567,7 +542,7 @@ module.exports = {
       await user.update({
         password: await hashData(newPassword),
       });
-      await UserOtp.destroy({ where: { email } });
+      await Otp.destroy({ where: { phone } });
       return res
         .status(200)
         .json({ success: true, message: "Password Reset Successfully" });
@@ -576,9 +551,60 @@ module.exports = {
       return res.status(500).json({ success: false, message: error.message });
     }
   },
+  // sendLoginOtp: async (req, res) => {
+  //   const { email } = req.body;
+  //   if (!email) {
+  //     return res.status(404).json({
+  //       success: false,
+  //       message: "Email is Required or phone is required",
+  //     });
+  //   }
+  //   try {
+  //     const user = await User.findOne({
+  //       where: { email },
+  //     });
+  //     if (!user) {
+  //       return res
+  //         .status(401)
+  //         .json({ success: false, message: "User Not Found" });
+  //     }
+  //     const loginOTP = String(Math.floor(100000 + Math.random() * 900000));
+  //     await Otp.create({
+  //       email,
+  //       otp: loginOTP,
+  //     });
+  //     const subject = "Login OTP";
+  //     const message = `
+  //       <div style="font-family: Arial, sans-serif; padding: 20px;">
+  //         <h2>OTP Verification</h2>
+  //         <p>Your OTP code is:</p>
+  //         <div style="
+  //           font-size: 24px;
+  //           font-weight: bold;
+  //           color: #007bff;
+  //           padding: 10px 0;
+  //         ">
+  //           ${loginOTP}
+  //         </div>
+  //         <p>This OTP is valid for 10 minutes.</p>
+  //         <p>Please Verify Your account.</p>
+  //         <br />
+  //         <p style="font-size: 14px; color: #999;">Ente Mahe</p>
+  //       </div>
+  //     `;
+  //     await sendEmail(email, subject, message);
+  //     return res.status(200).json({
+  //       success: true,
+  //       message: "sent Login OTP to your Email",
+  //     });
+  //   } catch (error) {
+  //     console.log(error);
+  //     return res.status(500).json({ success: false, message: error.message });
+  //   }
+  // },
   sendLoginOtp: async (req, res) => {
-    const { email } = req.body;
-    if (!email) {
+    const { phone } = req.body;
+    if (!phone) {
       return res.status(404).json({
         success: false,
         message: "Email is Required or phone is required",
@@ -586,7 +612,7 @@ module.exports = {
     }
     try {
       const user = await User.findOne({
-        where: { email },
+        where: { phone },
       });
       if (!user) {
         return res
@@ -594,47 +620,18 @@ module.exports = {
           .json({ success: false, message: "User Not Found" });
       }
       const loginOTP = String(Math.floor(100000 + Math.random() * 900000));
-      await UserOtp.create({
-        email,
-        // otp: await hashData(otp),
+      await Otp.create({
+        phone,
         otp: loginOTP,
       });
-      // const isValidPhone = (userId) =>
-      //   /^(\+91[\-\s]?)?[6-9]\d{9}$/.test(userId);
-      // console.log(isValidPhone());
-      const subject = "Login OTP";
+
       const message = `
-        <div style="font-family: Arial, sans-serif; padding: 20px;">
-          <h2>OTP Verification</h2>
-          <p>Your OTP code is:</p>
-          <div style="
-            font-size: 24px;
-            font-weight: bold;
-            color: #007bff;
-            padding: 10px 0;
-          ">
-            ${loginOTP}
-          </div>
-          <p>This OTP is valid for 10 minutes.</p>
-          <p>Please Verify Your account.</p>
-          <br />
-          <p style="font-size: 14px; color: #999;">Mahe Vyapari</p>
-        </div>
-      `;
-      // if (!isValidPhone(userId)) {
-      //   await sendEmail(user.email, subject, message);
-      //   return res.status(200).json({
-      //     success: true,
-      //     message: "sent Login OTP to your Email",
-      //   });
-      // } else {
-      //   await sendSMS(userId, `Your Login OTP is ${loginOTP}`);
-      //   return res.status(200).json({
-      //     success: true,
-      //     message: "sent Login OTP to your Phone",
-      //   });
-      // }
-      await sendEmail(email, subject, message);
+      OTP Verification
+      Your OTP code is: ${otp}
+      This OTP is valid for 10 minutes.
+      Please Verify Your account.
+      - Ente Mahe`;
+      await sendSMS(phone, message);
       return res.status(200).json({
         success: true,
         message: "sent Login OTP to your Email",

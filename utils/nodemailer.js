@@ -24,12 +24,12 @@ transporter.verify((error, success) => {
   }
 });
 module.exports = {
-  sendEmail: async (email,subject,message) => {
+  sendEmail: async (email, subject, message) => {
     const mailOptions = {
-      from:  `"Mahe Vyapari" <${process.env.AUTH_EMAIL}>`,
+      from: `"Mahe Vyapari" <${process.env.AUTH_EMAIL}>`,
       to: email,
       subject: subject,
-      html:message,
+      html: message,
     };
     transporter.sendMail(mailOptions);
   },

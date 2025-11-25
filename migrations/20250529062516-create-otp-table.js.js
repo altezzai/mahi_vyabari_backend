@@ -9,7 +9,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      email: {
+      phone: {
         type: Sequelize.STRING,
         allowNull: false,
         onDelete: "CASCADE",
