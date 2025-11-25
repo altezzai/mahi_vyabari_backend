@@ -418,24 +418,38 @@ module.exports = {
     }
   },
   getShopComplaints: async (req, res) => {
-    const search = req.query.search || "";
-    const area_id = req.query.area_id || null;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
+    const search = req.query.search || "";
+    const area_id = req.query.area_id || null;
     const dateFrom = req.query.dateFrom || null;
     const dateTo = req.query.dateTo || null;
+    const status = req.query.status || null;
+
     let whereCondition = {};
     if (search) {
       whereCondition = {
         shopName: { [Op.like]: `%${search}%` },
       };
     }
+
     if (dateFrom && dateTo) {
+      const startDate = new Date(dateFrom);
+      const endDate = new Date(dateTo);
+
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(23, 59, 59, 999);
+
       whereCondition.createdAt = {
-        [Op.between]: [new Date(dateFrom), new Date(dateTo)],
+        [Op.between]: [new Date(startDate), new Date(endDate)],
       };
+      console.log("whereCondition.createdAt", whereCondition.createdAt);
     }
+    if (status) {
+      whereCondition.status = status;
+    }
+
     try {
       const { count, rows: complaints } = await Complaint.findAndCountAll({
         limit,
