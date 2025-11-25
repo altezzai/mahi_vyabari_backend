@@ -78,20 +78,16 @@ module.exports = {
           .json({ success: false, message: "Tourism not found" });
       }
 
-      const updatedTourism = await tourism.update(
-        {
-          placeName,
-          phone,
-          area_id,
-          startTime,
-          endTime,
-          entryFee,
-          location,
-        },
-        { transaction: t }
-      );
+      const updatedTourism = await tourism.update({
+        placeName,
+        phone,
+        area_id,
+        startTime,
+        endTime,
+        entryFee,
+        location,
+      });
       if (req.files?.images) {
-        console.log(req.files.images);
         const imageRecords = [];
 
         for (const img of req.files.images) {
@@ -102,7 +98,7 @@ module.exports = {
           });
         }
 
-        await TourismImage.bulkCreate(imageRecords, { transaction: t });
+        await TourismImage.bulkCreate(imageRecords);
       }
       return res.status(200).json({ success: true, updatedTourism });
     } catch (error) {
