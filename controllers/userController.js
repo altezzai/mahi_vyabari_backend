@@ -34,6 +34,7 @@ const {
   deleteFileWithFolderName,
   compressAndSaveFile,
 } = require("../utils/fileHandler");
+const { Console } = require("console");
 
 const uploadPath = "public/uploads/userImages/";
 module.exports = {
@@ -47,7 +48,7 @@ module.exports = {
         });
       }
       const user = await User.findOne({
-        where: { email },
+        where: { phone },
       });
       if (user) {
         return res.status(409).json({
@@ -79,6 +80,12 @@ module.exports = {
           password: await hashData(password),
         };
         const savedUser = await User.create(userData);
+        if (!savedUser) {
+          return res.status(401).json({
+            success: false,
+            message: "An error occurred while creating user",
+          });
+        }
         const tokenData = {
           id: savedUser.id,
           email: savedUser.email,
@@ -94,8 +101,11 @@ module.exports = {
           });
         }
         const tokenVersion = Date.now();
-        const refreshToken = await generateRefreshToken(user.id, tokenVersion);
-        if (!token) {
+        const refreshToken = await generateRefreshToken(
+          savedUser.id,
+          tokenVersion
+        );
+        if (!refreshToken) {
           return res.status(401).json({
             success: false,
             message: "An error occured while creating jwt Token",
@@ -107,7 +117,7 @@ module.exports = {
           sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
           maxAge: 1000 * 60 * 60 * 24 * 7,
         });
-        await Otp.destroy({ where: { email } });
+        await Otp.destroy({ where: { phone } });
         return res.status(200).json({
           success: true,
           message: "User Registered Successfully",
@@ -125,7 +135,6 @@ module.exports = {
   editUser: async (req, res) => {
     try {
       const id = req.user.id;
-      console.log(id);
       const user = await User.findOne({
         where: { id },
       });
@@ -229,7 +238,6 @@ module.exports = {
     }
   },
   getDashboard: async (req, res) => {
-    console.log(req.body);
     res.status(200).json({
       success: true,
       message: "successfully registered...!",
@@ -359,6 +367,7 @@ module.exports = {
         userName: user?.userName,
         email: user?.email,
         role: user?.role,
+        image: user?.image,
         shopId: shopId?.id,
       };
       const accessToken = await generateAccessToken(tokenData);
@@ -396,7 +405,16 @@ module.exports = {
   },
   sendVerifyOtp: async (req, res) => {
     try {
-      const { phone } = req.body;
+      let { phone } = req.body;
+      if (!phone) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Phone number not found" });
+      }
+      if (!phone.startsWith("+91")) {
+        phone = "+91" + phone;
+      }
+      console.log(phone);
       const user = await User.findOne({ where: { phone } });
       if (user) {
         return res
@@ -404,6 +422,7 @@ module.exports = {
           .json({ success: false, message: "User already registered...!" });
       }
       const otp = String(Math.floor(100000 + Math.random() * 900000));
+      console.log(" Generated OTP:", otp);
       await Otp.create({
         phone,
         otp: await hashData(otp),
