@@ -4,7 +4,8 @@ const router = express.Router();
 const categoryController = require("../controllers/categoryController");
 const userAuth = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
-const { upload } = require("../middleware/upload2");
+const { upload, uploadWithErrorHandler } = require("../middleware/upload2");
+
 // router.use(userAuth, authorizeRoles("admin"));
 
 const categoryUploadFields = [{ name: "icon", maxCount: 1 }];
@@ -17,12 +18,12 @@ router.get("/get-type/:id", categoryController.getTypeById);
 
 router.post(
   "/add-category",
-  upload.single("icon"),
+  uploadWithErrorHandler(upload.single("icon")),
   categoryController.addCategory
 );
 router.put(
   "/update-category/:id",
-  upload.single("icon"),
+  uploadWithErrorHandler(upload.single("icon")),
   categoryController.updateCategory
 );
 router.patch("/delete-category/:id", categoryController.deleteCategory);

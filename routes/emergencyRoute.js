@@ -5,18 +5,18 @@ const emergencyController = require("../controllers/emergencyController");
 const userAuth = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
 const multerInstance = require("../middleware/upload");
-const { upload } = require("../middleware/upload2");
+const { upload, uploadWithErrorHandler } = require("../middleware/upload2");
 // router.use(userAuth, authorizeRoles("admin"));
 const emergencyUploadFields = [{ name: "icon", maxCount: 1 }];
 
 router.post(
   "/add-emergency",
-  upload.single("icon"),
+  uploadWithErrorHandler(upload.single("icon")),
   emergencyController.addEmergency
 );
 router.put(
   "/update-emergency/:id",
-  upload.single("icon"),
+  uploadWithErrorHandler(upload.single("icon")),
   emergencyController.updateEmergency
 );
 router.patch("/delete-emergency/:id", emergencyController.deleteEmergency);

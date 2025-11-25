@@ -4,18 +4,18 @@ const router = express.Router();
 const productController = require("../controllers/productController");
 const userAuth = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
-const { upload } = require("../middleware/upload2");
+const { upload, uploadWithErrorHandler } = require("../middleware/upload2");
 // router.use(userAuth, authorizeRoles("admin"));
 const productUploadFields = [{ name: "image", maxCount: 1 }];
 
 router.post(
   "/add-product",
-  upload.single("image"), // multerInstance.fields(productUploadFields),
+  uploadWithErrorHandler(upload.single("image")), // multerInstance.fields(productUploadFields),
   productController.addProduct
 );
 router.put(
   "/update-product/:id",
-  upload.single("image"),
+  uploadWithErrorHandler(upload.single("image")),
   productController.updateProduct
 );
 router.get("/get-products", productController.getProducts);

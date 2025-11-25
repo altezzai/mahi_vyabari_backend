@@ -4,7 +4,7 @@ const router = express.Router();
 const medDirectoryController = require("../controllers/medDirectoryController");
 const userAuth = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
-const { upload } = require("../middleware/upload2");
+const { upload, uploadWithErrorHandler } = require("../middleware/upload2");
 // router.use(userAuth, authorizeRoles("admin"));
 const medicalUploadFields = [
   { name: "image", maxCount: 1 },
@@ -13,12 +13,12 @@ const medicalUploadFields = [
 
 router.post(
   "/add-medicalDirectory",
-  upload.fields(medicalUploadFields),
+  uploadWithErrorHandler(upload.fields(medicalUploadFields)),
   medDirectoryController.addMedicalDirectory
 );
 router.put(
   "/update-medicalDirectory/:id",
-  upload.fields(medicalUploadFields),
+  uploadWithErrorHandler(upload.fields(medicalUploadFields)),
   medDirectoryController.updateMedicalDirectory
 );
 router.patch(

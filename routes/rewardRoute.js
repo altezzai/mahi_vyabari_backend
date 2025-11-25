@@ -5,18 +5,18 @@ const rewardController = require("../controllers/rewardController");
 const userAuth = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
 // router.use(userAuth, authorizeRoles("admin"));
-const { upload } = require("../middleware/upload2");
+const { upload, uploadWithErrorHandler } = require("../middleware/upload2");
 
 const giftImageUpload = [{ name: "image", maxCount: 1 }];
 
 router.post(
   "/create-milestone",
-  upload.single("image"),
+  uploadWithErrorHandler(upload.single("image")),
   rewardController.createMilestone
 );
 router.put(
   "/update-milestone/:id",
-  upload.single("image"),
+  uploadWithErrorHandler(upload.single("image")),
   rewardController.updateMilestone
 );
 router.get("/get-milestones", rewardController.getAllMilestones);

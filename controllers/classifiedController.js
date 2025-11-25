@@ -166,7 +166,7 @@ module.exports = {
         limit,
         offset,
         where: whereCondition,
-        attributes: ["id", "itemName", "priority", "icon", "price"],
+        attributes: ["id", "itemName", "priority", "icon", "price", "trash"],
         include: [
           {
             model: Category,

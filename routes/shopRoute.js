@@ -4,7 +4,7 @@ const router = express.Router();
 const shopController = require("../controllers/shopController");
 const userAuth = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
-const { upload } = require("../middleware/upload2");
+const { upload, uploadWithErrorHandler } = require("../middleware/upload2");
 // router.use(userAuth, authorizeRoles("admin"));
 
 const shopUploadFields = [
@@ -14,12 +14,12 @@ const shopUploadFields = [
 
 router.post(
   "/add-shop",
-  upload.fields(shopUploadFields),
+  uploadWithErrorHandler(upload.fields(shopUploadFields)),
   shopController.addShop
 );
 router.put(
   "/update-shop/:shopId",
-  upload.fields(shopUploadFields),
+  uploadWithErrorHandler(upload.fields(shopUploadFields)),
   shopController.updateShop
 );
 router.patch("/delete-shop/:shopId", shopController.deleteShop);

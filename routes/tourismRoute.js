@@ -4,18 +4,18 @@ const router = express.Router();
 const tourismController = require("../controllers/tourismController");
 const userAuth = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
-const { upload } = require("../middleware/upload2");
+const { upload, uploadWithErrorHandler } = require("../middleware/upload2");
 // router.use(userAuth, authorizeRoles("admin"));
 const tourismUploadFields = [{ name: "images", maxCount: 5 }];
 
 router.post(
   "/add-tourist-place",
-  upload.fields(tourismUploadFields),
+  uploadWithErrorHandler(upload.fields(tourismUploadFields)),
   tourismController.addTouristPlace
 );
 router.put(
   "/update-tourist-place/:id",
-  upload.fields(tourismUploadFields),
+  uploadWithErrorHandler(upload.fields(tourismUploadFields)),
   tourismController.updateTouristPlace
 );
 

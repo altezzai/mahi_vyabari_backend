@@ -4,7 +4,7 @@ const router = express.Router();
 const vehicleController = require("../controllers/vehicleController");
 const userAuth = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
-const { upload } = require("../middleware/upload2");
+const { upload, uploadWithErrorHandler } = require("../middleware/upload2");
 // router.use(userAuth, authorizeRoles("admin"));
 const vehicleUploadFields = [
   { name: "image", maxCount: 1 },
@@ -36,12 +36,12 @@ router.get(
 
 router.post(
   "/add-vehicle-Service",
-  upload.fields(vehicleUploadFields),
+  uploadWithErrorHandler(upload.fields(vehicleUploadFields)),
   vehicleController.addVehicleServiceProvider
 );
 router.put(
   "/update-vehicle-Service/:id",
-  upload.fields(vehicleUploadFields),
+  uploadWithErrorHandler(upload.fields(vehicleUploadFields)),
   vehicleController.updateVehicleServiceProvider
 );
 router.patch(
