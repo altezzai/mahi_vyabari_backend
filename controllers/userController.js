@@ -40,12 +40,18 @@ const uploadPath = "public/uploads/userImages/";
 module.exports = {
   registerUser: async (req, res) => {
     try {
-      const { userName, email, password, phone, otp } = req.body;
-      if (!userName || !email || !password || !phone) {
+      const { userName, email, password, otp } = req.body;
+
+      let phone = req.body.phone;
+      if (!userName || !email || !password || !phone || !otp) {
         return res.status(400).json({
           success: false,
           message: "Missing Details",
         });
+      }
+      console.log("otp:", otp);
+      if (!phone.startsWith("+91")) {
+        phone = "+91" + phone;
       }
       const user = await User.findOne({
         where: { phone },
@@ -62,6 +68,12 @@ module.exports = {
           },
           order: [["createdAt", "DESC"]],
         });
+        if (!otpEntry) {
+          return res.status(404).json({
+            success: false,
+            message: "OTP not found for this phone number",
+          });
+        }
         const otpMatch = await bcrypt.compare(otp, otpEntry.otp);
         if (!otpMatch) {
           return res.status(401).json({
