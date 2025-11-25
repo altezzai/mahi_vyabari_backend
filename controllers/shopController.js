@@ -433,18 +433,21 @@ module.exports = {
         shopName: { [Op.like]: `%${search}%` },
       };
     }
-
-    if (dateFrom && dateTo) {
+    if (dateFrom) {
       const startDate = new Date(dateFrom);
-      const endDate = new Date(dateTo);
-
       startDate.setHours(0, 0, 0, 0);
-      endDate.setHours(23, 59, 59, 999);
-
       whereCondition.createdAt = {
-        [Op.between]: [new Date(startDate), new Date(endDate)],
+        ...whereCondition.createdAt,
+        [Op.gte]: new Date(startDate),
       };
-      console.log("whereCondition.createdAt", whereCondition.createdAt);
+    }
+    if (dateTo) {
+      const endDate = new Date(dateTo);
+      endDate.setHours(23, 59, 59, 999);
+      whereCondition.createdAt = {
+        ...whereCondition.createdAt,
+        [Op.lte]: new Date(endDate),
+      };
     }
     if (status) {
       whereCondition.status = status;
