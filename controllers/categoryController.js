@@ -8,6 +8,7 @@ const {
   deleteFileWithFolderName,
   compressAndSaveFile,
 } = require("../utils/fileHandler");
+const { up } = require("../migrations/20250529060200-create-type-table.js");
 const uploadPath = "public/uploads/category/";
 module.exports = {
   addCategory: async (req, res) => {
@@ -18,10 +19,19 @@ module.exports = {
           .status(400)
           .json({ error: "typeId and categoryName are required." });
       }
+      const existingCategory = await Category.findOne({
+        where: { categoryName: categoryName.trim(), typeId: typeId },
+      });
+      if (existingCategory) {
+        return res
+          .status(409)
+          .json({ error: "Category with the same name already exists." });
+      }
       let fileName = null;
       if (req.file) {
         fileName = await compressAndSaveFile(req.file, uploadPath);
       }
+
       const newCategory = await Category.create({
         typeId,
         categoryName,
@@ -55,7 +65,19 @@ module.exports = {
           .json({ error: `Category with ID ${id} not found.` });
       }
 
-      const { ...bodyData } = req.body;
+      const { typeId, categoryName, description, userId } = req.body;
+      const existingCategory = await Category.findOne({
+        where: {
+          categoryName: categoryName.trim(),
+          typeId: typeId,
+          id: { [Op.ne]: id },
+        },
+      });
+      if (existingCategory) {
+        return res
+          .status(409)
+          .json({ error: "Category with the same name already exists." });
+      }
 
       let fileName = category.icon;
       if (req.file) {
@@ -67,7 +89,10 @@ module.exports = {
       }
 
       const updatedCategory = await category.update({
-        ...bodyData,
+        typeId,
+        categoryName,
+        description,
+        userId,
         icon: fileName,
       });
 
@@ -181,9 +206,46 @@ module.exports = {
   },
   addType: async (req, res) => {
     try {
-      const data = req.body;
-      const newType = await Type.bulkCreate(data);
+      const { typeName, description } = req.body;
+      const existingType = await Type.findOne({
+        where: { typeName: typeName.trim() },
+      });
+      if (existingType) {
+        return res
+          .status(409)
+          .json({ error: "Type with the same name already exists." });
+      }
+      const newType = await Type.create({
+        typeName,
+        description,
+      });
       res.status(201).json({ success: true, data: newType });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  updateType: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const type = await Type.findByPk(id);
+      if (!type) {
+        return res.status(404).json({ error: `Type with ID ${id} not found.` });
+      }
+      const { typeName, description } = req.body;
+      const existingType = await Type.findOne({
+        where: {
+          typeName: typeName.trim(),
+          id: { [Op.ne]: id },
+        },
+      });
+      if (existingType) {
+        return res
+          .status(409)
+          .json({ error: "Type with the same name already exists." });
+      }
+      await type.update({ typeName, description });
+      res.status(200).json({ success: true, data: type });
     } catch (error) {
       console.log(error);
       res.status(500).json({ success: false, message: error.message });

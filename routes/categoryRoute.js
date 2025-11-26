@@ -11,6 +11,7 @@ const { upload, uploadWithErrorHandler } = require("../middleware/upload2");
 const categoryUploadFields = [{ name: "icon", maxCount: 1 }];
 
 router.post("/add-type", categoryController.addType);
+router.put("/update-type/:id", categoryController.updateType);
 router.patch("/delete-type/:id", categoryController.deleteType);
 router.patch("/restore-type/:id", categoryController.restoreType);
 router.get("/get-types", categoryController.getTypes);
