@@ -138,6 +138,7 @@ module.exports = {
     const search = req.query.search || "";
     const area_id = req.query.area_id || null;
     const download = req.query.download || "";
+    const category_id = req.query.category_id || null;
     let { page = 1, limit = 10 } = req.query;
     if (download === "true") {
       page = null;
@@ -160,6 +161,9 @@ module.exports = {
     }
     if (area_id) {
       whereCondition.area_id = area_id;
+    }
+    if (category_id) {
+      whereCondition.category = category_id;
     }
     try {
       const { count, rows: classifieds } = await Classified.findAndCountAll({

@@ -190,6 +190,7 @@ module.exports = {
   getWorkerProfiles: async (req, res) => {
     const search = req.query.search || "";
     const area_id = req.query.area_id || null;
+    const category_id = req.query.category_id || null;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
@@ -223,6 +224,7 @@ module.exports = {
             model: Category,
             attributes: ["id", "categoryName"],
             through: { attributes: [] },
+            where: category_id ? { id: category_id } : null,
           },
           {
             model: Area,
