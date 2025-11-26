@@ -242,6 +242,7 @@ module.exports = {
           model: Category,
           attributes: ["id", "categoryName"],
           as: "category",
+          where: { trash: false },
         },
       });
       res.status(200).json({ success: true, classifiedCategories });

@@ -361,6 +361,7 @@ module.exports = {
         include: {
           model: Category,
           attributes: ["id", "categoryName"],
+          where: { trash: false },
           as: "category",
         },
       });
