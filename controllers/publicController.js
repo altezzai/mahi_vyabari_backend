@@ -900,7 +900,7 @@ module.exports = {
   getShopCategories: async (req, res) => {
     try {
       const shopCategories = await Type.findAll({
-        where: { typeName: "shop" },
+        where: { typeName: "shop", trash: false },
         attributes: [],
         include: [
           {
@@ -920,7 +920,7 @@ module.exports = {
   getWorkerCategory: async (req, res) => {
     try {
       const workerCategory = await Type.findAll({
-        where: { typeName: "worker" },
+        where: { typeName: "worker", trash: false },
         attributes: [],
         include: [
           {
@@ -940,7 +940,7 @@ module.exports = {
   getClassifiedCategory: async (req, res) => {
     try {
       const classifiedCategories = await Type.findAll({
-        where: { typeName: "classified" },
+        where: { typeName: "classified", trash: false },
         attributes: [],
         include: [
           {

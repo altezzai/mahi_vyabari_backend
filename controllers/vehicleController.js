@@ -485,6 +485,7 @@ module.exports = {
       const vehicleServiceCategories = await Type.findOne({
         where: {
           typeName: "taxi",
+          trash: false,
         },
         attributes: [],
         include: [

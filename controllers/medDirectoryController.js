@@ -244,6 +244,7 @@ module.exports = {
       const medicalCategory = await Type.findOne({
         where: {
           typeName: "medical",
+          trash: false,
         },
         attributes: [],
         include: {
