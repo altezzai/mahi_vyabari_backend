@@ -1,4 +1,5 @@
 const { Area } = require("../models");
+const { Op } = require("sequelize");
 
 const createArea = async (req, res) => {
   try {
@@ -133,8 +134,14 @@ const restoreArea = async (req, res) => {
 // --- (NEW) GET ALL ACTIVE AREAS ---
 const getAreas = async (req, res) => {
   try {
+    const search = req.query.search || "";
+    let whereClause = { trash: false };
+
+    if (search) {
+      whereClause = { name: { [Op.like]: `%${search}%` } };
+    }
     const areas = await Area.findAll({
-      where: { trash: false }, // Only get non-deleted areas
+      where: whereClause, // Only get non-deleted areas
       order: [["name", "ASC"]], // Order them alphabetically
     });
 
@@ -166,7 +173,14 @@ const getAreaById = async (req, res) => {
 // --- (NEW) GET ALL AREAS (FOR ADMIN) ---
 const getAllAreas = async (req, res) => {
   try {
+    const search = req.query.search || "";
+    let whereClause = {};
+
+    if (search) {
+      whereClause = { name: { [Op.like]: `%${search}%` } };
+    }
     const areas = await Area.findAll({
+      where: whereClause, // <-- Changed to get all areas
       order: [["name", "ASC"]], // Get all, including trashed
     });
 

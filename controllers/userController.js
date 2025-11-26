@@ -49,7 +49,6 @@ module.exports = {
           message: "Missing Details",
         });
       }
-      console.log("otp:", otp);
       if (!phone.startsWith("+91")) {
         phone = "+91" + phone;
       }

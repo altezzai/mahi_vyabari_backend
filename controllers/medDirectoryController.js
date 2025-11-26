@@ -147,7 +147,6 @@ module.exports = {
     }
 
     const offset = page && limit ? (page - 1) * limit : 0;
-
     const category = req.query.category || null;
     const subCategory = req.query.subCategory || null;
     let whereCondition = {};

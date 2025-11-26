@@ -56,6 +56,10 @@ Shop.belongsToMany(Category, {
   foreignKey: "shopId",
   otherKey: "categoryId",
 });
+ShopCategory.belongsTo(Shop, { foreignKey: "shopId" });
+ShopCategory.belongsTo(Category, { foreignKey: "categoryId" });
+Shop.hasMany(ShopCategory, { foreignKey: "shopId" });
+Category.hasMany(ShopCategory, { foreignKey: "categoryId" });
 
 Category.belongsToMany(Shop, {
   through: ShopCategory,

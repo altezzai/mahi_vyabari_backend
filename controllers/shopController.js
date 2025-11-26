@@ -145,6 +145,7 @@ module.exports = {
     const search = req.query.search || "";
     const area_id = req.query.area_id || null;
     const download = req.query.download || "";
+    const category_id = req.query.category_id || null;
     let { page = 1, limit = 10 } = req.query;
     if (download === "true") {
       page = null;
@@ -183,6 +184,7 @@ module.exports = {
             model: Category,
             attributes: ["id", "categoryName"],
             through: { attributes: [] },
+            where: category_id ? { id: category_id } : null,
           },
           {
             model: Area,

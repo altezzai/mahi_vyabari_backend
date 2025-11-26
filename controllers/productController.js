@@ -99,9 +99,7 @@ module.exports = {
   },
   getProducts: async (req, res) => {
     const search = req.query.search || "";
-    // const page = parseInt(req.query.page) || 1;
-    // const limit = parseInt(req.query.limit) || 10;
-    // const offset = (page - 1) * limit;
+    const shop_id = req.query.shop_id || null;
     const download = req.query.download || "";
     let { page = 1, limit = 10 } = req.query;
     if (download === "true") {
@@ -122,6 +120,9 @@ module.exports = {
           { "$shop.shopName$": { [Op.like]: `%${search}%` } },
         ],
       };
+    }
+    if (shop_id) {
+      whereCondition.shopId = shop_id;
     }
     try {
       const { count, rows: products } = await Product.findAndCountAll({
