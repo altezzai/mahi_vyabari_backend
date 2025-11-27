@@ -93,66 +93,39 @@ module.exports = {
     const shopId = req.user.shopId;
     const t = await sequelize.transaction();
     try {
-      const shopBatches = await ShopCoupon.findAll({
-        where: {
-          shopId,
-          status: "assigned",
-        },
-        order: [["couponIdFrom", "ASC"]],
-        transaction: t,
-      });
+      const totalShopCoupons =
+        (await ShopCoupon.sum("assignedCount", {
+          where: { shopId },
+        })) || 0;
 
-      if (!shopBatches.length) {
-        return res.status(404).json({
+      const totalUserAssigned =
+        (await UserCoupon.sum("assignedCount", {
+          where: { shopId },
+        })) || 0;
+      if (totalUserAssigned + Number(assignedCount) > totalShopCoupons) {
+        return res.status(400).json({
           success: false,
-          message: "No assigned coupon batches for this shop",
+          message: "Not enough coupons available to assign",
         });
       }
-
-      let remaining = Number(assignedCount);
-      const assignments = [];
-
-      for (const batch of shopBatches) {
-        if (remaining <= 0) break;
-
-        const { couponIdFrom, couponIdTo } = batch;
-
-        const last = await UserCoupon.findOne({
-          where: {
-            shopId,
-            couponIdFrom: { [Op.gte]: couponIdFrom },
-            couponIdTo: { [Op.lte]: couponIdTo },
-          },
-          order: [["couponIdTo", "DESC"]],
-          transaction: t,
-        });
-
-        const nextFrom = last ? last.couponIdTo + 1 : couponIdFrom;
-        const batchAvailable = couponIdTo - nextFrom + 1;
-
-        if (batchAvailable <= 0) continue;
-
-        const countFromThisBatch = Math.min(remaining, batchAvailable);
-        const nextTo = nextFrom + countFromThisBatch - 1;
-
-        assignments.push({
+      const lastUserCoupon = await UserCoupon.findOne({
+        order: [["couponIdTo", "DESC"]],
+      });
+      let nextCouponIdFrom = 1;
+      if (lastUserCoupon && lastUserCoupon.couponIdTo) {
+        nextCouponIdFrom = lastUserCoupon.couponIdTo + 1;
+      }
+      const userCoupon = await UserCoupon.create(
+        {
           shopId,
           userId,
-          assignedCount: countFromThisBatch,
-          couponIdFrom: nextFrom,
-          couponIdTo: nextTo,
-        });
-        remaining -= countFromThisBatch;
-      }
-      if (remaining > 0) {
-        return res.status(404).json({
-          success: false,
-          message: "Not enough coupons available to fulfill the request",
-        });
-      }
-      for (const data of assignments) {
-        await UserCoupon.create(data, { transaction: t });
-      }
+          assignedCount,
+          couponIdFrom: nextCouponIdFrom,
+          couponIdTo: nextCouponIdFrom + Number(assignedCount) - 1,
+        },
+        { transaction: t }
+      );
+
       const totalAssigned = await UserCoupon.sum("assignedCount", {
         where: { userId },
         transaction: t,
@@ -161,10 +134,12 @@ module.exports = {
         { couponCount: totalAssigned },
         { where: { id: userId }, transaction: t }
       );
+
       await t.commit();
       return res.status(200).json({
         success: true,
         message: "Coupons successfully assigned to user",
+        userCoupon,
       });
     } catch (error) {
       await t.rollback();
