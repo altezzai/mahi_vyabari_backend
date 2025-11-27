@@ -17,7 +17,7 @@ const {
 const Sequelize = require("sequelize");
 
 const { hashData } = require("../utils/hashData");
-const { sendShopWelcomeEmail } = require("../utils/emailService");
+const { sendSMS } = require("../utils/smsService");
 const {
   deleteFileWithFolderName,
   compressAndSaveFile,
@@ -28,7 +28,7 @@ const iconPath = "public/uploads/shop/icon/";
 const imgPath = "public/uploads/shop/";
 module.exports = {
   addShop: async (req, res) => {
-    const { shopName, phone, area_id, email } = req.body;
+    let { shopName, phone, area_id, email } = req.body;
     const t = await sequelize.transaction();
 
     try {
@@ -38,9 +38,21 @@ module.exports = {
           .status(400)
           .json({ error: "shopName, phone, and email are required." });
       }
-
+      if (!phone.startsWith("+91")) {
+        phone = "+91" + phone;
+      }
+      const existingPhone = await User.findOne({
+        where: { phone },
+        transaction: t,
+      });
+      if (existingPhone) {
+        return res.status(400).json({
+          success: false,
+          message: " Phone already exists in user table",
+        });
+      }
       // 🔹 Check duplicate shop email
-      const existingShop = await Shop.findOne({
+      const existingShop = await User.findOne({
         where: { email },
         transaction: t,
       });
@@ -70,6 +82,7 @@ module.exports = {
 
       const shopData = {
         ...shopBody,
+        phone,
         image: image || null,
         icon: icon || null,
       };
@@ -90,14 +103,15 @@ module.exports = {
         await ShopCategory.bulkCreate(shopCategoryData, { transaction: t });
       }
 
-      // 🔹 Create corresponding user login
+      const password = req.body.phone.slice(0, 6);
+
       await User.create(
         {
           userName: shopName,
           email,
           phone,
           area_id,
-          password: await hashData(phone),
+          password: await hashData(password),
           role: "shop",
           image: icon || null,
         },
@@ -107,14 +121,17 @@ module.exports = {
       // 🔹 Commit transaction
       await t.commit();
 
-      // 🔹 Send async welcome email
-      sendShopWelcomeEmail(
-        newShop.shopName,
-        newShop.email,
-        newShop.phone
-      ).catch((err) => {
-        console.error("--- ASYNC EMAIL FAILED TO SEND ---", err);
-      });
+      const message = `
+Welcome, ${shopName} 👋
+Your shop account has been created by the Admin.
+Login Phone: ${phone}
+Password: ${password}
+Thanks,
+Team Ente Mahe
+            `;
+      //Please change your password after logging in.
+
+      await sendSMS(phone, message);
 
       // 🔹 Fetch shop with relations
       const finalShop = await Shop.findByPk(newShop.id, {
@@ -259,9 +276,14 @@ module.exports = {
       }
       const { categories, ...updateBody } = req.body;
 
+      let phone = req.body.phone;
+      if (phone && !phone.startsWith("+91")) {
+        phone = "+91" + phone;
+      }
       const updatedShop = await shop.update(
         {
           ...updateBody,
+          phone: phone || shop.phone,
           icon,
           image,
         },

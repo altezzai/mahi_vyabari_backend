@@ -207,6 +207,12 @@ module.exports = {
           message: "invalid phone number or account is not registered..!",
         });
       }
+      if (user.trash === true) {
+        return res.status(401).json({
+          success: false,
+          message: "Your account has been temporarily disabled..!",
+        });
+      }
 
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
@@ -217,7 +223,16 @@ module.exports = {
       }
       let shopId;
       if (user.role === "shop") {
-        shopId = await Shop.findOne({ where: { phone }, attributes: ["id"] });
+        shopId = await Shop.findOne({
+          where: { phone },
+          attributes: ["id", "trash"],
+        });
+        if (shopId.trash === true) {
+          return res.status(403).json({
+            success: false,
+            message: "Your shop account has been temporarily disabled..!",
+          });
+        }
       }
       const tokenData = {
         id: user.id,

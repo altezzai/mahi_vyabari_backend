@@ -14,7 +14,7 @@ module.exports = {
         to: phone, // User phone number
       });
 
-      console.log("OTP SMS sent:", result.sid);
+      console.log("SMS sent:", phone);
       return result;
     } catch (error) {
       console.error("SMS sending error:", error);
