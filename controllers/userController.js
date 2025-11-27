@@ -186,22 +186,25 @@ module.exports = {
     }
   },
   userLogin: async (req, res) => {
-    const { email, password } = req.body;
-    if (!email || !password) {
+    let { phone, password } = req.body;
+    if (!phone || !password) {
       return res.status(409).json({
         success: false,
-        message: "email and password is required..!!",
+        message: "phone number and password is required..!!",
       });
+    }
+    if (!phone.startsWith("+91")) {
+      phone = "+91" + phone;
     }
     try {
       const user = await User.findOne({
-        where: { email },
+        where: { phone },
       });
 
       if (!user) {
         return res.status(403).json({
           success: false,
-          message: "invalid email or phone, or account is not registered..!",
+          message: "invalid phone number or account is not registered..!",
         });
       }
 
@@ -214,11 +217,12 @@ module.exports = {
       }
       let shopId;
       if (user.role === "shop") {
-        shopId = await Shop.findOne({ where: { email }, attributes: ["id"] });
+        shopId = await Shop.findOne({ where: { phone }, attributes: ["id"] });
       }
       const tokenData = {
         id: user.id,
         userName: user.userName,
+        phone: user.phone,
         email: user.email,
         role: user.role,
         shopId: shopId?.id,
@@ -439,11 +443,11 @@ module.exports = {
         otp: await hashData(otp),
       });
       const message = `
-      OTP Verification
-      Your OTP code is: ${otp}
-      This OTP is valid for 10 minutes.
-      Please Verify Your account.
-      - Ente Mahe`;
+OTP Verification
+Your OTP code is: ${otp}
+This OTP is valid for 10 minutes.
+Please Verify Your account.
+- Ente Mahe`;
       await sendSMS(phone, message);
       res
         .status(200)
@@ -500,11 +504,14 @@ module.exports = {
     }
   },
   sendResetOtp: async (req, res) => {
-    const { phone } = req.body;
+    let { phone } = req.body;
     if (!phone) {
       return res
         .status(404)
         .json({ success: false, message: "Email is Required" });
+    }
+    if (!phone.startsWith("+91")) {
+      phone = "+91" + phone;
     }
     try {
       const user = await User.findOne({
@@ -521,11 +528,11 @@ module.exports = {
         otp: await hashData(otp),
       });
       const message = `
-      OTP Verification
-      Your OTP code is: ${otp}
-      This OTP is valid for 10 minutes.
-      Please Verify Your account.
-      - Ente Mahe`;
+OTP Verification
+Your OTP code is: ${otp}
+This OTP is valid for 10 minutes.
+Please Verify Your account.
+- Ente Mahe`;
       await sendSMS(phone, message);
 
       return res.status(200).json({
@@ -537,13 +544,16 @@ module.exports = {
       return res.status(500).json({ success: false, message: error.message });
     }
   },
-  resetPassword: async (req, res) => {
-    const { phone, otp, newPassword } = req.body;
+  forgetPassword: async (req, res) => {
+    let { phone, otp, newPassword } = req.body;
     if (!phone || !otp || !newPassword) {
       return res.status(410).json({
         success: false,
         message: "Email,OTP and new password are required",
       });
+    }
+    if (!phone.startsWith("+91")) {
+      phone = "+91" + phone;
     }
     try {
       const user = await User.findOne({
@@ -560,6 +570,108 @@ module.exports = {
         },
         order: [["createdAt", "DESC"]],
       });
+      const otpMatch = await bcrypt.compare(otp, otpEntry.otp);
+      if (!otpMatch) {
+        return res.status(401).json({ success: false, message: "Invalid OTP" });
+      }
+      if (otpEntry.expiresAt < Date.now()) {
+        return res
+          .status(401)
+          .json({ success: false, message: "OTP has expired" });
+      }
+      await user.update({
+        password: await hashData(newPassword),
+      });
+      await Otp.destroy({ where: { phone } });
+      return res
+        .status(200)
+        .json({ success: true, message: "Password Reset Successfully" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  resetPassword: async (req, res) => {
+    const { oldPassword, newPassword } = req.body;
+    const { id } = req.user;
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing Details",
+      });
+    }
+    try {
+      const user = await User.findOne({
+        where: { id },
+      });
+      if (!user) {
+        return res
+          .status(401)
+          .json({ success: false, message: "User Not Found" });
+      }
+      const isMatch = await bcrypt.compare(oldPassword, user.password);
+      if (!isMatch) {
+        return res.status(401).json({ success: false, message: "Invalid OTP" });
+      }
+      await user.update({
+        password: await hashData(newPassword),
+      });
+      return res
+        .status(200)
+        .json({ success: true, message: "Password Reset Successfully" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  //adminChangePassword with otp
+  adminChangePassword: async (req, res) => {
+    const userId = req.user.id;
+    let { phone, otp, newPassword } = req.body;
+    if (!phone || !otp || !newPassword) {
+      return res.status(410).json({
+        success: false,
+        message: "Email,OTP and new password are required",
+      });
+    }
+    // phone = String(phone);
+    if (!phone.startsWith("+91")) {
+      phone = "+91" + phone;
+    }
+    const user = await User.findOne({
+      where: { id: userId },
+    });
+
+    if (user.role !== "admin") {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+    if (user.phone !== phone) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Phone number mismatch" });
+    }
+
+    try {
+      const user = await User.findOne({
+        where: { phone },
+      });
+      if (!user) {
+        return res
+          .status(401)
+          .json({ success: false, message: "User Not Found" });
+      }
+      const otpEntry = await Otp.findOne({
+        where: {
+          phone,
+        },
+        order: [["createdAt", "DESC"]],
+      });
+      if (!otpEntry) {
+        return res.status(404).json({
+          success: false,
+          message: "OTP not found for this phone number",
+        });
+      }
       const otpMatch = await bcrypt.compare(otp, otpEntry.otp);
       if (!otpMatch) {
         return res.status(401).json({ success: false, message: "Invalid OTP" });

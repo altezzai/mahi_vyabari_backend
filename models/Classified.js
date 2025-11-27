@@ -43,13 +43,21 @@ module.exports = (sequelize, DataTypes) => {
       },
       phone: {
         type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-          notEmpty: true,
-        },
+        allowNull: true,
       },
       whatsapp: {
         type: DataTypes.STRING,
+      },
+      fromDate: {
+        type: DataTypes.DATEONLY,
+      },
+      validityDate: {
+        type: DataTypes.DATEONLY,
+      },
+      priceStatus: {
+        type: DataTypes.ENUM("fixed", "negotiable"),
+        allowNull: false,
+        defaultValue: "fixed",
       },
       image: {
         type: DataTypes.STRING,

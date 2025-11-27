@@ -10,6 +10,8 @@ const {
 } = require("../utils/fileHandler");
 const { up } = require("../migrations/20250529060200-create-type-table.js");
 const uploadPath = "public/uploads/category/";
+const uploadTypePath = "public/uploads/type/";
+
 module.exports = {
   addCategory: async (req, res) => {
     try {
@@ -204,6 +206,7 @@ module.exports = {
       return res.status(500).json({ message: error.message });
     }
   },
+
   addType: async (req, res) => {
     try {
       const { typeName, description } = req.body;
@@ -215,9 +218,14 @@ module.exports = {
           .status(409)
           .json({ error: "Type with the same name already exists." });
       }
+      let fileName = null;
+      if (req.file) {
+        fileName = await compressAndSaveFile(req.file, uploadTypePath);
+      }
       const newType = await Type.create({
         typeName,
         description,
+        icon: fileName,
       });
       res.status(201).json({ success: true, data: newType });
     } catch (error) {
@@ -244,7 +252,15 @@ module.exports = {
           .status(409)
           .json({ error: "Type with the same name already exists." });
       }
-      await type.update({ typeName, description });
+      let fileName = type.icon;
+      if (req.file) {
+        const oldFilename = fileName;
+        fileName = await compressAndSaveFile(req.file, uploadTypePath);
+        if (oldFilename) {
+          await deleteFileWithFolderName(uploadTypePath, oldFilename);
+        }
+      }
+      await type.update({ typeName, description, icon: fileName });
       res.status(200).json({ success: true, data: type });
     } catch (error) {
       console.log(error);

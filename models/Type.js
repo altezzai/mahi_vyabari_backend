@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, DataTypes) => {
   const Type = sequelize.define(
     "Type",
@@ -13,6 +12,9 @@ module.exports = (sequelize, DataTypes) => {
         unique: true,
       },
       description: {
+        type: DataTypes.STRING,
+      },
+      icon: {
         type: DataTypes.STRING,
       },
       trash: {

@@ -27,8 +27,37 @@ module.exports = {
       if (req.files?.icon) {
         icon = await compressAndSaveFile(req.files.icon[0], iconPath);
       }
+      const {
+        userId,
+        category,
+        itemName,
+        price,
+        homeTown,
+        area_id,
+        address,
+        description,
+        priority,
+        phone,
+        whatsapp,
+        priceStatus,
+        validityDate,
+        fromDate,
+      } = req.body;
       const classifiedData = {
-        ...req.body,
+        userId,
+        category,
+        itemName,
+        price,
+        homeTown,
+        area_id,
+        address,
+        description,
+        priority,
+        phone,
+        whatsapp,
+        priceStatus,
+        validityDate,
+        fromDate,
         icon: icon || null,
       };
 
@@ -67,6 +96,22 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Item not found" });
       }
+      const {
+        userId,
+        category,
+        itemName,
+        price,
+        homeTown,
+        area_id,
+        address,
+        description,
+        priority,
+        phone,
+        whatsapp,
+        priceStatus,
+        validityDate,
+        fromDate,
+      } = req.body;
       let icon = classified.icon;
       if (req.files?.icon) {
         const oldFilename = classified.icon;
@@ -78,7 +123,20 @@ module.exports = {
 
       const { ...bodyData } = req.body;
       const updatedClassified = await classified.update({
-        ...bodyData,
+        userId,
+        category,
+        itemName,
+        price,
+        homeTown,
+        area_id,
+        address,
+        description,
+        priority,
+        phone,
+        whatsapp,
+        priceStatus,
+        validityDate,
+        fromDate,
         icon: icon || null,
       });
       if (req.files?.images) {

@@ -25,14 +25,14 @@ module.exports = {
       assignedCount: {
         type: Sequelize.INTEGER,
       },
-      couponIdFrom: {
-        type: Sequelize.INTEGER,
-        unique: true,
-      },
-      couponIdTo: {
-        type: Sequelize.INTEGER,
-        unique: true,
-      },
+      // couponIdFrom: {
+      //   type: Sequelize.INTEGER,
+      //   unique: true,
+      // },
+      // couponIdTo: {
+      //   type: Sequelize.INTEGER,
+      //   unique: true,
+      // },
       status: {
         type: Sequelize.ENUM("pending", "assigned"),
       },

@@ -3,6 +3,7 @@ const generatePassword = require("generate-password");
 const { User } = require("../models");
 const { hashData } = require("../utils/hashData");
 const { sendEmail } = require("../utils/nodemailer");
+const { sendSMS } = require("../utils/smsService");
 
 module.exports = {
   getCustomers: async (req, res) => {
@@ -76,16 +77,36 @@ module.exports = {
     }
   },
   addCustomer: async (req, res) => {
-    const { userName, email } = req.body;
+    let { userName, email, phone } = req.body;
     try {
+      if (!userName || !phone) {
+        return res
+          .status(400)
+          .json({ success: false, message: "All fields are required" });
+      }
+      if (!phone.startsWith("+91")) {
+        phone = "+91" + phone;
+      }
+      const existingUser = await User.findOne({
+        where: {
+          [Op.or]: [{ email }, { phone }],
+        },
+      });
+      if (existingUser) {
+        return res
+          .status(400)
+          .json({ success: false, message: "User already exists" });
+      }
+
       const users = await User.findOne({
-        where: { email },
+        where: { phone },
       });
       if (users) {
         return res
           .status(400)
-          .json({ success: false, message: "Email already exists" });
+          .json({ success: false, message: "phone already exists" });
       }
+
       const password = await generatePassword.generate({
         length: 10,
         numbers: true,
@@ -93,23 +114,24 @@ module.exports = {
       const userData = {
         userName,
         email,
+        phone,
+        role: "user",
         password: await hashData(password),
       };
-      const subject = "Welcome to Mahe Vyapari!";
       const message = `
-      <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4;">
-        <div style="max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px #ccc;">
-          <h2 style="color: #4CAF50;">Welcome, ${userName} 👋</h2>
-          <p>Your account has been created by the Admin.</p>
-          <p><strong>Login Email:</strong> ${email}</p>
-          <p><strong>Password:</strong><span style="font-weight:900;"> ${password}</span></p>
-          <p>Please login and change your password immediately for security reasons.</p>
-          <br/>
-          <p>Thanks,<br/>Team Mahe Vyapari</p>
-        </div>
-      </div>
-    `;
-      sendEmail(email, subject, message);
+Welcome, ${userName} 👋
+Your account has been created by the Admin.
+
+Login phone: ${phone}
+Password: ${password}
+Please log in and change your password immediately for security reasons.
+
+Thanks,
+Team Ente Mahe
+            `;
+
+      // sendEmail(email, subject, message);
+      await sendSMS(phone, message);
       const newusers = await User.create(userData);
       res.status(200).json({ success: true, newusers });
     } catch (error) {

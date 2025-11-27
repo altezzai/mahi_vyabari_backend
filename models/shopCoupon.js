@@ -22,14 +22,14 @@ module.exports = (sequelize, DataTypes) => {
       assignedCount: {
         type: DataTypes.INTEGER,
       },
-      couponIdFrom: {
-        type: DataTypes.INTEGER,
-        unique: true,
-      },
-      couponIdTo: {
-        type: DataTypes.INTEGER,
-        unique: true,
-      },
+      // couponIdFrom: {
+      //   type: DataTypes.INTEGER,
+      //   unique: true,
+      // },
+      // couponIdTo: {
+      //   type: DataTypes.INTEGER,
+      //   unique: true,
+      // },
       status: {
         type: DataTypes.ENUM("pending", "assigned"),
       },

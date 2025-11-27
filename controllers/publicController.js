@@ -213,6 +213,8 @@ module.exports = {
           {
             model: Product,
             as: "products",
+            separate: true, // <-- IMPORTANT for ordering inside include
+            order: [["id", "DESC"]], // <-- ORDER PRODUCTS BY ID DESC
             attributes: [
               "id",
               "productName",
@@ -785,7 +787,9 @@ module.exports = {
           },
           {
             model: ClassifiedImage,
-            attributes: ["image"],
+            attributes: ["id", "image"],
+            separate: true,
+            order: [["id", "ASC"]],
           },
         ],
         order: [["priority", "ASC"]],

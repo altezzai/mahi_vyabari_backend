@@ -304,12 +304,17 @@ module.exports = {
     const searchQuery = req.query.q || "";
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
+    const shopId = req.query.shopId || null;
+
     const offset = (page - 1) * limit;
     let whereCondition = { status: "assigned" };
     if (searchQuery) {
       whereCondition = {
         [Op.or]: [{ "$shop.shopName$": { [Op.like]: `%${searchQuery}%` } }],
       };
+    }
+    if (shopId) {
+      whereCondition.shopId = shopId;
     }
     try {
       const { count, rows: assignedCoupons } = await ShopCoupon.findAndCountAll(
@@ -324,6 +329,7 @@ module.exports = {
               as: "shop",
             },
           ],
+          order: [["createdAt", "DESC"]],
         }
       );
       const totalPages = Math.ceil(count / limit);
@@ -342,6 +348,10 @@ module.exports = {
   getCouponHistory: async (req, res) => {
     const searchQuery = req.query.q || "";
     const download = req.query.download || "";
+    const shopId = req.query.shopId || null;
+    const userId = req.query.userId || null;
+    const dateFrom = req.query.dateFrom || null;
+    const dateTo = req.query.dateTo || null;
     let { page = 1, limit = 10 } = req.query;
     if (download === "true") {
       page = null;
@@ -350,7 +360,22 @@ module.exports = {
       page = parseInt(page) || 1;
       limit = parseInt(limit) || 10;
     }
-
+    if (dateFrom) {
+      const startDate = new Date(dateFrom);
+      startDate.setHours(0, 0, 0, 0);
+      whereCondition.createdAt = {
+        ...whereCondition.createdAt,
+        [Op.gte]: new Date(startDate),
+      };
+    }
+    if (dateTo) {
+      const endDate = new Date(dateTo);
+      endDate.setHours(23, 59, 59, 999);
+      whereCondition.createdAt = {
+        ...whereCondition.createdAt,
+        [Op.lte]: new Date(endDate),
+      };
+    }
     const offset = page && limit ? (page - 1) * limit : 0;
 
     let whereCondition = {};
@@ -362,12 +387,25 @@ module.exports = {
         ],
       };
     }
+    if (shopId) {
+      whereCondition.shopId = shopId;
+    }
+    if (userId) {
+      whereCondition.userId = userId;
+    }
+
     try {
       const { count, rows: CouponHistory } = await UserCoupon.findAndCountAll({
         limit,
         offset,
         where: whereCondition,
-        attributes: ["id", "couponIdFrom", "couponIdTo", "assignedCount"],
+        attributes: [
+          "id",
+          "couponIdFrom",
+          "couponIdTo",
+          "assignedCount",
+          "createdAt",
+        ],
         include: [
           {
             model: Shop,

@@ -428,6 +428,8 @@ module.exports = {
     const area_id = req.query.area_id || null;
     const dateFrom = req.query.dateFrom || null;
     const dateTo = req.query.dateTo || null;
+    const shopId = req.query.shopId || null;
+    const userId = req.query.userId || null;
     const status = req.query.status || null;
 
     let whereCondition = {};
@@ -455,6 +457,12 @@ module.exports = {
     if (status) {
       whereCondition.status = status;
     }
+    if (shopId) {
+      whereCondition.shopId = shopId;
+    }
+    if (userId) {
+      whereCondition.userId = userId;
+    }
 
     try {
       const { count, rows: complaints } = await Complaint.findAndCountAll({
@@ -475,7 +483,7 @@ module.exports = {
         include: [
           {
             model: User,
-            attributes: ["id", "userName"],
+            attributes: ["id", "userName", "phone"],
             as: "user",
           },
           {

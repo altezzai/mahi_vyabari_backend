@@ -11,6 +11,7 @@ const {
 } = require("../middleware/rateLimiter");
 const multerInstance = require("../middleware/upload");
 const { upload } = require("../middleware/upload2");
+const { ro } = require("date-fns/locale");
 
 const userUploadFields = [{ name: "image", maxCount: 1 }];
 
@@ -18,14 +19,18 @@ router.get("/me", userAuth, userController.getCurrentUser);
 router.post("/send-register-otp", otpLimiter, userController.sendVerifyOtp);
 router.post("/register-user", authLimiter, userController.registerUser);
 router.post("/login-user", authLimiter, userController.userLogin);
-router.get("/refresh-token",userController.refreshAccessToken)
-router.post(
-  "/send-reset-otp",
-  otpLimiter,
-  userAuth,
-  userController.sendResetOtp
-);
+router.get("/refresh-token", userController.refreshAccessToken);
+
+router.post("/forget-password", userController.forgetPassword);
+router.post("/send-reset-otp", otpLimiter, userController.sendResetOtp);
 router.post("/reset-password", userAuth, userController.resetPassword);
+router.post(
+  "/admin-change-password",
+  userAuth,
+  authorizeRoles("admin"),
+  userController.adminChangePassword
+);
+
 router.post("/logout", userAuth, userController.Logout);
 router.put(
   "/edit-user",
