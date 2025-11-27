@@ -469,7 +469,7 @@ module.exports = {
       const couponHistory = await UserCoupon.findAndCountAll({
         where: { shopId: shopId },
         limit: 20,
-        attributes: ["id", "couponIdFrom", "couponIdTo"],
+        attributes: ["id", "couponIdFrom", "couponIdTo", "createdAt"],
         include: [
           {
             model: User,

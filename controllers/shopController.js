@@ -32,7 +32,6 @@ module.exports = {
     const t = await sequelize.transaction();
 
     try {
-      // 🔹 Validation
       if (!shopName || !phone || !email) {
         return res
           .status(400)
@@ -51,7 +50,6 @@ module.exports = {
           message: " Phone already exists in user table",
         });
       }
-      // 🔹 Check duplicate shop email
       const existingShop = await User.findOne({
         where: { email },
         transaction: t,
@@ -62,7 +60,6 @@ module.exports = {
           .json({ success: false, message: "Shop Email already exists" });
       }
 
-      // 🔹 Ensure upload folders exist
       const fs = require("fs");
       if (!fs.existsSync(iconPath)) fs.mkdirSync(iconPath, { recursive: true });
       if (!fs.existsSync(imgPath)) fs.mkdirSync(imgPath, { recursive: true });
@@ -77,7 +74,6 @@ module.exports = {
         image = await compressAndSaveFile(req.files.image[0], imgPath);
       }
 
-      // 🔹 Exclude categories field
       const { categories, ...shopBody } = req.body;
 
       const shopData = {
@@ -87,9 +83,7 @@ module.exports = {
         icon: icon || null,
       };
 
-      // 🔹 Create shop record
       const newShop = await Shop.create(shopData, { transaction: t });
-      // 🔹 Now handle categories separately
       let categoryList = [];
       if (Array.isArray(req.body.categories)) {
         categoryList = req.body.categories.map((c) => parseInt(c));
@@ -118,9 +112,6 @@ module.exports = {
         { transaction: t }
       );
 
-      // 🔹 Commit transaction
-      await t.commit();
-
       const message = `
 Welcome, ${shopName} 👋
 Your shop account has been created by the Admin.
@@ -129,23 +120,21 @@ Password: ${password}
 Thanks,
 Team Ente Mahe
             `;
-      //Please change your password after logging in.
 
-      await sendSMS(phone, message);
-
-      // 🔹 Fetch shop with relations
-      const finalShop = await Shop.findByPk(newShop.id, {
-        include: [{ model: Category }, { model: Area }],
-      });
+      try {
+        await sendSMS(phone, message);
+      } catch (smsError) {
+        console.error("SMS sending failed:", smsError.message);
+      }
+      await t.commit();
 
       res.status(201).json({
         success: true,
-        shop: finalShop,
+        shop: newShop,
       });
     } catch (error) {
       await t.rollback();
-
-      // 🔹 Delete uploaded files if transaction fails
+      console.error("Error adding shop:", error);
       if (req.files?.icon)
         await deleteFileWithFolderName(iconPath, req.files.icon[0].filename);
       if (req.files?.image)
