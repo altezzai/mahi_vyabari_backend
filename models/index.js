@@ -2,8 +2,6 @@ const fs = require("fs");
 const path = require("path");
 const Sequelize = require("sequelize");
 const sequelize = require("../config/database");
-const userCoupon = require("./userCoupon");
-
 const db = {};
 const basename = path.basename(__filename);
 

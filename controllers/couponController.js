@@ -13,9 +13,7 @@ const { parse } = require("dotenv");
 module.exports = {
   requestCoupon: async (req, res) => {
     const { requestedCount } = req.body;
-    const { id } = req.user;
-    const shopDetails = await Shop.findOne({ where: { userId: id } });
-    const shopId = shopDetails.id;
+    const shopId = req.user.shopId;
     const couponData = {
       status: "pending",
       requestedCount,
@@ -92,9 +90,7 @@ module.exports = {
   },
   assignUserCoupon: async (req, res) => {
     const { userId, assignedCount } = req.body;
-    const { id } = req.user;
-    const shopDetails = await Shop.findOne({ where: { userId: id } });
-    const shopId = shopDetails.id;
+    const shopId = req.user.shopId;
     const t = await sequelize.transaction();
     try {
       const shopBatches = await ShopCoupon.findAll({
@@ -259,13 +255,11 @@ module.exports = {
     }
   },
   getShopCouponsHistory: async (req, res) => {
-    const userId = req.user.id;
+    const shopId = req.user.shopId;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
 
-    const shopDetails = await Shop.findOne({ where: { userId } });
-    const shopId = shopDetails.id;
     let whereCondition = { shopId };
 
     try {
@@ -495,9 +489,7 @@ module.exports = {
     }
   },
   getRecentUserCoupons: async (req, res) => {
-    const { id } = req.user;
-    const shopDetails = await Shop.findOne({ where: { userId: id } });
-    const shopId = shopDetails.id;
+    const shopId = req.user.shopId;
     try {
       const couponHistory = await UserCoupon.findAndCountAll({
         where: { shopId: shopId },
@@ -522,7 +514,7 @@ module.exports = {
     }
   },
   getCurrentShopCouponStatus: async (req, res) => {
-    const shopId = req.user.id;
+    const shopId = req.user.shopId;
     try {
       if (!shopId) {
         return res
@@ -572,9 +564,7 @@ module.exports = {
     }
   },
   getPendingCoupons: async (req, res) => {
-    const { id } = req.user;
-    const shopDetails = await Shop.findOne({ where: { userId: id } });
-    const shopId = shopDetails.id;
+    const shopId = req.user.shopId;
     try {
       const pendingCoupons = await ShopCoupon.sum("requestedCount", {
         where: { status: "pending", shopId },
