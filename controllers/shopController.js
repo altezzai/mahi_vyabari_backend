@@ -75,9 +75,23 @@ module.exports = {
       }
 
       const { categories, ...shopBody } = req.body;
+      const password = req.body.phone.slice(0, 6);
 
+      const user = await User.create(
+        {
+          userName: shopName,
+          email,
+          phone,
+          area_id,
+          password: await hashData(password),
+          role: "shop",
+          image: icon || null,
+        },
+        { transaction: t }
+      );
       const shopData = {
         ...shopBody,
+        userId: user.id,
         phone,
         image: image || null,
         icon: icon || null,
@@ -96,21 +110,6 @@ module.exports = {
 
         await ShopCategory.bulkCreate(shopCategoryData, { transaction: t });
       }
-
-      const password = req.body.phone.slice(0, 6);
-
-      await User.create(
-        {
-          userName: shopName,
-          email,
-          phone,
-          area_id,
-          password: await hashData(password),
-          role: "shop",
-          image: icon || null,
-        },
-        { transaction: t }
-      );
 
       const message = `
 Welcome, ${shopName} 👋

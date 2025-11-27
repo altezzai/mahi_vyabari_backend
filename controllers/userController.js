@@ -200,7 +200,7 @@ module.exports = {
       const user = await User.findOne({
         where: { phone },
       });
-
+      console.log("user:", user);
       if (!user) {
         return res.status(403).json({
           success: false,
@@ -224,9 +224,10 @@ module.exports = {
       let shopId;
       if (user.role === "shop") {
         shopId = await Shop.findOne({
-          where: { phone },
+          where: { userId: user.id },
           attributes: ["id", "trash"],
         });
+        console.log("shopId:", shopId);
         if (shopId.trash === true) {
           return res.status(403).json({
             success: false,

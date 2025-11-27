@@ -329,22 +329,7 @@ module.exports = {
       page = parseInt(page) || 1;
       limit = parseInt(limit) || 10;
     }
-    if (dateFrom) {
-      const startDate = new Date(dateFrom);
-      startDate.setHours(0, 0, 0, 0);
-      whereCondition.createdAt = {
-        ...whereCondition.createdAt,
-        [Op.gte]: new Date(startDate),
-      };
-    }
-    if (dateTo) {
-      const endDate = new Date(dateTo);
-      endDate.setHours(23, 59, 59, 999);
-      whereCondition.createdAt = {
-        ...whereCondition.createdAt,
-        [Op.lte]: new Date(endDate),
-      };
-    }
+
     const offset = page && limit ? (page - 1) * limit : 0;
 
     let whereCondition = {};
@@ -362,7 +347,22 @@ module.exports = {
     if (userId) {
       whereCondition.userId = userId;
     }
-
+    if (dateFrom) {
+      const startDate = new Date(dateFrom);
+      startDate.setHours(0, 0, 0, 0);
+      whereCondition.createdAt = {
+        ...whereCondition.createdAt,
+        [Op.gte]: new Date(startDate),
+      };
+    }
+    if (dateTo) {
+      const endDate = new Date(dateTo);
+      endDate.setHours(23, 59, 59, 999);
+      whereCondition.createdAt = {
+        ...whereCondition.createdAt,
+        [Op.lte]: new Date(endDate),
+      };
+    }
     try {
       const { count, rows: CouponHistory } = await UserCoupon.findAndCountAll({
         limit,
