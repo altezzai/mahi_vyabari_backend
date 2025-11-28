@@ -40,7 +40,7 @@ const uploadPath = "public/uploads/userImages/";
 module.exports = {
   registerUser: async (req, res) => {
     try {
-      const { userName, email, password, otp } = req.body;
+      const { userName, email, password, otp, area_id } = req.body;
 
       let phone = req.body.phone;
       if (!userName || !email || !password || !phone || !otp) {
@@ -87,7 +87,11 @@ module.exports = {
           });
         }
         const userData = {
-          ...req.body,
+          userName,
+          email,
+          phone,
+          area_id,
+          role: "user",
           password: await hashData(password),
         };
         const savedUser = await User.create(userData);
@@ -156,7 +160,7 @@ module.exports = {
         });
       }
 
-      const { ...bodyData } = req.body;
+      const { userName, email, phone, area_id } = req.body;
 
       let fileName = user.image;
       if (req.file) {
@@ -167,7 +171,10 @@ module.exports = {
         }
       }
       const updatedData = {
-        ...bodyData,
+        userName,
+        email,
+        phone,
+        area_id,
         image: fileName,
       };
 
@@ -200,7 +207,6 @@ module.exports = {
       const user = await User.findOne({
         where: { phone },
       });
-      console.log("user:", user);
       if (!user) {
         return res.status(403).json({
           success: false,

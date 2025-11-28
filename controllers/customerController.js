@@ -77,7 +77,7 @@ module.exports = {
     }
   },
   addCustomer: async (req, res) => {
-    let { userName, email, phone } = req.body;
+    let { userName, email, phone, area_id } = req.body;
     try {
       if (!userName || !phone) {
         return res
@@ -116,6 +116,7 @@ module.exports = {
         email,
         phone,
         role: "user",
+        area_id,
         password: await hashData(password),
       };
       const message = `
