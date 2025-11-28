@@ -135,8 +135,8 @@ module.exports = {
         phone,
         whatsapp,
         priceStatus,
-        validityDate,
-        fromDate,
+        validityDate: validityDate || null,
+        fromDate: fromDate || null,
         icon: icon || null,
       });
       if (req.files?.images) {

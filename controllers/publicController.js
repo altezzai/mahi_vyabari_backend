@@ -769,11 +769,29 @@ module.exports = {
         category: category,
       };
     }
+    const today = new Date();
+    whereCondition = {
+      ...whereCondition,
+      [Op.or]: [{ fromDate: { [Op.lte]: today } }, { fromDate: null }],
+      [Op.or]: [
+        { validityDate: { [Op.gte]: today } }, // valid products
+        { validityDate: null }, // allow NULL validityDate
+      ],
+    };
     try {
       const { count, rows: classifieds } = await Classified.findAndCountAll({
         limit,
         offset,
-        attributes: ["id", "itemName", "price", "image", "phone", "priority"],
+        attributes: [
+          "id",
+          "itemName",
+          "price",
+          "image",
+          "phone",
+          "priority",
+          "fromDate",
+          "validityDate",
+        ],
         where: whereCondition,
         include: [
           {
@@ -809,8 +827,10 @@ module.exports = {
   getClassifiedById: async (req, res) => {
     try {
       const { id } = req.params;
+      const today = new Date();
+
       const classified = await Classified.findOne({
-        where: { id },
+        where: { id, trash: false },
         include: [
           {
             model: Category,
@@ -827,10 +847,18 @@ module.exports = {
           },
         ],
       });
+
       if (!classified) {
         return res
           .status(404)
           .json({ success: false, message: "Classfied not found" });
+      }
+      if (classified.validityDate) {
+        if (classified.validityDate < today) {
+          return res
+            .status(404)
+            .json({ success: false, message: "This classified is expired" });
+        }
       }
       res.status(200).json({ success: true, classified });
     } catch (error) {
