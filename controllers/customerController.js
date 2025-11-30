@@ -131,9 +131,12 @@ Thanks,
 Team Ente Mahe
             `;
 
-      // sendEmail(email, subject, message);
-      await sendSMS(phone, message);
       const newusers = await User.create(userData);
+      try {
+        await sendSMS(phone, message);
+      } catch (smsError) {
+        console.error("SMS sending failed:", smsError.message);
+      }
       res.status(200).json({ success: true, newusers });
     } catch (error) {
       console.log(error);
