@@ -89,7 +89,7 @@ module.exports = {
       }
       const existingUser = await User.findOne({
         where: {
-          [Op.or]: [{ email }, { phone }],
+          [Op.or]: [{ phone }],
         },
       });
       if (existingUser) {

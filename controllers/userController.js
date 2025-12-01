@@ -43,7 +43,7 @@ module.exports = {
       const { userName, email, password, otp, area_id } = req.body;
 
       let phone = req.body.phone;
-      if (!userName || !email || !password || !phone || !otp) {
+      if (!userName || !password || !phone || !otp) {
         return res.status(400).json({
           success: false,
           message: "Missing Details",
