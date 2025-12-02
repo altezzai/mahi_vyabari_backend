@@ -15,7 +15,8 @@ const uploadTypePath = "public/uploads/type/";
 module.exports = {
   addCategory: async (req, res) => {
     try {
-      const { typeId, categoryName, description, userId } = req.body;
+      const userId = req.user.id;
+      const { typeId, categoryName, description } = req.body;
       if (!typeId || !categoryName) {
         return res
           .status(400)
@@ -60,6 +61,7 @@ module.exports = {
   updateCategory: async (req, res) => {
     try {
       const { id } = req.params;
+      const userId = req.user.id;
       const category = await Category.findByPk(id);
       if (!category) {
         return res
@@ -67,7 +69,7 @@ module.exports = {
           .json({ error: `Category with ID ${id} not found.` });
       }
 
-      const { typeId, categoryName, description, userId } = req.body;
+      const { typeId, categoryName, description } = req.body;
       const existingCategory = await Category.findOne({
         where: {
           categoryName: categoryName.trim(),
@@ -148,15 +150,12 @@ module.exports = {
     const search = req.query.search || "";
     const type = req.query.type || "";
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = parseInt(req.query.limit) || 2;
     const offset = (page - 1) * limit;
     let whereCondition = {};
     if (search) {
       whereCondition = {
-        [Op.or]: [
-          { categoryName: { [Op.like]: `%${search}%` } },
-          { "$type.typeName$": { [Op.like]: `%${search}%` } },
-        ],
+        [Op.or]: [{ categoryName: { [Op.like]: `%${search}%` } }],
       };
     }
     try {
@@ -169,9 +168,10 @@ module.exports = {
             model: Type,
             attributes: ["id", "typeName"],
             as: "type",
+            where: type ? { typeName: { [Op.like]: `%${type}%` } } : {},
           },
         ],
-        order: [["createdAt", "DESC"]],
+        order: [["id", "DESC"]],
       });
       if (!categories) {
         return res
@@ -194,7 +194,16 @@ module.exports = {
   getCategoryById: async (req, res) => {
     try {
       const { id } = req.params;
-      const category = await Category.findByPk(id);
+      const category = await Category.findOne({
+        where: { id },
+        include: [
+          {
+            model: Type,
+            attributes: ["id", "typeName"],
+            as: "type",
+          },
+        ],
+      });
       if (!category) {
         return res
           .status(404)

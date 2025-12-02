@@ -30,6 +30,13 @@ router.post(
   authorizeRoles("shop"),
   couponController.assignUserCoupon
 );
+router.post(
+  "/admin-assign-user-coupon",
+  userAuth,
+  authorizeRoles("admin"),
+  couponController.adminAssignUserCoupon
+);
+
 router.get(
   "/get-shops",
   userAuth,

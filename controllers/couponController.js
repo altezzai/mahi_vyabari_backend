@@ -90,9 +90,15 @@ module.exports = {
   },
   assignUserCoupon: async (req, res) => {
     const { userId, assignedCount } = req.body;
+    const recordedBy = req.user.id;
     const shopId = req.user.shopId;
     const t = await sequelize.transaction();
     try {
+      if (!userId || !assignedCount) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Missing required fields" });
+      }
       const totalShopCoupons =
         (await ShopCoupon.sum("assignedCount", {
           where: { shopId },
@@ -122,6 +128,72 @@ module.exports = {
           assignedCount,
           couponIdFrom: nextCouponIdFrom,
           couponIdTo: nextCouponIdFrom + Number(assignedCount) - 1,
+          recordedBy,
+        },
+        { transaction: t }
+      );
+
+      const totalAssigned = await UserCoupon.sum("assignedCount", {
+        where: { userId },
+        transaction: t,
+      });
+      await User.update(
+        { couponCount: totalAssigned },
+        { where: { id: userId }, transaction: t }
+      );
+
+      await t.commit();
+      return res.status(200).json({
+        success: true,
+        message: "Coupons successfully assigned to user",
+        userCoupon,
+      });
+    } catch (error) {
+      await t.rollback();
+      console.error(error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  adminAssignUserCoupon: async (req, res) => {
+    const { userId, assignedCount, shopId } = req.body;
+    const recordedBy = req.user.id;
+    const t = await sequelize.transaction();
+    try {
+      if (!shopId || !userId || !assignedCount) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Missing required fields" });
+      }
+      const totalShopCoupons =
+        (await ShopCoupon.sum("assignedCount", {
+          where: { shopId },
+        })) || 0;
+
+      const totalUserAssigned =
+        (await UserCoupon.sum("assignedCount", {
+          where: { shopId },
+        })) || 0;
+      if (totalUserAssigned + Number(assignedCount) > totalShopCoupons) {
+        return res.status(400).json({
+          success: false,
+          message: "Not enough coupons available to assign",
+        });
+      }
+      const lastUserCoupon = await UserCoupon.findOne({
+        order: [["couponIdTo", "DESC"]],
+      });
+      let nextCouponIdFrom = 1;
+      if (lastUserCoupon && lastUserCoupon.couponIdTo) {
+        nextCouponIdFrom = lastUserCoupon.couponIdTo + 1;
+      }
+      const userCoupon = await UserCoupon.create(
+        {
+          shopId,
+          userId,
+          assignedCount,
+          couponIdFrom: nextCouponIdFrom,
+          couponIdTo: nextCouponIdFrom + Number(assignedCount) - 1,
+          recordedBy,
         },
         { transaction: t }
       );

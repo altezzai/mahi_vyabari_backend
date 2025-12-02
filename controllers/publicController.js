@@ -87,7 +87,7 @@ module.exports = {
       const area_id = req.query.area_id || "";
       const category = req.query.category || "";
       const page = parseInt(req.query.page) || 1;
-      const limit = parseInt(req.query.limit) || 10;
+      const limit = parseInt(req.query.limit) || 3;
       const offset = (page - 1) * limit;
       let whereCondition = { trash: false };
       if (searchQuery) {
@@ -148,7 +148,7 @@ module.exports = {
         ],
         order: [["priority", "ASC"]],
       });
-      const totalPages = Math.ceil(shops.length / limit);
+      const totalPages = Math.ceil(count / limit);
       res.status(200).json({
         success: true,
         totalCount: count,
