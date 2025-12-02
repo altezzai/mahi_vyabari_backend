@@ -868,6 +868,7 @@ module.exports = {
   },
   getTourism: async (req, res) => {
     const area_id = req.query.area_id || "";
+    const searchQuery = req.query.q || "";
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
@@ -876,6 +877,12 @@ module.exports = {
       whereCondition = {
         ...whereCondition,
         area_id: area_id,
+      };
+    }
+    if (searchQuery) {
+      whereCondition = {
+        ...whereCondition,
+        placeName: { [Op.like]: `%${searchQuery}%` },
       };
     }
     try {
