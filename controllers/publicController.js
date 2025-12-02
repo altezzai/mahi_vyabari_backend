@@ -185,6 +185,7 @@ module.exports = {
           "workingDays",
           "priority",
           "area_id",
+          "email",
           [
             Sequelize.literal(`(
               SELECT AVG(rating)

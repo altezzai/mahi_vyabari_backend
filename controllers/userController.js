@@ -284,39 +284,57 @@ module.exports = {
     try {
       const { shopId, rating } = req.body;
       const { id } = req.user;
+
       if (!id || !shopId || !rating) {
         return res.status(400).json({
           success: false,
           message: "User ID, Shop ID, and Rating are required!",
         });
       }
+
+      // Check if user already rated this shop
       const existingFeedback = await Feedback.findOne({
         where: { userId: id, shopId },
       });
-
       if (existingFeedback) {
-        existingFeedback.rating = rating;
-        await existingFeedback.save();
-        return res.status(200).json({
-          success: true,
-          message: "Rating updated successfully",
-          feedback: existingFeedback,
+        return res.status(400).json({
+          success: false,
+          message: "You have already rated this shop!",
         });
       }
-      const feedback = await Feedback.create({
+
+      await Feedback.create({
         userId: id,
         shopId,
         rating,
       });
-      // const feedback = await Feedback.bulkCreate(req.body,{validate:true})
-      res
-        .status(201)
-        .json({ success: true, message: "Rating submitted", feedback });
+
+      // 👉 Get all ratings for this shop
+      const allFeedback = await Feedback.findAll({
+        where: { shopId },
+        attributes: ["rating"],
+      });
+
+      // 👉 Calculate average
+      const sum = allFeedback.reduce((acc, f) => acc + f.rating, 0);
+      const avg = sum / allFeedback.length;
+
+      // 👉 Update shop table
+      await Shop.update(
+        { rating: avg.toFixed(1) }, // keep 1 decimal
+        { where: { id: shopId } }
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Feedback submitted successfully!",
+      });
     } catch (error) {
       console.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
+
   complaints: async (req, res) => {
     try {
       const { shopId, title, description } = req.body;

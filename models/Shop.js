@@ -67,6 +67,10 @@ module.exports = (sequelize, DataTypes) => {
       area_id: {
         type: DataTypes.INTEGER,
       },
+      rating: {
+        type: DataTypes.FLOAT,
+        defaultValue: 0,
+      },
       trash: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
