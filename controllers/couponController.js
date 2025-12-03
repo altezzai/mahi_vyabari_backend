@@ -503,7 +503,7 @@ module.exports = {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
-    let whereCondition = { role: "user" };
+    let whereCondition = { role: "user", trash: false };
     if (search) {
       whereCondition = {
         ...whereCondition,
