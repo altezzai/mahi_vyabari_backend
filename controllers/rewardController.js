@@ -173,7 +173,14 @@ module.exports = {
   // ➤ GET ALL Rewards
   getAllRewards: async (req, res) => {
     try {
-      const rewardList = await Rewards.findAll({
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const offset = (page - 1) * limit;
+
+      const { count, rows: rewardList } = await Rewards.findAndCountAll({
+        limit,
+        offset,
+        distinct: true,
         order: [["id", "DESC"]],
         include: [
           {
@@ -208,8 +215,14 @@ module.exports = {
           },
         ],
       });
-
-      return res.status(200).json({ data: rewardList });
+      const totalPages = Math.ceil(count / limit);
+      return res.status(200).json({
+        success: true,
+        totalContent: count,
+        totalPages,
+        currentPage: page,
+        data: rewardList,
+      });
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error: "Something went wrong" });

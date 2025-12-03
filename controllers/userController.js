@@ -577,7 +577,7 @@ Please Verify Your account.
 
       return res.status(200).json({
         success: true,
-        message: "sent password reset OTP to your Email",
+        message: "sent password reset OTP to your phone",
       });
     } catch (error) {
       console.log(error);

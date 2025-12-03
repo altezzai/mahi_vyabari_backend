@@ -398,6 +398,7 @@ Team Ente Mahe
       const { count, rows: shops } = await Shop.findAndCountAll({
         limit,
         offset,
+        distinct: true,
         where: whereCondition,
         attributes: [
           "id",
@@ -422,10 +423,14 @@ Team Ente Mahe
         order: [[Sequelize.literal("averageRating"), "DESC"]],
         subQuery: false,
       });
-      const totalPages = Math.ceil(count / limit);
-      return res
-        .status(200)
-        .json({ success: true, totalPages, currentPage: page, data: shops });
+      const totalPages = Math.ceil(count.length / limit);
+      return res.status(200).json({
+        success: true,
+        totalContent: count.length,
+        totalPages,
+        currentPage: page,
+        data: shops,
+      });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ success: false, message: error.message });
