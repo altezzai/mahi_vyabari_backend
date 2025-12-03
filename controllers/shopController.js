@@ -175,6 +175,7 @@ Team Ente Mahe
       const { count, rows: shops } = await Shop.findAndCountAll({
         limit,
         offset,
+        distinct: true,
         where: whereCondition,
         attributes: [
           "id",

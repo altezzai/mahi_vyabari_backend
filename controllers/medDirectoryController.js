@@ -172,6 +172,7 @@ module.exports = {
         {
           limit,
           offset,
+          distinct: true,
           attributes: [
             "id",
             "name",

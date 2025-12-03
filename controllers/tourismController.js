@@ -189,6 +189,7 @@ module.exports = {
       const { count, rows: tourism } = await Tourism.findAndCountAll({
         limit,
         offset,
+        distinct: true,
         where: whereCondition,
         attributes: ["id", "placeName", "entryFee", "phone", "trash"],
         order: [["id", "DESC"]],

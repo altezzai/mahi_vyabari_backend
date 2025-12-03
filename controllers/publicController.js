@@ -123,6 +123,7 @@ module.exports = {
       const { count, rows: shops } = await Shop.findAndCountAll({
         limit,
         offset,
+        distinct: true,
         attributes: [
           "id",
           "image",
@@ -319,6 +320,7 @@ module.exports = {
         {
           limit,
           offset,
+          distinct: true,
           attributes: [
             "id",
             "name",
@@ -409,6 +411,8 @@ module.exports = {
       const { count, rows: buses } = await VehicleSchedule.findAndCountAll({
         limit,
         offset,
+        distinct: true,
+
         where: whereCondition,
         order: [["departureTime", "ASC"]],
       });
@@ -444,6 +448,7 @@ module.exports = {
       const { count, rows: trains } = await VehicleSchedule.findAndCountAll({
         limit,
         offset,
+        distinct: true,
         where: whereCondition,
         order: [["departureTime", "ASC"]],
       });
@@ -486,6 +491,7 @@ module.exports = {
         await HealthcareProvider.findAndCountAll({
           limit,
           offset,
+          distinct: true,
           attributes: [
             "id",
             "name",
@@ -566,6 +572,7 @@ module.exports = {
       const { count, rows: emergencies } = await Emergency.findAndCountAll({
         limit,
         offset,
+        distinct: true,
         where: { trash: false },
       });
       const totalPages = Math.ceil(count / limit);
@@ -611,6 +618,7 @@ module.exports = {
         await VehicleService.findAndCountAll({
           limit,
           offset,
+          distinct: true,
           attributes: ["id", "ownerName", "vehicleNumber", "image", "priority"],
           where: whereCondition,
           include: [
@@ -707,6 +715,7 @@ module.exports = {
       const { count, rows: workers } = await Worker.findAndCountAll({
         limit,
         offset,
+        distinct: true,
         attributes: [
           "id",
           "workerName",
@@ -787,6 +796,7 @@ module.exports = {
       const { count, rows: classifieds } = await Classified.findAndCountAll({
         limit,
         offset,
+        distinct: true,
         attributes: [
           "id",
           "itemName",
@@ -894,6 +904,7 @@ module.exports = {
       const { count, rows: tourism } = await Tourism.findAndCountAll({
         limit,
         offset,
+        distinct: true,
         attributes: ["id", "placeName"],
         where: whereCondition,
         include: [

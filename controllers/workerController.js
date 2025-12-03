@@ -209,6 +209,7 @@ module.exports = {
       const { count, rows: workers } = await Worker.findAndCountAll({
         limit,
         offset,
+        distinct: true,
         where: whereCondition,
         attributes: [
           "id",

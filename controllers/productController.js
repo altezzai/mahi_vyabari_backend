@@ -128,6 +128,7 @@ module.exports = {
       const { count, rows: products } = await Product.findAndCountAll({
         limit,
         offset,
+        distinct: true,
         where: whereCondition,
         attributes: [
           "id",

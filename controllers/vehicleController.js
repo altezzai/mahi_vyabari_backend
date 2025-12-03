@@ -198,6 +198,7 @@ module.exports = {
         await VehicleSchedule.findAndCountAll({
           limit,
           offset,
+          distinct: true,
           where: whereCondition,
           attributes: [
             "id",
@@ -403,6 +404,7 @@ module.exports = {
         await VehicleService.findAndCountAll({
           limit,
           offset,
+          distinct: true,
           where: whereCondition,
           attributes: [
             "id",
