@@ -414,6 +414,7 @@ module.exports = {
             "icon",
             "minFee",
             "vehicleNumber",
+            "trash",
           ],
           include: [
             {
