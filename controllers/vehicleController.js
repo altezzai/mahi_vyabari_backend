@@ -493,7 +493,7 @@ module.exports = {
           {
             model: Category,
             where: { trash: false },
-            attributes: ["id", "categoryName"],
+            attributes: ["id", "categoryName", "icon"],
             as: "category",
           },
         ],
