@@ -20,7 +20,6 @@ const processImage = async (
   const filename = `${originalBaseName}-${uniqueSuffix}.webp`;
   const outputDir = path.join(UPLOAD_PATH, subfolder);
   const outputPath = path.join(outputDir, filename);
-  console.log(outputPath);
   await fs.promises.mkdir(outputDir, { recursive: true });
 
   await sharp(buffer)
@@ -135,7 +134,10 @@ const compressAndSaveFile = async (file, uploadPath) => {
 
     if (file.mimetype.startsWith("image")) {
       processedFileName = `${date}${file.originalname.split(".")[0]}.jpg`;
-      processedFile = await sharp(file.buffer).jpeg({ quality: 30 }).toBuffer();
+      processedFile = await sharp(file.buffer)
+        .rotate()
+        .jpeg({ quality: 30 })
+        .toBuffer();
     }
     const filePath = path.join(uploadPath, processedFileName);
     if (!fs.existsSync(uploadPath)) {
