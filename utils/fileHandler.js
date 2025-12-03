@@ -24,6 +24,7 @@ const processImage = async (
   await fs.promises.mkdir(outputDir, { recursive: true });
 
   await sharp(buffer)
+    .rotate()
     .resize(resizeOptions.width, resizeOptions.height, {
       fit: "inside",
       withoutEnlargement: true,
