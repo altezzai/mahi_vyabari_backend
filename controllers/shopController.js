@@ -55,21 +55,20 @@ module.exports = {
         where: { email },
         transaction: t,
       });
-      const existingUserName = await User.findOne({
-        where: { userName: shopName },
-        transaction: t,
-      });
-      if (existingUserName) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Shop Name already exists" });
-      }
       if (existingShop) {
         return res
           .status(400)
           .json({ success: false, message: "Shop Email already exists" });
       }
-
+      const existingshopName = await Shop.findOne({
+        where: { shopName },
+        transaction: t,
+      });
+      if (existingshopName) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Shop Name already exists" });
+      }
       const fs = require("fs");
       if (!fs.existsSync(iconPath)) fs.mkdirSync(iconPath, { recursive: true });
       if (!fs.existsSync(imgPath)) fs.mkdirSync(imgPath, { recursive: true });
@@ -310,20 +309,19 @@ Team Ente Mahe
           message: "Phone number already exists",
         });
       }
-      const existingUserName = await User.findOne({
+      const existingshopName = await Shop.findOne({
         where: {
-          userName: shopName,
+          shopName,
           id: {
-            [Op.ne]: shop.userId,
+            [Op.ne]: shopId,
           },
         },
+        transaction: t,
       });
-
-      if (existingUserName) {
-        return res.status(400).json({
-          success: false,
-          message: "Shop name already exists",
-        });
+      if (existingshopName) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Shop Name already exists" });
       }
 
       const updatedShop = await shop.update(
