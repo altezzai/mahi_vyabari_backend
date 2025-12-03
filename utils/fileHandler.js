@@ -3,6 +3,7 @@ const path = require("path");
 const fs = require("fs");
 
 const UPLOAD_PATH = process.env.UPLOAD_PATH;
+const logger = require("../utils/logger");
 const processImage = async (
   buffer,
   resizeOptions,
@@ -110,6 +111,7 @@ const cleanupFiles = async (processedFiles, subfolder) => {
   }
   await Promise.all(cleanupPromises).catch(console.error);
   console.log(`Cleanup for "${subfolder}" complete.`);
+  logger.info(`Cleanup for "${subfolder}" complete.`);
 };
 const deleteFileWithFolderName = async (uploadPath, filename) => {
   try {
@@ -120,6 +122,7 @@ const deleteFileWithFolderName = async (uploadPath, filename) => {
       }
     }
   } catch (err) {
+    logger.error("Error in deleteFile: " + err.message);
     console.error("Error cleaning up" + filename + " files:", err);
   }
 };
@@ -148,6 +151,7 @@ const compressAndSaveFile = async (file, uploadPath) => {
 
     return processedFileName;
   } catch (error) {
+    logger.error("Error in compressAndSaveFile: " + error.message);
     console.error("Error processing file:", error);
     throw new Error("Error processing file");
   }

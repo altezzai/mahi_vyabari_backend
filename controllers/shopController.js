@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const sequelize = require("../config/database");
 const { Op } = require("sequelize");
+const logger = require("../utils/logger");
 
 const {
   User,
@@ -14,6 +15,7 @@ const {
   Area,
   ShopCategory,
 } = require("../models");
+
 const Sequelize = require("sequelize");
 
 const { hashData } = require("../utils/hashData");
@@ -133,6 +135,7 @@ Team Ente Mahe
         await sendSMS(phone, message);
       } catch (smsError) {
         console.error("SMS sending failed:", smsError.message);
+        logger.error(error);
       }
       await t.commit();
 
@@ -143,6 +146,7 @@ Team Ente Mahe
     } catch (error) {
       await t.rollback();
       console.error("Error adding shop:", error);
+      logger.error(error);
       if (req.files?.icon)
         await deleteFileWithFolderName(iconPath, req.files.icon[0].filename);
       if (req.files?.image)
@@ -218,6 +222,7 @@ Team Ente Mahe
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -245,6 +250,7 @@ Team Ente Mahe
       res.status(200).json({ success: true, data: shop });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -389,6 +395,7 @@ Team Ente Mahe
     } catch (error) {
       await t.rollback();
       console.error(error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -408,6 +415,7 @@ Team Ente Mahe
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -424,6 +432,7 @@ Team Ente Mahe
       res.status(200).json({ success: true, shop });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res
         .status(500)
         .json({ success: false, message: "Internal Server Error" });
@@ -446,6 +455,7 @@ Team Ente Mahe
       res.status(200).json({ success: true, shopCategories });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -500,6 +510,7 @@ Team Ente Mahe
       });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -594,6 +605,7 @@ Team Ente Mahe
       });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -628,6 +640,7 @@ Team Ente Mahe
       res.status(200).json({ success: true, data: complaint });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -645,6 +658,7 @@ Team Ente Mahe
       res.status(200).json({ success: true, complaint });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -661,6 +675,7 @@ Team Ente Mahe
       res.status(200).json({ success: true, complaint });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -676,6 +691,7 @@ Team Ente Mahe
       res.status(200).json({ success: true, complaint });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },

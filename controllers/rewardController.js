@@ -7,6 +7,7 @@ const {
   Shop,
 } = require("../models");
 const { Op } = require("sequelize");
+const logger = require("../utils/logger");
 const {
   compressAndSaveFile,
   deleteFileWithFolderName,
@@ -39,6 +40,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ error: "Something went wrong" });
     }
   },
@@ -53,6 +55,7 @@ module.exports = {
       return res.status(200).json({ data: milestones });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ error: "Something went wrong" });
     }
   },
@@ -71,6 +74,7 @@ module.exports = {
       return res.status(200).json({ data: milestone });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ error: "Something went wrong" });
     }
   },
@@ -108,6 +112,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ error: "Something went wrong" });
     }
   },
@@ -133,6 +138,7 @@ module.exports = {
         .json({ message: "Milestone deleted successfully" });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ error: "Something went wrong" });
     }
   },
@@ -166,6 +172,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({ error: "Something went wrong" });
     }
   },
@@ -225,6 +232,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({ error: "Something went wrong" });
     }
   },
@@ -277,6 +285,7 @@ module.exports = {
       return res.status(200).json({ data: reward });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({ error: "Something went wrong" });
     }
   },
@@ -315,6 +324,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({ error: "Something went wrong" });
     }
   },
@@ -335,6 +345,7 @@ module.exports = {
       return res.status(200).json({ message: "Reward deleted successfully" });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({ error: "Something went wrong" });
     }
   },
@@ -371,6 +382,7 @@ module.exports = {
       return res.status(200).json({ data: rewards });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({ error: "Something went wrong" });
     }
   },

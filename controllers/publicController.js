@@ -1,5 +1,6 @@
 const { Sequelize } = require("sequelize");
 const { Op } = require("sequelize");
+const logger = require("../utils/logger");
 
 const {
   Shop,
@@ -78,6 +79,7 @@ module.exports = {
       res.json({ success: true, shops: shops, tourism: tourism });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -163,6 +165,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({
         success: false,
         message: error.message,
@@ -244,6 +247,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -357,6 +361,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -388,6 +393,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -425,6 +431,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -461,6 +468,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -525,6 +533,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -553,6 +562,7 @@ module.exports = {
       res.json({ success: true, hospital });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -584,6 +594,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -643,6 +654,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -671,6 +683,7 @@ module.exports = {
       res.status(200).json({ success: true, vehicleService });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -737,6 +750,7 @@ module.exports = {
       res.json({ success: true, totalPages, currentPage: page, data: workers });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -754,6 +768,7 @@ module.exports = {
       res.status(200).json({ success: true, worker });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -836,6 +851,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -878,6 +894,7 @@ module.exports = {
       res.status(200).json({ success: true, classified });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -925,6 +942,7 @@ module.exports = {
         .json({ success: true, totalPages, currentPage: page, data: tourism });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ success: true, message: error.message });
     }
   },
@@ -949,6 +967,7 @@ module.exports = {
       res.status(200).json({ success: true, data: tourism });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -969,6 +988,7 @@ module.exports = {
       return res.status(200).json({ success: true, shopCategories });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -989,6 +1009,7 @@ module.exports = {
       return res.status(200).json({ success: true, workerCategory });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -1009,6 +1030,7 @@ module.exports = {
       return res.status(200).json({ success: true, classifiedCategories });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -1022,6 +1044,7 @@ module.exports = {
       return res.status(200).json({ success: true, areas });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -1038,6 +1061,7 @@ module.exports = {
       return res.status(200).json({ success: true, banners });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },

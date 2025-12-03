@@ -4,6 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const { Tourism, TourismImage, Category, Area } = require("../models");
 const { Op } = require("sequelize");
+const logger = require("../utils/logger");
 const sequelize = require("../config/database");
 const {
   cleanupFiles,
@@ -51,7 +52,7 @@ module.exports = {
     } catch (error) {
       await t.rollback();
       console.log(error);
-      console.error("Error in createTourismSpot:", error);
+      logger.error(error);
       res.status(500).json({
         error: "Failed to create tourism spot",
         details: error.message,
@@ -103,6 +104,7 @@ module.exports = {
       return res.status(200).json({ success: true, updatedTourism });
     } catch (error) {
       console.error("Error in updateTourismSpot:", error);
+      logger.error(error);
       res.status(500).json({
         error: "Failed to update tourism spot",
         details: error.message,
@@ -128,6 +130,7 @@ module.exports = {
       res.status(200).json({ message: "Image deleted successfully!" });
     } catch (error) {
       console.error("Error deleting image:", error);
+      logger.error(error);
       res.status(500).json({ error: "Failed to delete image" });
     }
   },
@@ -144,6 +147,7 @@ module.exports = {
       await tourism.update({ trash: true });
       return res.status(200).json({ success: true, tourism });
     } catch (error) {
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -159,6 +163,7 @@ module.exports = {
       await tourism.update({ trash: false });
       return res.status(200).json({ success: true, tourism });
     } catch (error) {
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -215,6 +220,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       res
         .status(500)
         .json({ success: false, message: error.message, name: error.name });
@@ -244,6 +250,7 @@ module.exports = {
       res.status(200).json({ success: true, tourism });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },

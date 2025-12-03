@@ -3,6 +3,7 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const bcrypt = require("bcrypt");
+const logger = require("../utils/logger");
 const { startOfMonth, endOfMonth, subMonths } = require("date-fns");
 const {
   generateAccessToken,
@@ -141,6 +142,7 @@ module.exports = {
       }
     } catch (error) {
       console.log(error);
+      logger.error(error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -186,6 +188,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       res.status(500).json({
         success: false,
         message: error.message,
@@ -271,6 +274,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -331,6 +335,8 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
+
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -348,6 +354,8 @@ module.exports = {
       res.status(201).json({ success: true, complaint });
     } catch (error) {
       console.error(error);
+      logger.error(error);
+
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -365,6 +373,8 @@ module.exports = {
       res.status(200).json({ success: true, complaints });
     } catch (error) {
       console.error(error);
+      logger.error(error);
+
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -376,6 +386,8 @@ module.exports = {
       res.status(200).json(complaints);
     } catch (error) {
       console.error(error);
+      logger.error(error);
+
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -400,6 +412,8 @@ module.exports = {
       res.status(200).json({ success: true, user });
     } catch (error) {
       console.error(error);
+      logger.error(error);
+
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -455,6 +469,7 @@ module.exports = {
         .json({ success: true, message: "Successfully Logged Out" });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       res.status(500).json({ success: true, message: error.message });
     }
   },
@@ -494,6 +509,7 @@ Please Verify Your account.
         .json({ success: true, message: "Verification OTP Send on Phone" });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -540,6 +556,7 @@ Please Verify Your account.
       });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -581,6 +598,7 @@ Please Verify Your account.
       });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -628,6 +646,7 @@ Please Verify Your account.
         .json({ success: true, message: "Password Reset Successfully" });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -661,6 +680,7 @@ Please Verify Your account.
         .json({ success: true, message: "Password Reset Successfully" });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -730,6 +750,7 @@ Please Verify Your account.
         .json({ success: true, message: "Password Reset Successfully" });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -780,7 +801,7 @@ Please Verify Your account.
   //       message: "sent Login OTP to your Email",
   //     });
   //   } catch (error) {
-  //     console.log(error);
+  //      console.log(error);
   //     return res.status(500).json({ success: false, message: error.message });
   //   }
   // },
@@ -820,6 +841,7 @@ Please Verify Your account.
       });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -840,6 +862,7 @@ Please Verify Your account.
       });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -996,6 +1019,7 @@ Please Verify Your account.
       });
     } catch (error) {
       console.error("Error in getRegistrationStats:", error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -1090,6 +1114,7 @@ Please Verify Your account.
       });
     } catch (error) {
       console.error("Error getting type stats:", error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -1112,6 +1137,7 @@ Please Verify Your account.
       });
     } catch (error) {
       console.error("Error fetching user registrations by month:", error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -1260,6 +1286,7 @@ Please Verify Your account.
       });
     } catch (error) {
       console.error("Error fetching recent activities:", error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -1309,6 +1336,7 @@ Please Verify Your account.
       });
     } catch (error) {
       console.error("Error fetching top coupon distributors:", error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },

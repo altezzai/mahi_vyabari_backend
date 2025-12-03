@@ -4,6 +4,7 @@ const { User } = require("../models");
 const { hashData } = require("../utils/hashData");
 const { sendEmail } = require("../utils/nodemailer");
 const { sendSMS } = require("../utils/smsService");
+const logger = require("../utils/logger");
 
 module.exports = {
   getCustomers: async (req, res) => {
@@ -56,6 +57,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -73,6 +75,7 @@ module.exports = {
       res.status(201).json({ success: true, users });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -140,6 +143,8 @@ Team Ente Mahe
       res.status(200).json({ success: true, newusers });
     } catch (error) {
       console.log(error);
+      logger.error(error);
+
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -160,6 +165,7 @@ Team Ente Mahe
       });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -180,6 +186,7 @@ Team Ente Mahe
       });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },

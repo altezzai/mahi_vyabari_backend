@@ -3,6 +3,7 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const { Op } = require("sequelize");
+const logger = require("../utils/logger");
 
 const {
   VehicleSchedule,
@@ -54,6 +55,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       res.status(500).json({
         success: false,
         message: error.message,
@@ -105,6 +107,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -127,6 +130,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -149,6 +153,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -171,6 +176,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -226,6 +232,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -244,6 +251,7 @@ module.exports = {
       return res.status(200).json({ success: true, data: vehicleSchedule });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -274,6 +282,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       res.status(500).json({
         success: false,
         message: error.message,
@@ -318,6 +327,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -340,6 +350,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -362,6 +373,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -444,6 +456,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -477,6 +490,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -502,6 +516,7 @@ module.exports = {
       res.status(200).json({ success: true, vehicleServiceCategories });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },

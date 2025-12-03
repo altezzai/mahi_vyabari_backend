@@ -9,6 +9,7 @@ const {
   CouponMilestone,
 } = require("../models");
 const { parse } = require("dotenv");
+const logger = require("../utils/logger");
 
 module.exports = {
   requestCoupon: async (req, res) => {
@@ -27,6 +28,8 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
+      logger.error(error);
+
       res.status(500).json({
         success: false,
         message: error.message,
@@ -61,6 +64,8 @@ module.exports = {
       res.status(200).json({ success: true, shopCoupon });
     } catch (error) {
       console.log(error);
+      logger.error(error);
+
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -85,6 +90,7 @@ module.exports = {
       res.status(200).json({ success: true, shopCoupon });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -151,6 +157,7 @@ module.exports = {
     } catch (error) {
       await t.rollback();
       console.error(error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -216,6 +223,7 @@ module.exports = {
     } catch (error) {
       await t.rollback();
       console.error(error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -298,6 +306,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -337,6 +346,8 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
+      logger.error(error);
+
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -383,6 +394,8 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
+      logger.error(error);
+
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -471,6 +484,8 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
+      logger.error(error);
+
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -495,6 +510,8 @@ module.exports = {
       res.status(200).json({ success: true, shops });
     } catch (error) {
       console.log(error);
+      logger.error(error);
+
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -532,6 +549,8 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
+      logger.error(error);
+
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -557,6 +576,8 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
+      logger.error(error);
+
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -607,6 +628,8 @@ module.exports = {
       res.status(200).json({ success: true, couponStatus });
     } catch (error) {
       console.log(error);
+      logger.error(error);
+
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -619,6 +642,8 @@ module.exports = {
       res.status(200).json({ success: true, pendingCoupons });
     } catch (error) {
       console.log(error);
+      logger.error(error);
+
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -651,6 +676,8 @@ module.exports = {
         .json({ success: true, data: { totalCouponCount, userCouponStatus } });
     } catch (error) {
       console.log(error);
+      logger.error(error);
+
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -693,6 +720,8 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
+      logger.error(error);
+
       return res.status(500).json({ error: "Something went wrong" });
     }
   },
@@ -746,6 +775,8 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
+      logger.error(error);
+
       return res.status(500).json({ error: "Something went wrong" });
     }
   },
@@ -811,6 +842,8 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
+      logger.error(error);
+
       res.status(500).json({ success: false, message: error.message });
     }
   },

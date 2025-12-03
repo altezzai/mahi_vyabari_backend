@@ -1,5 +1,6 @@
 const { Area } = require("../models");
 const { Op } = require("sequelize");
+const logger = require("../utils/logger");
 
 const createArea = async (req, res) => {
   try {
@@ -22,6 +23,7 @@ const createArea = async (req, res) => {
   } catch (error) {
     // --- UPDATED ERROR HANDLING ---
     console.error("Error in createArea:", error);
+    logger.error(error);
     res
       .status(500)
       .json({ error: "Failed to create area", details: error.message });
@@ -57,6 +59,7 @@ const updateArea = async (req, res) => {
   } catch (error) {
     // --- UPDATED ERROR HANDLING ---
     console.error("Error in updateArea:", error);
+    logger.error(error);
     res
       .status(500)
       .json({ error: "Failed to update area", details: error.message });
@@ -92,6 +95,7 @@ const deleteArea = async (req, res) => {
 
     // --- UPDATED ERROR HANDLING ---
     console.error("Error in deleteArea:", error);
+    logger.error(error);
     res
       .status(500)
       .json({ error: "Failed to delete area", details: error.message });
@@ -124,6 +128,7 @@ const restoreArea = async (req, res) => {
   } catch (error) {
     // --- UPDATED ERROR HANDLING ---
     console.error("Error in restoreArea:", error);
+    logger.error(error);
     res
       .status(500)
       .json({ error: "Failed to restore area", details: error.message });
@@ -149,6 +154,7 @@ const getAreas = async (req, res) => {
   } catch (error) {
     // --- UPDATED ERROR HANDLING ---
     console.error("Error in getAreas:", error);
+    logger.error(error);
     res
       .status(500)
       .json({ error: "Failed to retrieve areas", details: error.message });
@@ -167,6 +173,7 @@ const getAreaById = async (req, res) => {
     res.status(200).json({ success: true, data: area });
   } catch (error) {
     console.log(error);
+    logger.error(error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -188,6 +195,7 @@ const getAllAreas = async (req, res) => {
   } catch (error) {
     // --- UPDATED ERROR HANDLING ---
     console.error("Error in getAllAreas:", error);
+    logger.error(error);
     res
       .status(500)
       .json({ error: "Failed to retrieve all areas", details: error.message });

@@ -8,6 +8,7 @@ const {
   compressAndSaveFile,
 } = require("../utils/fileHandler");
 const uploadPath = "public/uploads/products/";
+const logger = require("../utils/logger");
 
 module.exports = {
   addProduct: async (req, res) => {
@@ -47,6 +48,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       return res.status(401).json({
         success: false,
         message: error.message,
@@ -94,6 +96,7 @@ module.exports = {
       return res.status(200).json({ success: true, product: updatedProduct });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -159,6 +162,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -186,6 +190,7 @@ module.exports = {
       res.status(200).json({ success: true, product });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -205,6 +210,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -224,6 +230,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -248,6 +255,7 @@ module.exports = {
       res.status(200).json({ success: true, shops });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },

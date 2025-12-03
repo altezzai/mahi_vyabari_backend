@@ -1,4 +1,5 @@
 const twilio = require("twilio");
+const logger = require("../utils/logger");
 
 const client = new twilio(
   process.env.TWILIO_ACCOUNT_SID,
@@ -18,6 +19,7 @@ module.exports = {
       return result;
     } catch (error) {
       console.error("SMS sending error:", error);
+      logger.error("SMS sending error:", error);
       throw error;
     }
   },

@@ -8,6 +8,7 @@ const {
   deleteFileWithFolderName,
   compressAndSaveFile,
 } = require("../utils/fileHandler");
+const logger = require("../utils/logger");
 
 const iconPath = "public/uploads/healthcareProvider/icon/";
 const imgPath = "public/uploads/healthcareProvider/";
@@ -39,6 +40,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       res.status(500).json({
         success: false,
         message: error.message,
@@ -83,6 +85,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -105,6 +108,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -127,6 +131,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -208,6 +213,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       res.status(500).json({
         success: false,
         message: error.message,
@@ -234,6 +240,7 @@ module.exports = {
       return res.status(200).json({ success: true, data: healthcareProvider });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -258,6 +265,7 @@ module.exports = {
       return res.status(200).json({ success: true, data: medicalCategory });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },

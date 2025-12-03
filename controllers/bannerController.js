@@ -1,6 +1,7 @@
 const path = require("path");
 const fs = require("fs");
 const { Banner } = require("../models");
+const logger = require("../utils/logger");
 const sequelize = require("../config/database");
 const {
   deleteFileWithFolderName,
@@ -44,6 +45,7 @@ module.exports = {
         banner: newBanner,
       });
     } catch (error) {
+      logger.error(error);
       res.status(500).json({
         message: "An error occurred on the server while uploading banners.",
       });
@@ -98,6 +100,7 @@ module.exports = {
         banner: updatedBanner,
       });
     } catch (error) {
+      logger.error(error);
       res.status(500).json({ message: "Error updating banner." });
     }
   },
@@ -134,6 +137,7 @@ module.exports = {
         type2: type2Banners.map(addFullUrl),
       });
     } catch (error) {
+      logger.error(error);
       res.status(500).json({ message: "Error fetching banners." });
     }
   },
@@ -193,6 +197,7 @@ module.exports = {
         banners: banners,
       });
     } catch (error) {
+      logger.error(error);
       console.error("Error fetching admin banners:", error);
       res.status(500).json({ message: "Error fetching banners." });
     }
@@ -212,6 +217,7 @@ module.exports = {
 
       res.status(200).json({ message: "Banner soft-deleted successfully." });
     } catch (error) {
+      logger.error(error);
       res.status(500).json({ message: "Error soft-deleting banner." });
     }
   },
@@ -230,6 +236,7 @@ module.exports = {
 
       res.status(200).json({ message: "Banner soft-deleted successfully." });
     } catch (error) {
+      logger.error(error);
       res.status(500).json({ message: "Error soft-deleting banner." });
     }
   },
@@ -254,6 +261,7 @@ module.exports = {
         .status(200)
         .json({ message: "Banner permanently deleted successfully." });
     } catch (error) {
+      logger.error(error);
       res.status(500).json({ message: "Error hard-deleting banner." });
     }
   },
@@ -266,6 +274,7 @@ module.exports = {
       }
       res.status(200).json(banner);
     } catch (error) {
+      logger.error(error);
       res.status(500).json({ message: "Error fetching banner." });
     }
   },
@@ -286,6 +295,7 @@ module.exports = {
       await banner.destroy();
       res.status(200).json({ message: "Banner deleted successfully." });
     } catch (error) {
+      logger.error(error);
       res.status(500).json({ message: "Error deleting banner." });
     }
   },

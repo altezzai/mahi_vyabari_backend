@@ -1,10 +1,7 @@
 require("../config/database");
 const path = require("path");
-// const Worker = require("../models/Worker");
-// const WorkerCategory = require("../models/WorkerCategory");
 const { Op, where, col, Transaction } = require("sequelize");
-// const Type = require("../models/Type");
-// const Category = require("../models/Category");
+const logger = require("../utils/logger");
 const { Type, Category, Worker, WorkerCategory, Area } = require("../models");
 const sequelize = require("../config/database");
 const {
@@ -137,6 +134,7 @@ module.exports = {
     } catch (error) {
       await t.rollback();
       console.error(error);
+      logger.error(error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -159,6 +157,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -181,6 +180,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -249,6 +249,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -267,6 +268,7 @@ module.exports = {
       return res.status(200).json({ success: true, data: worker });
     } catch (error) {
       console.error(error);
+      logger.error(error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -290,6 +292,7 @@ module.exports = {
       return res.status(200).json({ success: true, data: workerCategory });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },

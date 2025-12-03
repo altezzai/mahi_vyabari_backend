@@ -48,10 +48,8 @@ module.exports = {
         category: newCategory,
       });
     } catch (error) {
-      console.error(
-        "Error during category creation, cleaning up uploaded files..."
-      );
       console.log(error);
+      logger.error(error);
       res.status(500).json({
         success: false,
         message: "An error occur while uploading Category data",
@@ -124,6 +122,7 @@ module.exports = {
       });
     } catch (error) {
       console.error("Error deleting category:", error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -143,6 +142,7 @@ module.exports = {
       });
     } catch (error) {
       console.error("Error deleting category:", error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -188,6 +188,7 @@ module.exports = {
       });
     } catch (error) {
       console.error("Error fetching categories:", error);
+      logger.error(error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -212,6 +213,7 @@ module.exports = {
       return res.status(200).json({ success: true, category });
     } catch (error) {
       console.error("Error fetching category:", error);
+      logger.error(error);
       return res.status(500).json({ message: error.message });
     }
   },
@@ -239,6 +241,7 @@ module.exports = {
       res.status(201).json({ success: true, data: newType });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -273,6 +276,7 @@ module.exports = {
       res.status(200).json({ success: true, data: type });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -288,6 +292,7 @@ module.exports = {
       res.json({ success: true, data: type });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -303,6 +308,7 @@ module.exports = {
       res.json({ success: true, data: type });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -312,6 +318,7 @@ module.exports = {
       res.json({ success: true, types });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -329,6 +336,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
+      logger.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
