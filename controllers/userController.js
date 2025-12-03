@@ -469,7 +469,7 @@ module.exports = {
       if (!phone.startsWith("+91")) {
         phone = "+91" + phone;
       }
-      console.log(phone);
+
       const user = await User.findOne({ where: { phone } });
       if (user) {
         return res

@@ -23,6 +23,7 @@ const {
   compressAndSaveFile,
 } = require("../utils/fileHandler");
 const { Console } = require("console");
+const { id } = require("date-fns/locale");
 
 const iconPath = "public/uploads/shop/icon/";
 const imgPath = "public/uploads/shop/";
@@ -54,6 +55,15 @@ module.exports = {
         where: { email },
         transaction: t,
       });
+      const existingUserName = await User.findOne({
+        where: { userName: shopName },
+        transaction: t,
+      });
+      if (existingUserName) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Shop Name already exists" });
+      }
       if (existingShop) {
         return res
           .status(400)
@@ -249,6 +259,7 @@ Team Ente Mahe
           .status(404)
           .json({ success: false, message: "Shop not found" });
       }
+
       let icon = shop.icon;
       let image = shop.image;
       if (req.files?.icon) {
@@ -263,21 +274,79 @@ Team Ente Mahe
         image = await compressAndSaveFile(req.files.image[0], imgPath);
         await deleteFileWithFolderName(imgPath, oldFilename);
       }
-      const { categories, ...updateBody } = req.body;
-
+      const { categories, email, shopName, ...updateBody } = req.body;
       let phone = req.body.phone;
       if (phone && !phone.startsWith("+91")) {
         phone = "+91" + phone;
       }
+      const existingEmail = await User.findOne({
+        where: {
+          email: email,
+          id: {
+            [Op.ne]: shop.userId,
+          },
+        },
+      });
+
+      if (existingEmail) {
+        return res.status(400).json({
+          success: false,
+          message: "Email already exists",
+        });
+      }
+
+      const existingPhone = await User.findOne({
+        where: {
+          phone: phone,
+          id: {
+            [Op.ne]: shop.userId,
+          },
+        },
+      });
+
+      if (existingPhone) {
+        return res.status(400).json({
+          success: false,
+          message: "Phone number already exists",
+        });
+      }
+      const existingUserName = await User.findOne({
+        where: {
+          userName: shopName,
+          id: {
+            [Op.ne]: shop.userId,
+          },
+        },
+      });
+
+      if (existingUserName) {
+        return res.status(400).json({
+          success: false,
+          message: "Shop name already exists",
+        });
+      }
+
       const updatedShop = await shop.update(
         {
           ...updateBody,
+          email: email || shop.email,
+          shopName: shopName || shop.userName,
           phone: phone || shop.phone,
           icon,
           image,
         },
         { transaction: t }
       );
+      if (phone || email || shopName) {
+        await User.update(
+          {
+            phone: phone || shop.phone,
+            email: email || shop.email,
+            userName: shopName || shop.userName,
+          },
+          { where: { id: shopId }, transaction: t }
+        );
+      }
 
       let categoryList = [];
 
