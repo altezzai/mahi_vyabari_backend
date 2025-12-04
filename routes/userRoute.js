@@ -96,4 +96,23 @@ router.get(
   userController.getTopShopUserCoupon
 );
 
+router.get(
+  "/get-shop-complaints-for-user",
+  userAuth,
+  authorizeRoles("user"),
+  userController.getShopComplaintSForUser
+);
+router.delete(
+  "/delete-complaints/:id",
+  userAuth,
+  authorizeRoles("user"),
+  userController.deleteComplaint
+);
+// router.get(
+//   "/get-shop-feedbacks-for-user",
+//   userAuth,
+//   authorizeRoles("user"),
+//   userController.getShopFeedbacksForUser
+// );
+
 module.exports = router;

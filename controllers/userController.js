@@ -391,6 +391,86 @@ module.exports = {
       res.status(500).json({ success: false, message: error.message });
     }
   },
+  getShopComplaintSForUser: async (req, res) => {
+    const userId = req.user.id;
+    const search = req.query.search || "";
+
+    const download = req.query.download || "";
+    let { page = 1, limit = 10 } = req.query;
+    if (download === "true") {
+      page = null;
+      limit = null;
+    } else {
+      page = parseInt(page) || 1;
+      limit = parseInt(limit) || 10;
+    }
+    const offset = page && limit ? (page - 1) * limit : 0;
+
+    let whereCondition = { userId };
+    if (search) {
+      whereCondition = {
+        shopName: { [Op.like]: `%${search}%` },
+      };
+    }
+    try {
+      const { count, rows: complaints } = await Complaint.findAndCountAll({
+        limit,
+        offset,
+        where: whereCondition,
+        attributes: {
+          exclude: ["userId", "shopId", "updatedAt"],
+        },
+        include: [
+          {
+            model: Shop,
+            attributes: ["id", "shopName"],
+            as: "shop",
+            include: [
+              {
+                model: Area,
+                attributes: ["id", "name"],
+              },
+            ],
+          },
+        ],
+        order: [["createdAt", "DESC"]],
+      });
+      const totalPages = Math.ceil(count / limit);
+      return res.status(200).json({
+        success: true,
+        count,
+        totalPages: download === "true" ? null : totalPages,
+        currentPage: download === "true" ? null : page,
+        data: complaints,
+      });
+    } catch (error) {
+      console.log(error);
+      logger.error(error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  deleteComplaint: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user.id;
+      const complaint = await Complaint.findOne({
+        where: { id, userId },
+      });
+      if (!complaint) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Complaint not found" });
+      }
+      await complaint.destroy();
+      res
+        .status(200)
+        .json({ success: true, message: "Complaint deleted successfully" });
+    } catch (error) {
+      console.error(error);
+      logger.error(error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
   getPersonalDetails: async (req, res) => {
     const { id } = req.user;
     try {
