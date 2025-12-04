@@ -324,9 +324,7 @@ module.exports = {
           limit,
           offset,
           where: whereCondition,
-          attributes: {
-            exclude: ["createdAt", "updatedAt"],
-          },
+
           include: [
             {
               model: Shop,
