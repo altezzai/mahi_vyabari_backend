@@ -352,12 +352,23 @@ module.exports = {
 
   getAssignedCoupon: async (req, res) => {
     const searchQuery = req.query.q || "";
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
     const shopId = req.query.shopId || null;
+    const start_date = req.query.start_date || null;
+    const end_date = req.query.end_date || null;
 
-    const offset = (page - 1) * limit;
+    const download = req.query.download || "";
+    let { page = 1, limit = 10 } = req.query;
+    if (download === "true") {
+      page = null;
+      limit = null;
+    } else {
+      page = parseInt(page) || 1;
+      limit = parseInt(limit) || 10;
+    }
+    const offset = page && limit ? (page - 1) * limit : 0;
+
     let whereCondition = { status: "assigned" };
+
     if (searchQuery) {
       whereCondition = {
         [Op.or]: [{ "$shop.shopName$": { [Op.like]: `%${searchQuery}%` } }],
@@ -365,6 +376,12 @@ module.exports = {
     }
     if (shopId) {
       whereCondition.shopId = shopId;
+    }
+    if (start_date) {
+      whereClause.createdAt = { [Op.gte]: start_date };
+    }
+    if (end_date) {
+      whereClause.createdAt = { [Op.lte]: end_date };
     }
     try {
       const { count, rows: assignedCoupons } = await ShopCoupon.findAndCountAll(
@@ -386,8 +403,8 @@ module.exports = {
       return res.status(200).json({
         success: true,
         count,
-        totalPages,
-        currentPage: page,
+        totalPages: download === "true" ? null : totalPages,
+        currentPage: download === "true" ? null : page,
         assignedCoupons,
       });
     } catch (error) {
@@ -402,8 +419,8 @@ module.exports = {
     const download = req.query.download || "";
     const shopId = req.query.shopId || null;
     const userId = req.query.userId || null;
-    const dateFrom = req.query.dateFrom || null;
-    const dateTo = req.query.dateTo || null;
+    const start_date = req.query.start_date || null;
+    const end_date = req.query.end_date || null;
     let { page = 1, limit = 10 } = req.query;
     if (download === "true") {
       page = null;
@@ -430,21 +447,11 @@ module.exports = {
     if (userId) {
       whereCondition.userId = userId;
     }
-    if (dateFrom) {
-      const startDate = new Date(dateFrom);
-      startDate.setHours(0, 0, 0, 0);
-      whereCondition.createdAt = {
-        ...whereCondition.createdAt,
-        [Op.gte]: new Date(startDate),
-      };
+    if (start_date) {
+      whereCondition.createdAt = { [Op.gte]: start_date };
     }
-    if (dateTo) {
-      const endDate = new Date(dateTo);
-      endDate.setHours(23, 59, 59, 999);
-      whereCondition.createdAt = {
-        ...whereCondition.createdAt,
-        [Op.lte]: new Date(endDate),
-      };
+    if (end_date) {
+      whereCondition.createdAt = { [Op.lte]: end_date };
     }
     try {
       const { count, rows: CouponHistory } = await UserCoupon.findAndCountAll({

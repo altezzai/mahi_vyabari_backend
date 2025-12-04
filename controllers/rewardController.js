@@ -180,14 +180,45 @@ module.exports = {
   // ➤ GET ALL Rewards
   getAllRewards: async (req, res) => {
     try {
-      const page = parseInt(req.query.page) || 1;
-      const limit = parseInt(req.query.limit) || 10;
-      const offset = (page - 1) * limit;
+      const searchQuery = req.query.search || "";
+      const start_date = req.query.start_date || null;
+      const end_date = req.query.end_date || null;
+      const milestone_id = req.query.milestone_id || null;
+      const type = req.query.type || null;
+      if (type === "milestone") {
+      }
+
+      const download = req.query.download || "";
+      let { page = 1, limit = 10 } = req.query;
+      if (download === "true") {
+        page = null;
+        limit = null;
+      } else {
+        page = parseInt(page) || 1;
+        limit = parseInt(limit) || 10;
+      }
+      const offset = page && limit ? (page - 1) * limit : 0;
+      let whereCondition = {};
+      if (start_date) {
+        whereCondition.createdAt = { [Op.gte]: start_date };
+      }
+      if (end_date) {
+        whereCondition.createdAt = { [Op.lte]: end_date };
+      }
+      if (milestone_id) {
+        whereCondition.milestone_id = milestone_id;
+      }
+      if (type === "coupon") {
+        whereCondition.coupon_id = { [Op.not]: null };
+      } else if (type === "milestone") {
+        whereCondition.milestone_id = { [Op.not]: null };
+      }
 
       const { count, rows: rewardList } = await Rewards.findAndCountAll({
         limit,
         offset,
         distinct: true,
+        where: whereCondition,
         order: [["id", "DESC"]],
         include: [
           {
@@ -202,6 +233,16 @@ module.exports = {
           {
             model: User,
             attributes: ["id", "image", "userName", "email", "phone"],
+            //i want to search by userName or phone
+            where: searchQuery
+              ? {
+                  [Op.or]: [
+                    { userName: { [Op.like]: `%${searchQuery}%` } },
+                    { phone: { [Op.like]: `%${searchQuery}%` } },
+                    { id: { [Op.like]: `%${searchQuery}%` } },
+                  ],
+                }
+              : null,
             include: [
               {
                 model: Area,
