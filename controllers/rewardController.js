@@ -200,10 +200,20 @@ module.exports = {
       const offset = page && limit ? (page - 1) * limit : 0;
       let whereCondition = {};
       if (start_date) {
-        whereCondition.createdAt = { [Op.gte]: start_date };
+        const startDate = new Date(start_date);
+        startDate.setHours(0, 0, 0, 0);
+        whereCondition.createdAt = {
+          ...whereCondition.createdAt,
+          [Op.gte]: new Date(startDate),
+        };
       }
       if (end_date) {
-        whereCondition.createdAt = { [Op.lte]: end_date };
+        const endDate = new Date(end_date);
+        endDate.setHours(23, 59, 59, 999);
+        whereCondition.createdAt = {
+          ...whereCondition.createdAt,
+          [Op.lte]: new Date(endDate),
+        };
       }
       if (milestone_id) {
         whereCondition.milestone_id = milestone_id;

@@ -541,10 +541,20 @@ Team Ente Mahe
       };
     }
     if (start_date) {
-      whereClause.date = { [Op.gte]: start_date };
+      const startDate = new Date(start_date);
+      startDate.setHours(0, 0, 0, 0);
+      whereCondition.createdAt = {
+        ...whereCondition.createdAt,
+        [Op.gte]: new Date(startDate),
+      };
     }
     if (end_date) {
-      whereClause.date = { [Op.lte]: end_date };
+      const endDate = new Date(end_date);
+      endDate.setHours(23, 59, 59, 999);
+      whereCondition.createdAt = {
+        ...whereCondition.createdAt,
+        [Op.lte]: new Date(endDate),
+      };
     }
     if (status) {
       whereCondition.status = status;
