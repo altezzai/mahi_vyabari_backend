@@ -60,10 +60,34 @@ router.post(
   userController.complaints
 );
 router.get(
-  "/get-complaints",
+  "/get-complaint/:id",
+  userAuth,
+  authorizeRoles("admin"),
+  userController.getComplaintsById
+);
+router.get(
+  "/get-shop-complaints-for-user",
   userAuth,
   authorizeRoles("user"),
-  userController.getComplaints
+  userController.getShopComplaintSForUser
+);
+router.delete(
+  "/delete-complaints/:id",
+  userAuth,
+  authorizeRoles("user"),
+  userController.deleteComplaint
+);
+router.get(
+  "/get-own-feedbacks",
+  userAuth,
+  authorizeRoles("user"),
+  userController.getOwnFeedbacks
+);
+router.put(
+  "/edit-feedback/:id",
+  userAuth,
+  authorizeRoles("user"),
+  userController.editFeedback
 );
 router.get(
   "/get-registration-status",
@@ -95,24 +119,5 @@ router.get(
   authorizeRoles("admin"),
   userController.getTopShopUserCoupon
 );
-
-router.get(
-  "/get-shop-complaints-for-user",
-  userAuth,
-  authorizeRoles("user"),
-  userController.getShopComplaintSForUser
-);
-router.delete(
-  "/delete-complaints/:id",
-  userAuth,
-  authorizeRoles("user"),
-  userController.deleteComplaint
-);
-// router.get(
-//   "/get-shop-feedbacks-for-user",
-//   userAuth,
-//   authorizeRoles("user"),
-//   userController.getShopFeedbacksForUser
-// );
 
 module.exports = router;

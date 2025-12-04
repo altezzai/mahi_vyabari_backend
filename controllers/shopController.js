@@ -570,6 +570,7 @@ Team Ente Mahe
       const { count, rows: complaints } = await Complaint.findAndCountAll({
         limit,
         offset,
+        distinct: true,
         where: whereCondition,
         attributes: {
           include: [

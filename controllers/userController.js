@@ -340,6 +340,67 @@ module.exports = {
       res.status(500).json({ success: false, message: error.message });
     }
   },
+  editFeedback: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { rating } = req.body;
+      const userId = req.user.id;
+      const feedback = await Feedback.findOne({ where: { id, userId } });
+      if (!feedback) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Feedback not found" });
+      }
+      await feedback.update({ rating });
+      res
+        .status(200)
+        .json({ success: true, message: "Feedback updated successfully" });
+    } catch (error) {
+      console.error(error);
+      logger.error(error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  getOwnFeedbacks: async (req, res) => {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 5;
+      const offset = (page - 1) * limit;
+
+      const { count, rows: feedbacks } = await Feedback.findAndCountAll({
+        limit,
+        offset,
+        distinct: true,
+        where: { userId: req.user.id },
+        attributes: ["id", "shopId", "rating", "createdAt"],
+        include: [
+          {
+            model: Shop,
+            attributes: ["id", "shopName"],
+            include: [
+              {
+                model: Area,
+                attributes: ["id", "name"],
+              },
+            ],
+          },
+        ],
+        order: [["id", "DESC"]],
+      });
+      res.status(200).json({
+        success: true,
+        totalContents: count,
+        totalPage: Math.ceil(count / limit),
+        currentPage: page,
+        feedbacks,
+      });
+    } catch (error) {
+      console.error(error);
+      logger.error(error);
+
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
 
   complaints: async (req, res) => {
     try {
@@ -359,25 +420,7 @@ module.exports = {
       res.status(500).json({ success: false, message: error.message });
     }
   },
-  getComplaints: async (req, res) => {
-    try {
-      const complaints = await Complaint.findAll({
-        where: { userId: req.user.id },
-        order: [["createdAt", "DESC"]],
-      });
-      if (!complaints) {
-        return res
-          .status(404)
-          .json({ success: false, message: "No complaints found" });
-      }
-      res.status(200).json({ success: true, complaints });
-    } catch (error) {
-      console.error(error);
-      logger.error(error);
 
-      res.status(500).json({ success: false, message: error.message });
-    }
-  },
   getComplaintsById: async (req, res) => {
     try {
       const complaints = await Complaint.findAll({
@@ -394,18 +437,9 @@ module.exports = {
   getShopComplaintSForUser: async (req, res) => {
     const userId = req.user.id;
     const search = req.query.search || "";
-
-    const download = req.query.download || "";
-    let { page = 1, limit = 10 } = req.query;
-    if (download === "true") {
-      page = null;
-      limit = null;
-    } else {
-      page = parseInt(page) || 1;
-      limit = parseInt(limit) || 10;
-    }
-    const offset = page && limit ? (page - 1) * limit : 0;
-
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const offset = (page - 1) * limit;
     let whereCondition = { userId };
     if (search) {
       whereCondition = {
@@ -416,6 +450,7 @@ module.exports = {
       const { count, rows: complaints } = await Complaint.findAndCountAll({
         limit,
         offset,
+        distinct: true,
         where: whereCondition,
         attributes: {
           exclude: ["userId", "shopId", "updatedAt"],
@@ -439,8 +474,8 @@ module.exports = {
       return res.status(200).json({
         success: true,
         count,
-        totalPages: download === "true" ? null : totalPages,
-        currentPage: download === "true" ? null : page,
+        totalPages: totalPages,
+        currentPage: page,
         data: complaints,
       });
     } catch (error) {
