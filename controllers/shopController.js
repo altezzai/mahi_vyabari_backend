@@ -515,16 +515,24 @@ Team Ente Mahe
     }
   },
   getShopComplaints: async (req, res) => {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const offset = (page - 1) * limit;
     const search = req.query.search || "";
     const area_id = req.query.area_id || null;
-    const dateFrom = req.query.dateFrom || null;
-    const dateTo = req.query.dateTo || null;
+    const start_date = req.query.start_date || null;
+    const end_date = req.query.end_date || null;
     const shopId = req.query.shopId || null;
     const userId = req.query.userId || null;
     const status = req.query.status || null;
+
+    const download = req.query.download || "";
+    let { page = 1, limit = 10 } = req.query;
+    if (download === "true") {
+      page = null;
+      limit = null;
+    } else {
+      page = parseInt(page) || 1;
+      limit = parseInt(limit) || 10;
+    }
+    const offset = page && limit ? (page - 1) * limit : 0;
 
     let whereCondition = {};
     if (search) {
@@ -532,21 +540,11 @@ Team Ente Mahe
         shopName: { [Op.like]: `%${search}%` },
       };
     }
-    if (dateFrom) {
-      const startDate = new Date(dateFrom);
-      startDate.setHours(0, 0, 0, 0);
-      whereCondition.createdAt = {
-        ...whereCondition.createdAt,
-        [Op.gte]: new Date(startDate),
-      };
+    if (start_date) {
+      whereClause.date = { [Op.gte]: start_date };
     }
-    if (dateTo) {
-      const endDate = new Date(dateTo);
-      endDate.setHours(23, 59, 59, 999);
-      whereCondition.createdAt = {
-        ...whereCondition.createdAt,
-        [Op.lte]: new Date(endDate),
-      };
+    if (end_date) {
+      whereClause.date = { [Op.lte]: end_date };
     }
     if (status) {
       whereCondition.status = status;
@@ -599,8 +597,8 @@ Team Ente Mahe
       return res.status(200).json({
         success: true,
         count,
-        totalPages,
-        currentPage: page,
+        totalPages: download === "true" ? null : totalPages,
+        currentPage: download === "true" ? null : page,
         data: complaints,
       });
     } catch (error) {
