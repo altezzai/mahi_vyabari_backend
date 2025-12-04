@@ -24,7 +24,6 @@ module.exports = {
       },
       via: {
         type: Sequelize.STRING,
-        defaultValue: "mahe",
       },
       to: {
         type: Sequelize.STRING,

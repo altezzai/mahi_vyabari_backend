@@ -20,9 +20,12 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      via: {
+      from: {
         type: DataTypes.STRING,
         defaultValue: "mahe",
+      },
+      via: {
+        type: DataTypes.STRING,
       },
       to: {
         type: DataTypes.STRING,
