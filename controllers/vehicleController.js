@@ -222,6 +222,7 @@ module.exports = {
             "id",
             "vehicleName",
             "category",
+            "from",
             "via",
             "to",
             "vehicleNumber",

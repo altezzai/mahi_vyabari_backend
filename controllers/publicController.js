@@ -435,21 +435,22 @@ module.exports = {
       res.status(500).json({ success: false, message: error.message });
     }
   },
-  getTrainSchedules: async (req, res) => {
-    const via = req.query.via || "mahe";
+  getVehicleSchedules: async (req, res) => {
+    const from = req.query.from || "";
+    const via = req.query.via || "";
     const to = req.query.to || "";
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
-    let whereCondition = { trash: false, category: "train" };
-    if (via && to) {
-      whereCondition = {
-        ...whereCondition,
-        [Op.and]: [
-          { via: { [Op.like]: `%${via}%` } },
-          { to: { [Op.like]: `%${to}%` } },
-        ],
-      };
+    let whereCondition = { trash: false, category: "bus" };
+    if (from) {
+      whereCondition.from = from;
+    }
+    if (to) {
+      whereCondition.to = to;
+    }
+    if (via) {
+      whereCondition.via = via;
     }
     try {
       const { count, rows: trains } = await VehicleSchedule.findAndCountAll({
@@ -462,6 +463,7 @@ module.exports = {
       const totalPages = Math.ceil(count / limit);
       res.status(200).json({
         success: true,
+        totalContents: count,
         totalPages,
         currentPage: page,
         data: trains,

@@ -10,7 +10,7 @@ router.get("/product/:id", publicController.getProductById);
 router.get("/docters", publicController.getDoctors);
 router.get("/docter/:id", publicController.getDoctorById);
 router.get("/busSchedule", publicController.getBusSchedules);
-router.get("/trainSchedule", publicController.getTrainSchedules);
+router.get("/vehicleSchedule", publicController.getVehicleSchedules);
 router.get("/hospitals", publicController.getHospitals);
 router.get("/hospital/:id", publicController.getHospitalsById);
 router.get("/emergency", publicController.getEmergencies);
