@@ -1,5 +1,4 @@
 require("dotenv").config();
-require("./utils/passport");
 require("./config/database");
 const fs = require("fs");
 const express = require("express");
@@ -7,7 +6,6 @@ const app = express();
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const session = require("express-session");
-const passport = require("passport");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const compression = require("compression");
@@ -64,7 +62,7 @@ const rewardRouter = require("./routes/rewardRoute");
 //     secret: process.env.SESSION_SECRET,
 //   })
 // );
-
+app.set("trust proxy", 1);
 app.use("/public/uploads", express.static("public/uploads"));
 // app.use(passport.initialize());
 // app.use(passport.session());

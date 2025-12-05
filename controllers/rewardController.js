@@ -40,7 +40,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in creating milestone", error);
       res.status(500).json({ error: "Something went wrong" });
     }
   },
@@ -55,7 +55,7 @@ module.exports = {
       return res.status(200).json({ data: milestones });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getting milestones", error);
       res.status(500).json({ error: "Something went wrong" });
     }
   },
@@ -74,7 +74,7 @@ module.exports = {
       return res.status(200).json({ data: milestone });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getting milestone by id", error);
       res.status(500).json({ error: "Something went wrong" });
     }
   },
@@ -112,7 +112,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in updating milestone", error);
       res.status(500).json({ error: "Something went wrong" });
     }
   },
@@ -138,7 +138,7 @@ module.exports = {
         .json({ message: "Milestone deleted successfully" });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in deleting milestone", error);
       res.status(500).json({ error: "Something went wrong" });
     }
   },
@@ -172,7 +172,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in creating reward", error);
       return res.status(500).json({ error: "Something went wrong" });
     }
   },
@@ -283,7 +283,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getting rewards", error);
       return res.status(500).json({ error: "Something went wrong" });
     }
   },
@@ -336,7 +336,7 @@ module.exports = {
       return res.status(200).json({ data: reward });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getting reward by id", error);
       return res.status(500).json({ error: "Something went wrong" });
     }
   },
@@ -375,7 +375,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in updating reward", error);
       return res.status(500).json({ error: "Something went wrong" });
     }
   },
@@ -396,7 +396,7 @@ module.exports = {
       return res.status(200).json({ message: "Reward deleted successfully" });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in deleting reward", error);
       return res.status(500).json({ error: "Something went wrong" });
     }
   },
@@ -433,7 +433,7 @@ module.exports = {
       return res.status(200).json({ data: rewards });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getting user rewards", error);
       return res.status(500).json({ error: "Something went wrong" });
     }
   },

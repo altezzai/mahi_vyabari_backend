@@ -27,7 +27,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in addEmergency", error);
       res.status(500).json({
         success: false,
         message: error.message,
@@ -66,7 +66,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in updateEmergency", error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -89,7 +89,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in deleteEmergency", error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -112,7 +112,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in restoreEmergency", error);
       return res.status(500).json({
         success: false,
         message: "Error soft deleting emergency",
@@ -156,7 +156,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getEmergencies", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -173,7 +173,7 @@ module.exports = {
       return res.status(200).json({ success: true, data: emergency });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getEmergencyById", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },

@@ -28,7 +28,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("  error in requestCoupon", error);
 
       res.status(500).json({
         success: false,
@@ -64,7 +64,7 @@ module.exports = {
       res.status(200).json({ success: true, shopCoupon });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in assignShopCouponRequest", error);
 
       res.status(500).json({ success: false, message: error.message });
     }
@@ -90,7 +90,7 @@ module.exports = {
       res.status(200).json({ success: true, shopCoupon });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in assignShopCoupon", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -157,7 +157,7 @@ module.exports = {
     } catch (error) {
       await t.rollback();
       console.error(error);
-      logger.error(error);
+      logger.error("error in assignUserCoupon", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -223,7 +223,7 @@ module.exports = {
     } catch (error) {
       await t.rollback();
       console.error(error);
-      logger.error(error);
+      logger.error("error in adminAssignUserCoupon", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -306,7 +306,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getCouponRequests", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -344,7 +344,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getShopCouponsHistory", error);
 
       return res.status(500).json({ success: false, message: error.message });
     }
@@ -419,7 +419,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getAssignedCoupon", error);
 
       return res.status(500).json({ success: false, message: error.message });
     }
@@ -509,7 +509,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getCouponHistory", error);
 
       return res.status(500).json({ success: false, message: error.message });
     }
@@ -535,7 +535,7 @@ module.exports = {
       res.status(200).json({ success: true, shops });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getShops", error);
 
       res.status(500).json({ success: false, message: error.message });
     }
@@ -574,7 +574,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getUsers", error);
 
       return res.status(500).json({ success: false, message: error.message });
     }
@@ -601,7 +601,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getRecentUserCoupons", error);
 
       res.status(500).json({ success: false, message: error.message });
     }
@@ -653,7 +653,7 @@ module.exports = {
       res.status(200).json({ success: true, couponStatus });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getCurrentShopCouponStatus", error);
 
       res.status(500).json({ success: false, message: error.message });
     }
@@ -667,7 +667,7 @@ module.exports = {
       res.status(200).json({ success: true, pendingCoupons });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getPendingCoupons", error);
 
       res.status(500).json({ success: false, message: error.message });
     }
@@ -701,7 +701,7 @@ module.exports = {
         .json({ success: true, data: { totalCouponCount, userCouponStatus } });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getUserCouponStatus", error);
 
       res.status(500).json({ success: false, message: error.message });
     }
@@ -745,7 +745,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getCouponRange", error);
 
       return res.status(500).json({ error: "Something went wrong" });
     }
@@ -800,7 +800,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in luckDraw", error);
 
       return res.status(500).json({ error: "Something went wrong" });
     }
@@ -867,7 +867,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getUserMilestone", error);
 
       res.status(500).json({ success: false, message: error.message });
     }

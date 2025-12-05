@@ -57,7 +57,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getCustomers", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -75,7 +75,7 @@ module.exports = {
       res.status(201).json({ success: true, users });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getCustomerById", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -143,7 +143,7 @@ Team Ente Mahe
       res.status(200).json({ success: true, newusers });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in addCustomer", error);
 
       return res.status(500).json({ success: false, message: error.message });
     }
@@ -165,7 +165,7 @@ Team Ente Mahe
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in deleteCustomer", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -186,7 +186,7 @@ Team Ente Mahe
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in restoreCustomer", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },

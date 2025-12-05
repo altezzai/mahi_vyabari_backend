@@ -49,7 +49,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in addCategory", error);
       res.status(500).json({
         success: false,
         message: "An error occur while uploading Category data",
@@ -103,6 +103,8 @@ module.exports = {
         category: updatedCategory,
       });
     } catch (error) {
+      console.error("Error updating category:", error);
+      logger.error("Error updating category:", error);
       res
         .status(500)
         .json({ success: false, message: "Error updating category" });
@@ -122,7 +124,7 @@ module.exports = {
       });
     } catch (error) {
       console.error("Error deleting category:", error);
-      logger.error(error);
+      logger.error("Error deleting category:", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -142,7 +144,7 @@ module.exports = {
       });
     } catch (error) {
       console.error("Error deleting category:", error);
-      logger.error(error);
+      logger.error("Error deleting category:", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -188,7 +190,7 @@ module.exports = {
       });
     } catch (error) {
       console.error("Error fetching categories:", error);
-      logger.error(error);
+      logger.error("Error fetching categories:", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -213,7 +215,7 @@ module.exports = {
       return res.status(200).json({ success: true, category });
     } catch (error) {
       console.error("Error fetching category:", error);
-      logger.error(error);
+      logger.error("Error fetching category:", error);
       return res.status(500).json({ message: error.message });
     }
   },
@@ -241,7 +243,7 @@ module.exports = {
       res.status(201).json({ success: true, data: newType });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in addType", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -276,7 +278,7 @@ module.exports = {
       res.status(200).json({ success: true, data: type });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in updateType", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -292,7 +294,7 @@ module.exports = {
       res.json({ success: true, data: type });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in deleteType", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -308,7 +310,7 @@ module.exports = {
       res.json({ success: true, data: type });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in restoreType", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -318,7 +320,7 @@ module.exports = {
       res.json({ success: true, types });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getTypes", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -336,7 +338,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getTypeById", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },

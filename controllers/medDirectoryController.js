@@ -40,7 +40,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in addMedicalDirectory", error);
       res.status(500).json({
         success: false,
         message: error.message,
@@ -85,7 +85,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in updateMedicalDirectory", error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -108,7 +108,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in deleteMedicalDirectory", error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -131,7 +131,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in restoreMedicalDirectory", error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -213,7 +213,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getMedicalDirectories", error);
       res.status(500).json({
         success: false,
         message: error.message,
@@ -240,7 +240,7 @@ module.exports = {
       return res.status(200).json({ success: true, data: healthcareProvider });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getMedicalDirectoryById", error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -265,7 +265,7 @@ module.exports = {
       return res.status(200).json({ success: true, data: medicalCategory });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getMedicalCategory", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },

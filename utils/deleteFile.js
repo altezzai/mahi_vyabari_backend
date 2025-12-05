@@ -18,6 +18,7 @@ const deleteFile = async (files) => {
       }
     }
   } catch (err) {
+    logger.error("Error in deleteFile: " + err.message);
     console.error("Error cleaning up files:", err);
   }
 };
@@ -31,6 +32,7 @@ const deleteFileWithFolderName = async (uploadPath, filename) => {
     }
   } catch (err) {
     console.error("Error cleaning up" + filename + " files:", err);
+    logger.error("Error in deleteFile: " + err.message);
   }
 };
 module.exports = { deleteFile, deleteFileWithFolderName };

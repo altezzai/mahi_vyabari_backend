@@ -79,7 +79,7 @@ module.exports = {
       res.json({ success: true, shops: shops, tourism: tourism });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in homePage", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -165,7 +165,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getShops", error);
       res.status(500).json({
         success: false,
         message: error.message,
@@ -247,7 +247,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getShopById", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -295,7 +295,11 @@ module.exports = {
         success: true,
         product,
       });
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+      logger.error("error in getProductById", error);
+      res.status(500).json({ success: false, message: error.message });
+    }
   },
   getDoctors: async (req, res) => {
     const searchQuery = req.query.q || "";
@@ -361,7 +365,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getDoctors", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -393,7 +397,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getDoctorById", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -431,7 +435,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getBusSchedules", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -470,7 +474,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getVehicleSchedules", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -535,7 +539,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getHospitals", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -564,7 +568,7 @@ module.exports = {
       res.json({ success: true, hospital });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getHospitalsById", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -596,7 +600,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getEmergencies", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -656,7 +660,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getVehicleServices", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -685,7 +689,7 @@ module.exports = {
       res.status(200).json({ success: true, vehicleService });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getVehicleServiceById", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -752,7 +756,7 @@ module.exports = {
       res.json({ success: true, totalPages, currentPage: page, data: workers });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getLocalWorkers", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -770,7 +774,7 @@ module.exports = {
       res.status(200).json({ success: true, worker });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getLocalWorkersById", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -853,7 +857,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getClassifieds", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -896,7 +900,7 @@ module.exports = {
       res.status(200).json({ success: true, classified });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getClassifiedById", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -944,7 +948,7 @@ module.exports = {
         .json({ success: true, totalPages, currentPage: page, data: tourism });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getTourism", error);
       res.status(500).json({ success: true, message: error.message });
     }
   },
@@ -969,7 +973,7 @@ module.exports = {
       res.status(200).json({ success: true, data: tourism });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getTourismById", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -990,7 +994,7 @@ module.exports = {
       return res.status(200).json({ success: true, shopCategories });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getShopCategories", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -1011,7 +1015,7 @@ module.exports = {
       return res.status(200).json({ success: true, workerCategory });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getWorkerCategory", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -1032,7 +1036,7 @@ module.exports = {
       return res.status(200).json({ success: true, classifiedCategories });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getClassifiedCategory", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -1046,7 +1050,7 @@ module.exports = {
       return res.status(200).json({ success: true, areas });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getAreas", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -1063,7 +1067,7 @@ module.exports = {
       return res.status(200).json({ success: true, banners });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getBanners", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },

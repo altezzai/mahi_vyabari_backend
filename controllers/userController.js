@@ -142,7 +142,7 @@ module.exports = {
       }
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in registerUser", error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -188,7 +188,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in editUser", error);
       res.status(500).json({
         success: false,
         message: error.message,
@@ -274,7 +274,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in userLogin", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -335,7 +335,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("  error in feedback", error);
 
       res.status(500).json({ success: false, message: error.message });
     }
@@ -357,7 +357,7 @@ module.exports = {
         .json({ success: true, message: "Feedback updated successfully" });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in editFeedback", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -396,7 +396,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getOwnFeedbacks", error);
 
       res.status(500).json({ success: false, message: error.message });
     }
@@ -415,7 +415,7 @@ module.exports = {
       res.status(201).json({ success: true, complaint });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in complaints", error);
 
       res.status(500).json({ success: false, message: error.message });
     }
@@ -429,7 +429,7 @@ module.exports = {
       res.status(200).json(complaints);
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getComplaintsById", error);
 
       res.status(500).json({ success: false, message: error.message });
     }
@@ -480,7 +480,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getShopComplaintSForUser", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -502,7 +502,7 @@ module.exports = {
         .json({ success: true, message: "Complaint deleted successfully" });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in deleteComplaint", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -527,7 +527,7 @@ module.exports = {
       res.status(200).json({ success: true, user });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getPersonalDetails", error);
 
       res.status(500).json({ success: false, message: error.message });
     }
@@ -584,7 +584,7 @@ module.exports = {
         .json({ success: true, message: "Successfully Logged Out" });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in Logout", error);
       res.status(500).json({ success: true, message: error.message });
     }
   },
@@ -624,7 +624,7 @@ Please Verify Your account.
         .json({ success: true, message: "Verification OTP Send on Phone" });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in sendVerifyOtp", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -671,7 +671,7 @@ Please Verify Your account.
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in verifyAccount", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -713,7 +713,7 @@ Please Verify Your account.
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in sendResetOtp", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -761,7 +761,7 @@ Please Verify Your account.
         .json({ success: true, message: "Password Reset Successfully" });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in forgetPassword", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -795,7 +795,7 @@ Please Verify Your account.
         .json({ success: true, message: "Password Reset Successfully" });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in resetPassword", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -865,32 +865,10 @@ Please Verify Your account.
         .json({ success: true, message: "Password Reset Successfully" });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in adminChangePassword", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
-  // sendLoginOtp: async (req, res) => {
-  //   const { email } = req.body;
-  //   if (!email) {
-  //     return res.status(404).json({
-  //       success: false,
-  //       message: "Email is Required or phone is required",
-  //     });
-  //   }
-  //   try {
-  //     const user = await User.findOne({
-  //       where: { email },
-  //     });
-  //     if (!user) {
-  //       return res
-  //         .status(401)
-  //         .json({ success: false, message: "User Not Found" });
-  //     }
-  //     const loginOTP = String(Math.floor(100000 + Math.random() * 900000));
-  //     await Otp.create({
-  //       email,
-  //       otp: loginOTP,
-  //     });
   //     const subject = "Login OTP";
   //     const message = `
   //       <div style="font-family: Arial, sans-serif; padding: 20px;">
@@ -911,15 +889,7 @@ Please Verify Your account.
   //       </div>
   //     `;
   //     await sendEmail(email, subject, message);
-  //     return res.status(200).json({
-  //       success: true,
-  //       message: "sent Login OTP to your Email",
-  //     });
-  //   } catch (error) {
-  //      console.log(error);
-  //     return res.status(500).json({ success: false, message: error.message });
-  //   }
-  // },
+
   sendLoginOtp: async (req, res) => {
     const { phone } = req.body;
     if (!phone) {
@@ -956,7 +926,7 @@ Please Verify Your account.
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in sendLoginOtp", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -977,7 +947,7 @@ Please Verify Your account.
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getCurrentUser", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -1134,7 +1104,7 @@ Please Verify Your account.
       });
     } catch (error) {
       console.error("Error in getRegistrationStats:", error);
-      logger.error(error);
+      logger.error("Error in getRegistrationStats:", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -1229,7 +1199,7 @@ Please Verify Your account.
       });
     } catch (error) {
       console.error("Error getting type stats:", error);
-      logger.error(error);
+      logger.error("Error getting type stats:", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -1252,7 +1222,7 @@ Please Verify Your account.
       });
     } catch (error) {
       console.error("Error fetching user registrations by month:", error);
-      logger.error(error);
+      logger.error("Error fetching user registrations by month:", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -1401,7 +1371,7 @@ Please Verify Your account.
       });
     } catch (error) {
       console.error("Error fetching recent activities:", error);
-      logger.error(error);
+      logger.error("Error fetching recent activities:", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -1451,7 +1421,7 @@ Please Verify Your account.
       });
     } catch (error) {
       console.error("Error fetching top coupon distributors:", error);
-      logger.error(error);
+      logger.error("Error fetching top coupon distributors:", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },

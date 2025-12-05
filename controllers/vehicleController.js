@@ -57,7 +57,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in addVehicleSchedule", error);
       res.status(500).json({
         success: false,
         message: error.message,
@@ -111,7 +111,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in updateVehicleSchedule", error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -134,7 +134,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in deleteVehicleSchedule", error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -157,7 +157,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in restoreVehicleSchedule", error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -245,7 +245,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getVehicleSchedules", error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -264,7 +264,7 @@ module.exports = {
       return res.status(200).json({ success: true, data: vehicleSchedule });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getVehicleScheduleById", error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -295,7 +295,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in addVehicleServiceProvider", error);
       res.status(500).json({
         success: false,
         message: error.message,
@@ -340,7 +340,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in updateVehicleServiceProvider", error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -386,7 +386,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in restoreVehicleServiceProvider", error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -469,7 +469,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getVehicleServiceProviders", error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -503,7 +503,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getVehicleServiceProviderById", error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -529,7 +529,7 @@ module.exports = {
       res.status(200).json({ success: true, vehicleServiceCategories });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getVehicleServiceCategories", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },

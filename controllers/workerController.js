@@ -51,6 +51,7 @@ module.exports = {
       });
     } catch (error) {
       await t.rollback();
+      logger.error("error in addWorkerProfile", error);
       res.status(401).json({
         success: false,
         message: error.message,
@@ -134,7 +135,7 @@ module.exports = {
     } catch (error) {
       await t.rollback();
       console.error(error);
-      logger.error(error);
+      logger.error("error in updateWorkerProfile", error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -157,7 +158,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in deleteWorkerProfile", error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -180,7 +181,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in restoreWorkerProfile", error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -257,7 +258,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getWorkerProfiles", error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -276,7 +277,7 @@ module.exports = {
       return res.status(200).json({ success: true, data: worker });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getWorkerProfileById", error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -300,7 +301,7 @@ module.exports = {
       return res.status(200).json({ success: true, data: workerCategory });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getWorkerCategory", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },

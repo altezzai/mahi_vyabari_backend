@@ -48,7 +48,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in addProduct", error);
       return res.status(401).json({
         success: false,
         message: error.message,
@@ -96,7 +96,7 @@ module.exports = {
       return res.status(200).json({ success: true, product: updatedProduct });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in updateProduct", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -162,7 +162,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getProducts", error);
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -190,7 +190,7 @@ module.exports = {
       res.status(200).json({ success: true, product });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in getProductById", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -210,7 +210,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in deleteProductById", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -230,7 +230,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      logger.error(error);
+      logger.error("error in restoreProductById", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -255,7 +255,7 @@ module.exports = {
       res.status(200).json({ success: true, shops });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getShopName", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },

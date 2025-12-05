@@ -45,7 +45,7 @@ module.exports = {
         banner: newBanner,
       });
     } catch (error) {
-      logger.error(error);
+      logger.error("error in uploadBanners", error);
       res.status(500).json({
         message: "An error occurred on the server while uploading banners.",
       });
@@ -100,7 +100,7 @@ module.exports = {
         banner: updatedBanner,
       });
     } catch (error) {
-      logger.error(error);
+      logger.error("error in updateBanner", error);
       res.status(500).json({ message: "Error updating banner." });
     }
   },
@@ -137,7 +137,7 @@ module.exports = {
         type2: type2Banners.map(addFullUrl),
       });
     } catch (error) {
-      logger.error(error);
+      logger.error("error in getLatestBannersByType", error);
       res.status(500).json({ message: "Error fetching banners." });
     }
   },
@@ -178,16 +178,6 @@ module.exports = {
         order: [["createdAt", "DESC"]],
       });
 
-      // const addFullUrl = (banner) => ({
-      //   ...banner.toJSON(),
-      //   banner_image_large: `${req.protocol}://${req.get(
-      //     "host"
-      //   )}/public/uploads/banners/${banner.banner_image_large}`,
-      //   banner_image_small: `${req.protocol}://${req.get(
-      //     "host"
-      //   )}/public/uploads/banners/${banner.banner_image_small}`,
-      // });
-
       const totalPages = Math.ceil(count / limitNum);
 
       res.status(200).json({
@@ -197,7 +187,7 @@ module.exports = {
         banners: banners,
       });
     } catch (error) {
-      logger.error(error);
+      logger.error("error in getAllBannersAdmin", error);
       console.error("Error fetching admin banners:", error);
       res.status(500).json({ message: "Error fetching banners." });
     }
@@ -217,7 +207,7 @@ module.exports = {
 
       res.status(200).json({ message: "Banner soft-deleted successfully." });
     } catch (error) {
-      logger.error(error);
+      logger.error("error in softDeleteBanner", error);
       res.status(500).json({ message: "Error soft-deleting banner." });
     }
   },
@@ -236,7 +226,7 @@ module.exports = {
 
       res.status(200).json({ message: "Banner soft-deleted successfully." });
     } catch (error) {
-      logger.error(error);
+      logger.error("error in restoreBanner", error);
       res.status(500).json({ message: "Error soft-deleting banner." });
     }
   },
@@ -261,7 +251,7 @@ module.exports = {
         .status(200)
         .json({ message: "Banner permanently deleted successfully." });
     } catch (error) {
-      logger.error(error);
+      logger.error("error in hardDeleteBanner", error);
       res.status(500).json({ message: "Error hard-deleting banner." });
     }
   },
@@ -274,7 +264,7 @@ module.exports = {
       }
       res.status(200).json(banner);
     } catch (error) {
-      logger.error(error);
+      logger.error("error in getBannerById", error);
       res.status(500).json({ message: "Error fetching banner." });
     }
   },
@@ -295,7 +285,7 @@ module.exports = {
       await banner.destroy();
       res.status(200).json({ message: "Banner deleted successfully." });
     } catch (error) {
-      logger.error(error);
+      logger.error("error in deleteBannerById", error);
       res.status(500).json({ message: "Error deleting banner." });
     }
   },

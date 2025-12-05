@@ -52,7 +52,7 @@ module.exports = {
     } catch (error) {
       await t.rollback();
       console.log(error);
-      logger.error(error);
+      logger.error("error in addTouristPlace", error);
       res.status(500).json({
         error: "Failed to create tourism spot",
         details: error.message,
@@ -104,7 +104,7 @@ module.exports = {
       return res.status(200).json({ success: true, updatedTourism });
     } catch (error) {
       console.error("Error in updateTourismSpot:", error);
-      logger.error(error);
+      logger.error("Error in updateTourismSpot:", error);
       res.status(500).json({
         error: "Failed to update tourism spot",
         details: error.message,
@@ -130,7 +130,7 @@ module.exports = {
       res.status(200).json({ message: "Image deleted successfully!" });
     } catch (error) {
       console.error("Error deleting image:", error);
-      logger.error(error);
+      logger.error("Error deleting image:", error);
       res.status(500).json({ error: "Failed to delete image" });
     }
   },
@@ -147,7 +147,7 @@ module.exports = {
       await tourism.update({ trash: true });
       return res.status(200).json({ success: true, tourism });
     } catch (error) {
-      logger.error(error);
+      logger.error("error in deleteTouristPlace", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -163,7 +163,7 @@ module.exports = {
       await tourism.update({ trash: false });
       return res.status(200).json({ success: true, tourism });
     } catch (error) {
-      logger.error(error);
+      logger.error("error in restoreTouristPlace", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -220,7 +220,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getTouristPlaces", error);
       res
         .status(500)
         .json({ success: false, message: error.message, name: error.name });
@@ -250,7 +250,7 @@ module.exports = {
       res.status(200).json({ success: true, tourism });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getTouristPlaceById", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },

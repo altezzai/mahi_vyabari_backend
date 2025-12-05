@@ -81,7 +81,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in addClassified", error);
       res.status(401).json({
         success: false,
         message: error.message,
@@ -156,7 +156,7 @@ module.exports = {
       return res.status(200).json({ success: true, item: updatedClassified });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in updateClassified", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -173,7 +173,7 @@ module.exports = {
       return res.status(200).json({ success: true, item });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in deleteClassified", error);
       return res
         .status(500)
         .json({ success: false, message: "Internal Sever Error" });
@@ -192,7 +192,7 @@ module.exports = {
       return res.status(200).json({ success: true, item });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in restoreClassified", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -262,7 +262,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getClassifieds", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -294,7 +294,7 @@ module.exports = {
       return res.status(200).json({ success: true, data: classified });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getClassifiedById", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -313,7 +313,7 @@ module.exports = {
       res.status(200).json({ success: true, classifiedCategories });
     } catch (error) {
       console.log(error);
-      logger.error(error);
+      logger.error("error in getClassifiedCategories", error);
       res.status(500).json({
         success: false,
         message: error.message,
@@ -339,7 +339,7 @@ module.exports = {
       res.status(200).json({ message: "Image deleted successfully!" });
     } catch (error) {
       console.error("Error deleting image:", error);
-      logger.error(error);
+      logger.error("Error deleting image:", error);
       res.status(500).json({ error: "Failed to delete image" });
     }
   },
