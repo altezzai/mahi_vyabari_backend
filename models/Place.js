@@ -11,6 +11,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      primary: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+        defaultValue: false,
+      },
       trash: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
