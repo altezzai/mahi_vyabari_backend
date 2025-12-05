@@ -12,11 +12,13 @@ const {
   Category,
   Area,
   User,
+  Place,
 } = require("../models");
 const {
   deleteFileWithFolderName,
   compressAndSaveFile,
 } = require("../utils/fileHandler");
+const { get } = require("http");
 
 const iconPath = "public/uploads/taxi/icon/";
 const imgPath = "public/uploads/taxi/";
@@ -227,6 +229,10 @@ module.exports = {
             "to",
             "vehicleNumber",
             "trash",
+          ],
+          include: [
+            { model: Place, as: "fromPlace", attributes: ["id", "name"] },
+            { model: Place, as: "toPlace", attributes: ["id", "name"] },
           ],
           order: [["createdAt", "DESC"]],
         });
@@ -530,6 +536,132 @@ module.exports = {
     } catch (error) {
       console.log(error);
       logger.error("error in getVehicleServiceCategories", error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  addPlace: async (req, res) => {
+    try {
+      const { name } = req.body;
+      const existingPlace = await Place.findOne({ where: { name } });
+      if (existingPlace) {
+        return res
+          .status(409)
+          .json({ success: false, message: "Place already exists" });
+      }
+      const savedPlaces = await Place.create({ name });
+      res.status(201).json({ success: true, savedPlaces });
+    } catch (error) {
+      console.error(error);
+      logger.error("error in addPlaces", error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  updatePlace: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { name } = req.body;
+      const place = await Place.findByPk(id);
+
+      if (!place) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Place not found" });
+      }
+      const existingPlace = await Place.findOne({
+        where: { name, id: { [Op.ne]: id } },
+      });
+      if (existingPlace) {
+        return res
+          .status(409)
+          .json({ success: false, message: "Place already exists" });
+      }
+      const savedPlaces = await Place.update({ name }, { where: { id } });
+      res.status(201).json({ success: true, savedPlaces });
+    } catch (error) {
+      console.error(error);
+      logger.error("error in updatePlace", error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  getPlaces: async (req, res) => {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 5;
+      const offset = (page - 1) * limit;
+      const search = req.query.search || "";
+      let whereCondition = {};
+      if (search) {
+        whereCondition = {
+          name: { [Op.like]: `%${search}%` },
+        };
+      }
+
+      const { rows: places, count } = await Place.findAndCountAll({
+        where: whereCondition,
+        limit,
+        offset,
+        order: [["createdAt", "DESC"]],
+      });
+      res.status(200).json({
+        success: true,
+        totalContents: count,
+        totalPage: Math.ceil(count / limit),
+        currentPage: page,
+        places,
+      });
+    } catch (error) {
+      console.error(error);
+      logger.error("error in getPlaces", error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  getPlaceById: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const place = await Place.findByPk(id);
+      if (!place) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Place not found" });
+      }
+      res.status(200).json({ success: true, place });
+    } catch (error) {
+      console.error(error);
+      logger.error("error in getPlaceById", error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  deletePlace: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const place = await Place.findByPk(id);
+      if (!place) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Place not found" });
+      }
+      await place.update({ trash: true });
+      res.status(200).json({ success: true, message: "Place deleted" });
+    } catch (error) {
+      console.error(error);
+      logger.error("error in deletePlace", error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  restorePlace: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const place = await Place.findByPk(id);
+      if (!place) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Place not found" });
+      }
+      await place.update({ trash: false });
+      res.status(200).json({ success: true, message: "Place restored" });
+    } catch (error) {
+      console.error(error);
+      logger.error("error in restorePlace", error);
       res.status(500).json({ success: false, message: error.message });
     }
   },

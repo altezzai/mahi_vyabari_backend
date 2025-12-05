@@ -26,7 +26,7 @@ module.exports = {
         type: Sequelize.STRING,
       },
       to: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
       departureTime: {

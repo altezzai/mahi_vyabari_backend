@@ -21,6 +21,7 @@ const {
   ClassifiedImage,
   HealthcareProvider,
   Banner,
+  Place,
 } = require("../models");
 
 module.exports = {
@@ -453,15 +454,17 @@ module.exports = {
     if (to) {
       whereCondition.to = to;
     }
-    if (via) {
-      whereCondition.via = via;
-    }
+
     try {
       const { count, rows: trains } = await VehicleSchedule.findAndCountAll({
         limit,
         offset,
         distinct: true,
         where: whereCondition,
+        include: [
+          { model: Place, as: "fromPlace", attributes: ["id", "name"] },
+          { model: Place, as: "toPlace", attributes: ["id", "name"] },
+        ],
         order: [["departureTime", "ASC"]],
       });
       const totalPages = Math.ceil(count / limit);
@@ -1069,6 +1072,20 @@ module.exports = {
       console.log(error);
       logger.error("error in getBanners", error);
       return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  getActivePlaces: async (req, res) => {
+    try {
+      const places = await Place.findAll({
+        where: { trash: false },
+        attributes: ["id", "name"],
+        order: [["name", "ASC"]],
+      });
+      res.status(200).json({ success: true, places });
+    } catch (error) {
+      console.error(error);
+      logger.error("error in getActivePlaces", error);
+      res.status(500).json({ success: false, message: error.message });
     }
   },
 };

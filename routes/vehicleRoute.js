@@ -5,7 +5,7 @@ const vehicleController = require("../controllers/vehicleController");
 const userAuth = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
 const { upload, uploadWithErrorHandler } = require("../middleware/upload2");
-// router.use(userAuth, authorizeRoles("admin"));
+router.use(userAuth, authorizeRoles("admin"));
 const vehicleUploadFields = [
   { name: "image", maxCount: 1 },
   { name: "icon", maxCount: 1 },
@@ -64,5 +64,12 @@ router.get(
   "/get-vehicle-service-categories",
   vehicleController.getVehicleServiceCategories
 );
+//manage places
+router.post("/add-place", vehicleController.addPlace);
+router.put("/update-place/:id", vehicleController.updatePlace);
+router.patch("/delete-place/:id", vehicleController.deletePlace);
+router.patch("/restore-place/:id", vehicleController.restorePlace);
+router.get("/get-places", vehicleController.getPlaces);
+router.get("/get-place/:id", vehicleController.getPlaceById);
 
 module.exports = router;

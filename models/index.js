@@ -43,6 +43,8 @@ const {
   TourismImage,
   CouponMilestone,
   Rewards,
+  Place,
+  VehicleSchedule,
 } = db;
 
 // Many-to-Many → Shop ⇄ Category
@@ -108,6 +110,10 @@ VehicleService.belongsTo(Category, {
   foreignKey: "category",
   as: "taxiCategory",
 });
+VehicleSchedule.belongsTo(Place, { foreignKey: "to", as: "toPlace" });
+Place.hasMany(VehicleSchedule, { foreignKey: "to", as: "toPlace" });
+VehicleSchedule.belongsTo(Place, { foreignKey: "from", as: "fromPlace" });
+Place.hasMany(VehicleSchedule, { foreignKey: "from", as: "fromPlace" });
 
 Worker.belongsToMany(Category, {
   through: WorkerCategory,

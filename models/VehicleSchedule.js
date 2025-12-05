@@ -21,14 +21,13 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       from: {
-        type: DataTypes.STRING,
-        defaultValue: "mahe",
+        type: DataTypes.INTEGER,
       },
       via: {
         type: DataTypes.STRING,
       },
       to: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
       departureTime: {
