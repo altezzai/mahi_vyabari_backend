@@ -403,44 +403,6 @@ module.exports = {
     }
   },
   getBusSchedules: async (req, res) => {
-    const via = req.query.via || "mahe";
-    const to = req.query.to || "";
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const offset = (page - 1) * limit;
-    let whereCondition = { trash: false, category: "bus" };
-    if (via && to) {
-      whereCondition = {
-        ...whereCondition,
-        [Op.and]: [
-          { via: { [Op.like]: `%${via}%` } },
-          { to: { [Op.like]: `%${to}%` } },
-        ],
-      };
-    }
-    try {
-      const { count, rows: buses } = await VehicleSchedule.findAndCountAll({
-        limit,
-        offset,
-        distinct: true,
-
-        where: whereCondition,
-        order: [["departureTime", "ASC"]],
-      });
-      const totalPages = Math.ceil(count / limit);
-      res.status(200).json({
-        success: true,
-        totalPages,
-        currentPage: page,
-        data: buses,
-      });
-    } catch (error) {
-      console.error(error);
-      logger.error("error in getBusSchedules", error);
-      res.status(500).json({ success: false, message: error.message });
-    }
-  },
-  getVehicleSchedules: async (req, res) => {
     const from = req.query.from || "";
     const via = req.query.via || "";
     const to = req.query.to || "";
@@ -481,6 +443,7 @@ module.exports = {
       res.status(500).json({ success: false, message: error.message });
     }
   },
+
   getHospitals: async (req, res) => {
     const searchQuery = req.query.q || "";
     const area_id = req.query.area_id || "";
