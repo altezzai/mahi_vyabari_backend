@@ -1076,12 +1076,32 @@ module.exports = {
   },
   getActivePlaces: async (req, res) => {
     try {
-      const places = await Place.findAll({
-        where: { trash: false },
-        attributes: ["id", "name"],
-        order: [["name", "ASC"]],
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 5;
+      const offset = (page - 1) * limit;
+      const search = req.query.search || "";
+      let whereCondition = {
+        trash: false,
+      };
+      if (search) {
+        whereCondition = {
+          name: { [Op.like]: `%${search}%` },
+        };
+      }
+
+      const { rows: places, count } = await Place.findAndCountAll({
+        where: whereCondition,
+        limit,
+        offset,
+        order: [["createdAt", "DESC"]],
       });
-      res.status(200).json({ success: true, places });
+      res.status(200).json({
+        success: true,
+        totalContents: count,
+        totalPage: Math.ceil(count / limit),
+        currentPage: page,
+        places,
+      });
     } catch (error) {
       console.error(error);
       logger.error("error in getActivePlaces", error);

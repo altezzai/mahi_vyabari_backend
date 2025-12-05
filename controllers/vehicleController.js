@@ -261,7 +261,14 @@ module.exports = {
   getVehicleScheduleById: async (req, res) => {
     try {
       const { id } = req.params;
-      const vehicleSchedule = await VehicleSchedule.findByPk(id);
+      const vehicleSchedule = await VehicleSchedule.findOne({
+        where: { id },
+        include: [
+          { model: Place, as: "fromPlace", attributes: ["id", "name"] },
+          { model: Place, as: "toPlace", attributes: ["id", "name"] },
+        ],
+      });
+
       if (!vehicleSchedule) {
         return res
           .status(404)
