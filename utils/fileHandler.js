@@ -126,40 +126,62 @@ const deleteFileWithFolderName = async (uploadPath, filename) => {
     console.error("Error cleaning up" + filename + " files:", err);
   }
 };
+const jpeg = require("jpeg-js");
 
+const repairJPEG = (buffer) => {
+  try {
+    const raw = jpeg.decode(buffer, {
+      useTArray: true,
+      tolerantDecoding: true,
+    }); // tolerant decoding = auto repair
+    const repaired = jpeg.encode(raw, 80); // re-encode as clean JPEG
+    return repaired.data;
+  } catch (err) {
+    console.log("JPEG repair failed:", err.message);
+    return buffer; // fallback to original
+  }
+};
 const compressAndSaveFile = async (file, uploadPath) => {
   try {
     const date = Date.now() + "-";
     let processedFileName = `${date}${file.originalname}`;
     let processedFile = file.buffer;
 
-    const ext = path.extname(file.originalname).toLowerCase();
-
     if (file.mimetype.startsWith("image")) {
+      // 🔥 REPAIR BROKEN JPEG BEFORE SHARP
+      if (file.mimetype === "image/jpeg" || file.mimetype === "image/jpg") {
+        processedFile = repairJPEG(file.buffer);
+      }
+
       processedFileName = `${date}${file.originalname.split(".")[0]}.jpg`;
-      processedFile = await sharp(file.buffer)
+
+      // 🔥 SAFE CONVERSION TO PREVENT CRASH
+      processedFile = await sharp(processedFile)
         .rotate()
-        .jpeg({ quality: 30 })
+        .ensureAlpha()
+        .toFormat("jpeg", { quality: 30 })
         .toBuffer();
     }
-    const filePath = path.join(uploadPath, processedFileName);
+
     if (!fs.existsSync(uploadPath)) {
       fs.mkdirSync(uploadPath, { recursive: true });
     }
 
+    const filePath = path.join(uploadPath, processedFileName);
     fs.writeFileSync(filePath, processedFile);
 
     return processedFileName;
   } catch (error) {
-    logger.error("Error in compressAndSaveFile: " + error.message);
     console.error("Error processing file:", error);
-    throw new Error("Error processing file");
+    throw new Error("Error processing file: " + error.message);
   }
 };
+
 module.exports = {
   processImageFields,
   cleanupFiles,
   deleteFileWithFolderName,
   processImage,
   compressAndSaveFile,
+  repairJPEG,
 };
