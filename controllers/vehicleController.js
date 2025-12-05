@@ -192,6 +192,8 @@ module.exports = {
   getVehicleSchedules: async (req, res) => {
     const search = req.query.search || "";
     const download = req.query.download || "";
+    const from = req.query.from || null;
+    const to = req.query.to || null;
     let { page = 1, limit = 10 } = req.query;
     if (download === "true") {
       page = null;
@@ -207,11 +209,15 @@ module.exports = {
       whereCondition = {
         [Op.or]: [
           { vehicleName: { [Op.like]: `%${search}%` } },
-          { category: { [Op.like]: `%${search}%` } },
-          { via: { [Op.like]: `%${search}%` } },
-          { to: { [Op.like]: `%${search}%` } },
+          { vehicleNumber: { [Op.like]: `%${search}%` } },
         ],
       };
+    }
+    if (from) {
+      whereCondition.from = from;
+    }
+    if (to) {
+      whereCondition.to = to;
     }
     try {
       const { count, rows: vehicleSchedules } =
