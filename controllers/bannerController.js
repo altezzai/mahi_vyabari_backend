@@ -143,13 +143,7 @@ module.exports = {
   },
   getAllBannersAdmin: async (req, res) => {
     try {
-      const {
-        page = 1,
-        limit = 10,
-        search,
-        type,
-        status = "active",
-      } = req.query;
+      const { page = 1, limit = 10, search, type, status } = req.query;
 
       const pageNum = parseInt(page, 10);
       const limitNum = parseInt(limit, 10);
