@@ -4,6 +4,8 @@ const fs = require("fs");
 const path = require("path");
 const { Category, Type } = require("../models");
 const { Op } = require("sequelize");
+const logger = require("../utils/logger");
+
 const {
   deleteFileWithFolderName,
   compressAndSaveFile,

@@ -900,7 +900,8 @@ module.exports = {
           {
             model: TourismImage,
             as: "images",
-            attributes: ["image"],
+            attributes: ["id", "image"],
+            separate: true,
           },
           {
             model: Area,
@@ -927,7 +928,7 @@ module.exports = {
           {
             model: TourismImage,
             as: "images",
-            attributes: ["image"],
+            attributes: ["id", "image"],
           },
         ],
       });
