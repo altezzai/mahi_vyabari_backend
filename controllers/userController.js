@@ -1,7 +1,4 @@
 require("../config/database");
-const multer = require("multer");
-const fs = require("fs");
-const path = require("path");
 const bcrypt = require("bcrypt");
 const logger = require("../utils/logger");
 const { startOfMonth, endOfMonth, subMonths } = require("date-fns");
@@ -11,9 +8,8 @@ const {
 } = require("../utils/tokenService");
 
 // const Otp = require("../models/Otp");
-const { sendEmail } = require("../utils/nodemailer");
 const { hashData } = require("../utils/hashData");
-const { where, Op, fn, literal, col } = require("sequelize");
+const { Op, fn, literal, col } = require("sequelize");
 const { sendSMS } = require("../utils/smsService");
 const jwt = require("jsonwebtoken");
 const {
@@ -35,7 +31,6 @@ const {
   deleteFileWithFolderName,
   compressAndSaveFile,
 } = require("../utils/fileHandler");
-const { Console } = require("console");
 
 const uploadPath = "public/uploads/userImages/";
 module.exports = {
@@ -888,7 +883,6 @@ Please Verify Your account.
   //         <p style="font-size: 14px; color: #999;">Ente Mahe</p>
   //       </div>
   //     `;
-  //     await sendEmail(email, subject, message);
 
   sendLoginOtp: async (req, res) => {
     const { phone } = req.body;

@@ -2,7 +2,6 @@ const { Op } = require("sequelize");
 const generatePassword = require("generate-password");
 const { User } = require("../models");
 const { hashData } = require("../utils/hashData");
-const { sendEmail } = require("../utils/nodemailer");
 const { sendSMS } = require("../utils/smsService");
 const logger = require("../utils/logger");
 
