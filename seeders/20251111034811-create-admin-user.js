@@ -5,14 +5,14 @@ const bcrypt = require("bcrypt");
 module.exports = {
   async up(queryInterface, Sequelize) {
     const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASS, 10);
-    const email = process.env.ADMIN_EMAIL;
+    const phone = process.env.ADMIN_PHONE;
     await queryInterface.bulkInsert("users", [
       {
         googleId: null,
         userName: "Admin",
-        email: email,
+        email: null,
         password: hashedPassword,
-        phone: null,
+        phone: phone,
         image: null,
         area_id: null,
         couponCount: 0,
