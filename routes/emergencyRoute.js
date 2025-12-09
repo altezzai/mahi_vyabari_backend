@@ -6,7 +6,7 @@ const userAuth = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
 const multerInstance = require("../middleware/upload");
 const { upload, uploadWithErrorHandler } = require("../middleware/upload2");
-// router.use(userAuth, authorizeRoles("admin"));
+router.use(userAuth, authorizeRoles("admin"));
 const emergencyUploadFields = [{ name: "icon", maxCount: 1 }];
 
 router.post(

@@ -60,10 +60,7 @@ router.get(
   "/get-vehicle-Service/:id",
   vehicleController.getVehicleServiceProviderById
 );
-router.get(
-  "/get-vehicle-service-categories",
-  vehicleController.getVehicleServiceCategories
-);
+
 //manage places
 router.post("/add-place", vehicleController.addPlace);
 router.put("/update-place/:id", vehicleController.updatePlace);

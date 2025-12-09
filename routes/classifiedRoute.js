@@ -5,7 +5,7 @@ const classifiedController = require("../controllers/classifiedController");
 const userAuth = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
 const { upload, uploadWithErrorHandler } = require("../middleware/upload2");
-// router.use(userAuth, authorizeRoles("admin"));
+router.use(userAuth, authorizeRoles("admin"));
 const classifiedUploadFields = [
   { name: "images", maxCount: 5 },
   { name: "icon", maxCount: 1 },

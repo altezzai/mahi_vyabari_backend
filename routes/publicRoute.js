@@ -24,6 +24,10 @@ router.get("/tourism/:id", publicController.getTourismById);
 router.get("/shop-categories", publicController.getShopCategories);
 router.get("/worker-categories", publicController.getWorkerCategory);
 router.get("/classified-categories", publicController.getClassifiedCategory);
+router.get(
+  "/get-vehicle-service-categories",
+  publicController.getVehicleServiceCategories
+);
 router.get("/areas", publicController.getAreas);
 router.get("/banners", publicController.getBanners);
 router.get("/places", publicController.getActivePlaces);

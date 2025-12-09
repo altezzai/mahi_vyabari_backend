@@ -5,7 +5,7 @@ const medDirectoryController = require("../controllers/medDirectoryController");
 const userAuth = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
 const { upload, uploadWithErrorHandler } = require("../middleware/upload2");
-// router.use(userAuth, authorizeRoles("admin"));
+router.use(userAuth, authorizeRoles("admin"));
 const medicalUploadFields = [
   { name: "image", maxCount: 1 },
   { name: "icon", maxCount: 1 },

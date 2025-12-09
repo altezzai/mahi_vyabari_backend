@@ -529,29 +529,7 @@ module.exports = {
       });
     }
   },
-  getVehicleServiceCategories: async (req, res) => {
-    try {
-      const vehicleServiceCategories = await Type.findOne({
-        where: {
-          typeName: "taxi",
-        },
-        attributes: [],
-        include: [
-          {
-            model: Category,
-            where: { trash: false },
-            attributes: ["id", "categoryName", "icon"],
-            as: "category",
-          },
-        ],
-      });
-      res.status(200).json({ success: true, vehicleServiceCategories });
-    } catch (error) {
-      console.log(error);
-      logger.error("error in getVehicleServiceCategories", error);
-      res.status(500).json({ success: false, message: error.message });
-    }
-  },
+
   addPlace: async (req, res) => {
     try {
       const { name } = req.body;
