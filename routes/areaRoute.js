@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const areaController = require("../controllers/areaController");
+const userAuth = require("../middleware/authMiddleware");
+const authorizeRoles = require("../middleware/roleMiddleware");
 router.use(userAuth, authorizeRoles("admin"));
 
 router.get("/", areaController.getAreas);
