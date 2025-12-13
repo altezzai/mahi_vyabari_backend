@@ -130,7 +130,7 @@ Password: ${password}
 Please log in and change your password immediately for security reasons.
 
 Thanks,
-Team Ente Mahe
+EnteMahe - Mahe Businesss Community
             `;
 
       const newusers = await User.create(userData);

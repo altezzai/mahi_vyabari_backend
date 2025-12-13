@@ -612,7 +612,7 @@ OTP Verification
 Your OTP code is: ${otp}
 This OTP is valid for 10 minutes.
 Please Verify Your account.
-- Ente Mahe`;
+- EnteMahe - Mahe Businesss Community`;
       await sendSMS(phone, message);
       res
         .status(200)
@@ -699,7 +699,7 @@ OTP Verification
 Your OTP code is: ${otp}
 This OTP is valid for 10 minutes.
 Please Verify Your account.
-- Ente Mahe`;
+- EnteMahe - Mahe Businesss Community`;
       await sendSMS(phone, message);
 
       return res.status(200).json({

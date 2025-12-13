@@ -128,7 +128,7 @@ Your shop account has been created by the Admin.
 Login Phone: ${phone}
 Password: ${password}
 Thanks,
-Team Ente Mahe
+EnteMahe - Mahe Businesss Community
             `;
 
       try {
