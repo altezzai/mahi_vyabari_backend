@@ -74,7 +74,7 @@ module.exports = {
         }
         await ClassifiedImage.bulkCreate(imageRecords);
       }
-
+      logger.info("classified added successfully");
       res.status(201).json({
         success: true,
         savedShop: savedClassified,
@@ -152,7 +152,7 @@ module.exports = {
         }
         await ClassifiedImage.bulkCreate(imageRecords);
       }
-
+      logger.info("classified updated successfully");
       return res.status(200).json({ success: true, item: updatedClassified });
     } catch (error) {
       console.log(error);
