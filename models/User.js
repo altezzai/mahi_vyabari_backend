@@ -21,7 +21,6 @@ module.exports = (sequelize, DataTypes) => {
           isEmail: true,
           notEmpty: true,
         },
-        unique: true,
       },
       password: {
         type: DataTypes.STRING,
@@ -40,6 +39,8 @@ module.exports = (sequelize, DataTypes) => {
         validate: {
           is: /^\+?[\d\s-]+$/,
         },
+        allowNull: false,
+        unique: true,
       },
       image: {
         type: DataTypes.STRING,

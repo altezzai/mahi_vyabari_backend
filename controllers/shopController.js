@@ -53,15 +53,15 @@ module.exports = {
           message: " Phone already exists in user table",
         });
       }
-      const existingShop = await User.findOne({
-        where: { email },
-        transaction: t,
-      });
-      if (existingShop) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Shop Email already exists" });
-      }
+      // const existingShop = await User.findOne({
+      //   where: { email },
+      //   transaction: t,
+      // });
+      // if (existingShop) {
+      //   return res
+      //     .status(400)
+      //     .json({ success: false, message: "Shop Email already exists" });
+      // }
       const existingshopName = await Shop.findOne({
         where: { shopName },
         transaction: t,
@@ -284,21 +284,21 @@ EnteMahe - Mahe Businesss Community
       if (phone && !phone.startsWith("+91")) {
         phone = "+91" + phone;
       }
-      const existingEmail = await User.findOne({
-        where: {
-          email: email,
-          id: {
-            [Op.ne]: shop.userId,
-          },
-        },
-      });
+      // const existingEmail = await User.findOne({
+      //   where: {
+      //     email: email,
+      //     id: {
+      //       [Op.ne]: shop.userId,
+      //     },
+      //   },
+      // });
 
-      if (existingEmail) {
-        return res.status(400).json({
-          success: false,
-          message: "Email already exists",
-        });
-      }
+      // if (existingEmail) {
+      //   return res.status(400).json({
+      //     success: false,
+      //     message: "Email already exists",
+      //   });
+      // }
 
       const existingPhone = await User.findOne({
         where: {

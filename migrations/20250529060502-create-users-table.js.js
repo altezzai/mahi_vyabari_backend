@@ -19,13 +19,13 @@ module.exports = {
       email: {
         type: Sequelize.STRING,
         allowNull: true,
-        unique: true,
       },
       password: {
         type: Sequelize.STRING,
       },
       phone: {
         type: Sequelize.STRING,
+        unique: true,
       },
       image: {
         type: Sequelize.STRING,
