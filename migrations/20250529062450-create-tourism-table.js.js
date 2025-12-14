@@ -13,9 +13,13 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      description: {
+        type: Sequelize.TEXT,
+      },
       images: {
         type: Sequelize.TEXT,
       },
+
       phone: {
         type: Sequelize.STRING,
       },
@@ -37,6 +41,11 @@ module.exports = {
       entryFee: {
         type: Sequelize.STRING,
       },
+      priority: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+      },
+
       trash: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,

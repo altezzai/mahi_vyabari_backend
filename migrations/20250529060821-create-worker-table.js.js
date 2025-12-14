@@ -63,9 +63,16 @@ module.exports = {
         ),
       },
     });
+
+    await queryInterface.addIndex("workers", ["workerName"]);
+    await queryInterface.addIndex("workers", ["area_id"]);
+    await queryInterface.addIndex("workers", ["phone"]);
   },
 
   down: async (queryInterface, Sequelize) => {
+    await queryInterface.removeIndex("workers", ["workerName"]);
+    await queryInterface.removeIndex("workers", ["area_id"]);
+    await queryInterface.removeIndex("workers", ["phone"]);
     await queryInterface.dropTable("workers");
   },
 };

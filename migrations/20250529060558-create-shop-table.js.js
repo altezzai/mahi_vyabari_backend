@@ -85,9 +85,18 @@ module.exports = {
         ),
       },
     });
+
+    await queryInterface.addIndex("shops", ["userId"]);
+    await queryInterface.addIndex("shops", ["area_id"]);
+    await queryInterface.addIndex("shops", ["shopName"]);
+    await queryInterface.addIndex("shops", ["phone"]);
   },
 
   down: async (queryInterface, Sequelize) => {
+    await queryInterface.removeIndex("shops", ["userId"]);
+    await queryInterface.removeIndex("shops", ["area_id"]);
+    await queryInterface.removeIndex("shops", ["shopName"]);
+    await queryInterface.removeIndex("shops", ["phone"]);
     await queryInterface.dropTable("shops");
   },
 };

@@ -908,6 +908,7 @@ module.exports = {
             attributes: ["id", "name"],
           },
         ],
+        order: [["priority", "ASC"]],
       });
       const totalPages = Math.ceil(count / limit);
       res

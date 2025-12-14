@@ -38,7 +38,7 @@ module.exports = {
       },
       offerPercentage: {
         type: Sequelize.FLOAT,
-        defaultValue:0,
+        defaultValue: 0,
         validate: {
           min: 0,
           max: 100,
@@ -57,12 +57,21 @@ module.exports = {
       },
       updatedAt: {
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        defaultValue: Sequelize.literal(
+          "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+        ),
       },
     });
+
+    await queryInterface.addIndex("products", ["userId"]);
+    await queryInterface.addIndex("products", ["shopId"]);
+    await queryInterface.addIndex("products", ["productName"]);
   },
 
   down: async (queryInterface, Sequelize) => {
+    await queryInterface.removeIndex("products", ["userId"]);
+    await queryInterface.removeIndex("products", ["shopId"]);
+    await queryInterface.removeIndex("products", ["productName"]);
     await queryInterface.dropTable("products");
   },
 };

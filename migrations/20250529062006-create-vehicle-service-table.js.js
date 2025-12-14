@@ -76,9 +76,18 @@ module.exports = {
         ),
       },
     });
+
+    await queryInterface.addIndex("vehicleservice", ["ownerName"]);
+    await queryInterface.addIndex("vehicleservice", ["category"]);
+    await queryInterface.addIndex("vehicleservice", ["area_id"]);
+    await queryInterface.addIndex("vehicleservice", ["phone"]);
   },
 
   down: async (queryInterface, Sequelize) => {
+    await queryInterface.removeIndex("vehicleservice", ["ownerName"]);
+    await queryInterface.removeIndex("vehicleservice", ["category"]);
+    await queryInterface.removeIndex("vehicleservice", ["area_id"]);
+    await queryInterface.removeIndex("vehicleservice", ["phone"]);
     await queryInterface.dropTable("vehicleservice");
   },
 };

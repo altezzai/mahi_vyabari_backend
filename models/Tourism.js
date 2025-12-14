@@ -14,6 +14,9 @@ module.exports = (sequelize, DataTypes) => {
       phone: {
         type: DataTypes.STRING,
       },
+      description: {
+        type: DataTypes.TEXT,
+      },
       area_id: {
         type: DataTypes.INTEGER,
       },
@@ -33,6 +36,10 @@ module.exports = (sequelize, DataTypes) => {
       location: {
         type: DataTypes.STRING,
         allowNull: true,
+      },
+      priority: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
       },
       trash: {
         type: DataTypes.BOOLEAN,

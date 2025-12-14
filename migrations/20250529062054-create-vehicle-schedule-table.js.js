@@ -52,9 +52,20 @@ module.exports = {
         ),
       },
     });
+
+    await queryInterface.addIndex("vehicleschedules", ["userId"]);
+    await queryInterface.addIndex("vehicleschedules", ["category"]);
+    await queryInterface.addIndex("vehicleschedules", ["vehicleName"]);
+    await queryInterface.addIndex("vehicleschedules", ["vehicleNumber"]);
+    await queryInterface.addIndex("vehicleschedules", ["to"]);
   },
 
   down: async (queryInterface, Sequelize) => {
+    await queryInterface.removeIndex("vehicleschedules", ["userId"]);
+    await queryInterface.removeIndex("vehicleschedules", ["category"]);
+    await queryInterface.removeIndex("vehicleschedules", ["vehicleName"]);
+    await queryInterface.removeIndex("vehicleschedules", ["vehicleNumber"]);
+    await queryInterface.removeIndex("vehicleschedules", ["to"]);
     await queryInterface.dropTable("vehicleschedules");
   },
 };

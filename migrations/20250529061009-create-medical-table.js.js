@@ -90,9 +90,22 @@ module.exports = {
         ),
       },
     });
+
+    await queryInterface.addIndex("HealthcareProviders", ["userId"]);
+    await queryInterface.addIndex("HealthcareProviders", ["category"]);
+    await queryInterface.addIndex("HealthcareProviders", ["name"]);
+    await queryInterface.addIndex("HealthcareProviders", ["phone"]);
+    await queryInterface.addIndex("HealthcareProviders", ["subCategory"]);
+    await queryInterface.addIndex("HealthcareProviders", ["area_id"]);
   },
 
   down: async (queryInterface, Sequelize) => {
+    await queryInterface.removeIndex("HealthcareProviders", ["userId"]);
+    await queryInterface.removeIndex("HealthcareProviders", ["category"]);
+    await queryInterface.removeIndex("HealthcareProviders", ["name"]);
+    await queryInterface.removeIndex("HealthcareProviders", ["phone"]);
+    await queryInterface.removeIndex("HealthcareProviders", ["subCategory"]);
+    await queryInterface.removeIndex("HealthcareProviders", ["area_id"]);
     await queryInterface.dropTable("HealthcareProviders");
   },
 };

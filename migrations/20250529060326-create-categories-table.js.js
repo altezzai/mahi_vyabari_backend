@@ -41,12 +41,21 @@ module.exports = {
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        defaultValue: Sequelize.literal(
+          "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+        ),
       },
     });
+
+    await queryInterface.addIndex("categories", ["userId"]);
+    await queryInterface.addIndex("categories", ["typeId"]);
+    await queryInterface.addIndex("categories", ["categoryName"]);
   },
 
   down: async (queryInterface, Sequelize) => {
+    await queryInterface.removeIndex("categories", ["userId"]);
+    await queryInterface.removeIndex("categories", ["typeId"]);
+    await queryInterface.removeIndex("categories", ["categoryName"]);
     await queryInterface.dropTable("categories");
   },
 };

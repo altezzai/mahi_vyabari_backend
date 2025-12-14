@@ -16,10 +16,50 @@ const uploadPath = "public/uploads/tourism/";
 module.exports = {
   addTouristPlace: async (req, res) => {
     const t = await sequelize.transaction();
+
     try {
+      const {
+        placeName,
+        phone,
+        address,
+        area_id,
+        startTime,
+        endTime,
+        entryFee,
+        location,
+        priority,
+        description,
+      } = req.body;
+      const existingSpot = await Tourism.findOne({
+        where: {
+          placeName,
+        },
+      });
+      if (existingSpot) {
+        return res.status(400).json({
+          success: false,
+          message: "A tourism spot with the same name already exists.",
+        });
+      }
+
+      let newPriority = priority;
+      if (!newPriority) {
+        const maxPriority = await Tourism.max("priority");
+        newPriority = (maxPriority || 0) + 1;
+      }
+
       const newSpot = await Tourism.create(
         {
-          ...req.body,
+          placeName,
+          phone,
+          address,
+          area_id,
+          startTime,
+          endTime,
+          entryFee,
+          location,
+          priority: newPriority,
+          description,
         },
         { transaction: t }
       );
@@ -64,11 +104,14 @@ module.exports = {
     const {
       placeName,
       phone,
+      address,
       area_id,
       startTime,
       endTime,
       entryFee,
       location,
+      description,
+      priority,
     } = req.body;
     try {
       const { id } = req.params;
@@ -78,15 +121,30 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Tourism not found" });
       }
+      const existingSpot = await Tourism.findOne({
+        where: {
+          placeName,
+          id: { [Op.ne]: id },
+        },
+      });
+      if (existingSpot) {
+        return res.status(400).json({
+          success: false,
+          message: "A tourism spot with the same name already exists.",
+        });
+      }
 
       const updatedTourism = await tourism.update({
         placeName,
         phone,
+        address,
         area_id,
         startTime,
         endTime,
         entryFee,
         location,
+        description,
+        priority,
       });
       if (req.files?.images) {
         const imageRecords = [];
@@ -196,7 +254,14 @@ module.exports = {
         offset,
         distinct: true,
         where: whereCondition,
-        attributes: ["id", "placeName", "entryFee", "phone", "trash"],
+        attributes: [
+          "id",
+          "placeName",
+          "entryFee",
+          "priority",
+          "phone",
+          "trash",
+        ],
         order: [["id", "DESC"]],
         include: [
           {

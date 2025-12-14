@@ -6,8 +6,10 @@ module.exports = {
       type: Sequelize.INTEGER,
       allowNull: false,
     });
+    await queryInterface.addIndex("vehicleschedules", ["from"]);
   },
   async down(queryInterface, Sequelize) {
+    await queryInterface.removeIndex("vehicleschedules", ["from"]);
     await queryInterface.removeColumn("vehicleschedules", "from");
   },
 };
