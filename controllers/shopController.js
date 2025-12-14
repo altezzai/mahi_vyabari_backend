@@ -185,7 +185,11 @@ EnteMahe - Mahe Businesss Community
       whereCondition.area_id = area_id;
     }
     try {
-      const { count, rows: shops } = await Shop.findAndCountAll({
+      const count = await Shop.count({
+        where: whereCondition,
+        distinct: true,
+      });
+      const shops = await Shop.findAll({
         limit,
         offset,
         distinct: true,

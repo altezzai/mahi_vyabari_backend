@@ -85,6 +85,7 @@ module.exports = {
         },
         { transaction: t }
       );
+      logger.info("tourist place added successfully");
       res.status(201).json({
         message: "Tourism spot created successfully!",
         spot: finalSpot,
@@ -100,7 +101,6 @@ module.exports = {
     }
   },
   updateTouristPlace: async (req, res) => {
-    const t = await sequelize.transaction();
     const {
       placeName,
       phone,
@@ -159,6 +159,7 @@ module.exports = {
 
         await TourismImage.bulkCreate(imageRecords);
       }
+      logger.info("tourist place updated successfully");
       return res.status(200).json({ success: true, updatedTourism });
     } catch (error) {
       console.error("Error in updateTourismSpot:", error);
@@ -249,7 +250,11 @@ module.exports = {
       whereCondition.area_id = area_id;
     }
     try {
-      const { count, rows: tourism } = await Tourism.findAndCountAll({
+      const count = await Tourism.count({
+        where: whereCondition,
+        distinct: true,
+      });
+      const tourism = await Tourism.findAll({
         limit,
         offset,
         distinct: true,

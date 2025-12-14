@@ -224,7 +224,11 @@ module.exports = {
       whereCondition.category = category_id;
     }
     try {
-      const { count, rows: classifieds } = await Classified.findAndCountAll({
+      const count = await Classified.count({
+        where: whereCondition,
+        distinct: true,
+      });
+      const classifieds = await Classified.findAll({
         limit,
         offset,
         distinct: true,

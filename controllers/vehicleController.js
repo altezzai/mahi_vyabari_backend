@@ -586,9 +586,13 @@ module.exports = {
           name: { [Op.like]: `%${search}%` },
         };
       }
-
-      const { rows: places, count } = await Place.findAndCountAll({
+      const count = await Place.count({
         where: whereCondition,
+        distinct: true,
+      });
+      const places = await Place.findAll({
+        where: whereCondition,
+        distinct: true,
         limit,
         offset,
         order: [["createdAt", "DESC"]],

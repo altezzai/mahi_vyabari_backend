@@ -173,36 +173,38 @@ module.exports = {
       whereCondition.subCategory = subCategory;
     }
     try {
-      const { count, rows: medical } = await HealthcareProvider.findAndCountAll(
-        {
-          limit,
-          offset,
-          distinct: true,
-          attributes: [
-            "id",
-            "name",
-            "priority",
-            "category",
-            "subCategory",
-            "image",
-            "icon",
-            "trash",
-          ],
-          where: whereCondition,
-          include: [
-            {
-              model: Category,
-              attributes: ["id", "categoryName"],
-              as: "categoryInfo",
-            },
-            {
-              model: Area,
-              attributes: ["id", "name"],
-            },
-          ],
-          order: [["createdAt", "DESC"]],
-        }
-      );
+      const count = await HealthcareProvider.count({
+        where: whereCondition,
+        distinct: true,
+      });
+      const medical = await HealthcareProvider.findAll({
+        limit,
+        offset,
+        distinct: true,
+        attributes: [
+          "id",
+          "name",
+          "priority",
+          "category",
+          "subCategory",
+          "image",
+          "icon",
+          "trash",
+        ],
+        where: whereCondition,
+        include: [
+          {
+            model: Category,
+            attributes: ["id", "categoryName"],
+            as: "categoryInfo",
+          },
+          {
+            model: Area,
+            attributes: ["id", "name"],
+          },
+        ],
+        order: [["createdAt", "DESC"]],
+      });
       const totalPages = Math.ceil(count / limit);
       return res.status(200).json({
         success: true,

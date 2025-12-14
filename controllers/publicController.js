@@ -123,7 +123,12 @@ module.exports = {
         whereCondition.id = shopIds;
       }
 
-      const { count, rows: shops } = await Shop.findAndCountAll({
+      const count = await Shop.count({
+        distinct: true,
+        where: whereCondition,
+      });
+
+      const shops = await Shop.findAll({
         limit,
         offset,
         distinct: true,
@@ -597,26 +602,33 @@ module.exports = {
       };
     }
     try {
-      const { count, rows: vehicleServices } =
-        await VehicleService.findAndCountAll({
-          limit,
-          offset,
-          distinct: true,
-          attributes: ["id", "ownerName", "vehicleNumber", "image", "priority"],
-          where: whereCondition,
-          include: [
-            {
-              model: Category,
-              as: "taxiCategory",
-              attributes: ["categoryName", "id"],
-            },
-            {
-              model: Area,
-              attributes: ["id", "name"],
-            },
-          ],
-          order: [["priority", "ASC"]],
-        });
+      const count = await VehicleService.count({
+        where: whereCondition,
+        distinct: true,
+        // include: [
+        //   { model: Category, as: "taxiCategory", attributes: [] },
+        //   { model: Area, attributes: [] },
+        // ],
+      });
+
+      const vehicleServices = await VehicleService.findAll({
+        limit,
+        offset,
+        attributes: ["id", "ownerName", "vehicleNumber", "image", "priority"],
+        where: whereCondition,
+        include: [
+          {
+            model: Category,
+            as: "taxiCategory",
+            attributes: ["categoryName", "id"],
+          },
+          {
+            model: Area,
+            attributes: ["id", "name"],
+          },
+        ],
+        order: [["priority", "ASC"]],
+      });
       const totalPages = Math.ceil(count / limit);
       res.status(200).json({
         success: true,
@@ -697,7 +709,11 @@ module.exports = {
       whereCondition.id = workerIds;
     }
     try {
-      const { count, rows: workers } = await Worker.findAndCountAll({
+      const count = await Worker.count({
+        distinct: true,
+        where: whereCondition,
+      });
+      const workers = await Worker.findAll({
         limit,
         offset,
         distinct: true,
@@ -780,7 +796,11 @@ module.exports = {
       ],
     };
     try {
-      const { count, rows: classifieds } = await Classified.findAndCountAll({
+      const count = await Classified.count({
+        distinct: true,
+        where: whereCondition,
+      });
+      const classifieds = await Classified.findAll({
         limit,
         offset,
         distinct: true,
@@ -890,10 +910,14 @@ module.exports = {
       };
     }
     try {
-      const { count, rows: tourism } = await Tourism.findAndCountAll({
+      const count = await Tourism.count({
+        distinct: true,
+        where: whereCondition,
+      });
+
+      const tourism = await Tourism.findAll({
         limit,
         offset,
-        distinct: true,
         attributes: ["id", "placeName"],
         where: whereCondition,
         include: [
@@ -1053,7 +1077,7 @@ module.exports = {
         limit,
         where: { banner_type: type, trash: false },
         attributes: ["id", "banner_image_large", "banner_image_small", "url"],
-        order: [["createdAt", "DESC"]],
+        order: [["id", "DESC"]],
       });
       return res.status(200).json({ success: true, banners });
     } catch (error) {

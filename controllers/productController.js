@@ -128,7 +128,11 @@ module.exports = {
       whereCondition.shopId = shop_id;
     }
     try {
-      const { count, rows: products } = await Product.findAndCountAll({
+      const count = await Product.count({
+        where: whereCondition,
+        distinct: true,
+      });
+      const products = await Product.findAll({
         limit,
         offset,
         distinct: true,
