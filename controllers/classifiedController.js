@@ -20,7 +20,6 @@ const imgPath = "public/uploads/classified/";
 const sequelize = require("../config/database");
 module.exports = {
   addClassified: async (req, res) => {
-    const t = await sequelize.transaction();
     try {
       let icon = null;
 
@@ -122,7 +121,6 @@ module.exports = {
         }
       }
 
-      const { ...bodyData } = req.body;
       const updatedClassified = await classified.update({
         userId,
         category,
@@ -215,12 +213,10 @@ module.exports = {
     let whereCondition = {};
     if (search) {
       whereCondition = {
-        [Op.or]: [
-          { itemName: { [Op.like]: `%${search}%` } },
-          { "$itemCategory.categoryName$": { [Op.like]: `%${search}%` } },
-        ],
+        [Op.or]: [{ itemName: { [Op.like]: `%${search}%` } }],
       };
     }
+
     if (area_id) {
       whereCondition.area_id = area_id;
     }
