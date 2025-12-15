@@ -232,6 +232,10 @@ module.exports = {
             attributes: ["id", "categoryName"],
             as: "categoryInfo",
           },
+          {
+            model: Area,
+            attributes: ["id", "name"],
+          },
         ],
       });
       if (!healthcareProvider) {
