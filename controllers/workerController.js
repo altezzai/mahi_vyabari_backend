@@ -268,7 +268,20 @@ module.exports = {
   getWorkerProfileById: async (req, res) => {
     try {
       const { id } = req.params;
-      const worker = await Worker.findByPk(id);
+      const worker = await Worker.findOne({
+        where: { id },
+        include: [
+          {
+            model: Category,
+            attributes: ["id", "categoryName"],
+            through: { attributes: [] },
+          },
+          {
+            model: Area,
+            attributes: ["id", "name"],
+          },
+        ],
+      });
       if (!worker) {
         return res
           .status(404)
