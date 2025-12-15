@@ -47,18 +47,18 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Coupon Request Is Not Found" });
       }
-      const lastAssigned = await ShopCoupon.findOne({
-        order: [["couponIdTo", "DESC"]],
-        attributes: ["couponIdTo"],
-      });
-      let nextCouponIdFrom = 1;
-      if (lastAssigned && lastAssigned.couponIdTo) {
-        nextCouponIdFrom = lastAssigned.couponIdTo + 1;
-      }
+      // const lastAssigned = await ShopCoupon.findOne({
+      //   order: [["couponIdTo", "DESC"]],
+      //   attributes: ["couponIdTo"],
+      // });
+      // let nextCouponIdFrom = 1;
+      // if (lastAssigned && lastAssigned.couponIdTo) {
+      //   nextCouponIdFrom = lastAssigned.couponIdTo + 1;
+      // }
       await shopCoupon.update({
         assignedCount,
-        couponIdFrom: nextCouponIdFrom,
-        couponIdTo: nextCouponIdFrom + Number(assignedCount) - 1,
+        // couponIdFrom: nextCouponIdFrom,
+        // couponIdTo: nextCouponIdFrom + Number(assignedCount) - 1,
         status: "assigned",
       });
       res.status(200).json({ success: true, shopCoupon });
@@ -72,19 +72,19 @@ module.exports = {
   assignShopCoupon: async (req, res) => {
     const { assignedCount, shopId } = req.body;
     try {
-      const lastAssigned = await ShopCoupon.findOne({
-        order: [["couponIdTo", "DESC"]],
-        attributes: ["couponIdTo"],
-      });
-      let nextCouponIdFrom = 1;
-      if (lastAssigned && lastAssigned.couponIdTo) {
-        nextCouponIdFrom = lastAssigned.couponIdTo + 1;
-      }
+      // const lastAssigned = await ShopCoupon.findOne({
+      //   order: [["couponIdTo", "DESC"]],
+      //   attributes: ["couponIdTo"],
+      // });
+      // let nextCouponIdFrom = 1;
+      // if (lastAssigned && lastAssigned.couponIdTo) {
+      //   nextCouponIdFrom = lastAssigned.couponIdTo + 1;
+      // }
       const shopCoupon = await ShopCoupon.create({
         shopId,
         assignedCount,
-        couponIdFrom: nextCouponIdFrom,
-        couponIdTo: nextCouponIdFrom + Number(assignedCount) - 1,
+        // couponIdFrom: nextCouponIdFrom,
+        // couponIdTo: nextCouponIdFrom + Number(assignedCount) - 1,
         status: "assigned",
       });
       res.status(200).json({ success: true, shopCoupon });
@@ -284,14 +284,7 @@ module.exports = {
               "remainingCount",
             ],
           ],
-          exclude: [
-            "couponIdFrom",
-            "couponIdTo",
-            "status",
-            "createdAt",
-            "updatedAt",
-            "assignedCount",
-          ],
+          exclude: ["status", "createdAt", "updatedAt", "assignedCount"],
         },
         order: [["createdAt", "DESC"]],
       });
@@ -643,8 +636,7 @@ module.exports = {
             "requestedCount",
             "assignedCount",
             "status",
-            "couponIdFrom",
-            "couponIdTo",
+
             "createdAt",
             "updatedAt",
           ],
