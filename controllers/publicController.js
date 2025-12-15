@@ -728,6 +728,11 @@ module.exports = {
         where: whereCondition,
         include: [
           {
+            model: Category,
+            attributes: ["id", "categoryName"],
+            through: { attributes: [] },
+          },
+          {
             model: Area,
             attributes: ["id", "name"],
           },
@@ -747,6 +752,17 @@ module.exports = {
       const { id } = req.params;
       const worker = await Worker.findOne({
         where: { id, trash: false },
+        include: [
+          {
+            model: Category,
+            attributes: ["id", "categoryName"],
+            through: { attributes: [] },
+          },
+          {
+            model: Area,
+            attributes: ["id", "name"],
+          },
+        ],
       });
       if (!worker) {
         return res
