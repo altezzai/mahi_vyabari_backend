@@ -83,7 +83,7 @@ module.exports = {
           });
         }
         let area = null;
-        if (area_id === 0) {
+        if (parseInt(area_id) === 0 || area_id === 0) {
           area = null;
         } else {
           area = area_id;
