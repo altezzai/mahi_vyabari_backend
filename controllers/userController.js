@@ -82,11 +82,18 @@ module.exports = {
             message: "OTP Expired",
           });
         }
+        let area = null;
+        if (area_id === 0) {
+          area = null;
+        } else {
+          area = area_id;
+        }
+
         const userData = {
           userName,
           email,
           phone,
-          area_id,
+          area_id: area,
           role: "user",
           password: await hashData(password),
         };
