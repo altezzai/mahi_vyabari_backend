@@ -67,10 +67,12 @@ module.exports = {
           .json({ success: false, message: "Product not found" });
       }
 
-      const { offerPercentage, ...bodyData } = req.body;
-      const offerPrice = parseFloat(bodyData.offerPrice) || product.offerPrice;
-      const originalPrice =
-        parseFloat(bodyData.originalPrice) || product.originalPrice;
+      const { originalPrice, offerPrice, offerPercentage, ...bodyData } =
+        req.body;
+      const tempOfferPrice = offerPrice ? parseFloat(offerPrice) : null;
+      const tempOriginalPrice = originalPrice
+        ? parseFloat(originalPrice)
+        : null;
 
       if (originalPrice && offerPrice) {
         if (offerPrice > originalPrice) {
@@ -88,11 +90,12 @@ module.exports = {
           await deleteFileWithFolderName(uploadPath, oldFilename);
         }
       }
+
       const updatedProduct = await product.update({
         ...bodyData,
         image: fileName,
-        offerPrice,
-        originalPrice,
+        offerPrice: tempOfferPrice || 0,
+        originalPrice: tempOriginalPrice || 0,
         offerPercentage: offerPercentage,
       });
 
