@@ -37,10 +37,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      workingDays: {
+        type: DataTypes.STRING,
+      },
       priority: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },
+
       trash: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,

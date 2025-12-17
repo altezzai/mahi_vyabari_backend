@@ -29,6 +29,7 @@ module.exports = {
         location,
         priority,
         description,
+        workingDays,
       } = req.body;
       const existingSpot = await Tourism.findOne({
         where: {
@@ -60,6 +61,7 @@ module.exports = {
           location,
           priority: newPriority,
           description,
+          workingDays,
         },
         { transaction: t }
       );
@@ -112,6 +114,7 @@ module.exports = {
       location,
       description,
       priority,
+      workingDays,
     } = req.body;
     try {
       const { id } = req.params;
@@ -145,6 +148,7 @@ module.exports = {
         location,
         description,
         priority,
+        workingDays,
       });
       if (req.files?.images) {
         const imageRecords = [];
