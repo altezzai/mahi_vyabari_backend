@@ -35,12 +35,7 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       offerPercentage: {
-        type: DataTypes.FLOAT,
-        defaultValue: 0,
-        validate: {
-          min: 0,
-          max: 100,
-        },
+        type: DataTypes.STRING,
       },
       description: {
         type: DataTypes.STRING,
