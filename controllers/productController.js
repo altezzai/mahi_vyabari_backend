@@ -18,7 +18,8 @@ module.exports = {
       if (req.file) {
         fileName = await compressAndSaveFile(req.file, uploadPath);
       }
-      const { offerPrice, originalPrice, ...bodyData } = req.body;
+      const { offerPrice, originalPrice, offerPercentage, ...bodyData } =
+        req.body;
       const offerPriceFloat = parseFloat(offerPrice) || 0;
       const originalPriceFloat = parseFloat(originalPrice) || 0;
       if (offerPriceFloat && originalPriceFloat) {
@@ -35,6 +36,7 @@ module.exports = {
         image: fileName,
         offerPrice: offerPriceFloat,
         originalPrice: offerPriceFloat,
+        offerPercentage: offerPercentage,
       };
       const savedProduct = await Product.create(productData);
       if (!savedProduct) {
@@ -65,7 +67,7 @@ module.exports = {
           .json({ success: false, message: "Product not found" });
       }
 
-      const { ...bodyData } = req.body;
+      const { offerPercentage, ...bodyData } = req.body;
       const offerPrice = parseFloat(bodyData.offerPrice) || product.offerPrice;
       const originalPrice =
         parseFloat(bodyData.originalPrice) || product.originalPrice;
@@ -91,6 +93,7 @@ module.exports = {
         image: fileName,
         offerPrice,
         originalPrice,
+        offerPercentage: offerPercentage,
       });
 
       return res.status(200).json({ success: true, product: updatedProduct });
