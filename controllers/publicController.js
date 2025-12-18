@@ -1075,7 +1075,7 @@ module.exports = {
     try {
       const areas = await Area.findAll({
         where: { trash: false }, // Only get non-deleted areas
-        order: [["name", "ASC"]],
+        order: [["id", "ASC"]],
         attributes: ["id", "name"],
       });
       return res.status(200).json({ success: true, areas });

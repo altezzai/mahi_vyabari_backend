@@ -125,7 +125,7 @@ const getAreas = async (req, res) => {
     }
     const areas = await Area.findAll({
       where: whereClause,
-      order: [["name", "ASC"]],
+      order: [["id", "ASC"]],
     });
 
     res.status(200).json(areas);
@@ -164,7 +164,7 @@ const getAllAreas = async (req, res) => {
     }
     const areas = await Area.findAll({
       where: whereClause,
-      order: [["name", "ASC"]],
+      order: [["id", "ASC"]],
     });
 
     res.status(200).json(areas);
