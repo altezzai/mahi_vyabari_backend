@@ -124,10 +124,7 @@ module.exports = {
     let whereCondition = {};
     if (search) {
       whereCondition = {
-        [Op.or]: [
-          { productName: { [Op.like]: `%${search}%` } },
-          { "$shop.shopName$": { [Op.like]: `%${search}%` } },
-        ],
+        [Op.or]: [{ productName: { [Op.like]: `%${search}%` } }],
       };
     }
     if (shop_id) {
