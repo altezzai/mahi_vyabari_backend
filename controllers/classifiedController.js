@@ -233,7 +233,21 @@ module.exports = {
         offset,
         distinct: true,
         where: whereCondition,
-        attributes: ["id", "itemName", "priority", "icon", "price", "trash"],
+        attributes: [
+          "id",
+          "itemName",
+          "priority",
+          "icon",
+          "description",
+          "validityDate",
+          "fromDate",
+          "phone",
+          "whatsapp",
+          "priceStatus",
+          "address",
+          "price",
+          "trash",
+        ],
         include: [
           {
             model: Category,
