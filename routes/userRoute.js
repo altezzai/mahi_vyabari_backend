@@ -120,4 +120,10 @@ router.get(
   userController.getTopShopUserCoupon
 );
 
+router.get(
+  "/get-user-rewards",
+  userAuth,
+  authorizeRoles("user"),
+  userController.getUserRewards
+);
 module.exports = router;

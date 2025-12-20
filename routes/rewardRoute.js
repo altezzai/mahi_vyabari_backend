@@ -29,11 +29,5 @@ router.put("/update-reward/:id", rewardController.updateReward);
 router.get("/get-rewards", rewardController.getAllRewards);
 router.get("/get-reward/:id", rewardController.getRewardById);
 router.delete("/delete-reward/:id", rewardController.deleteReward);
-router.get(
-  "/get-user-rewards",
-  userAuth,
-  authorizeRoles("user"),
-  rewardController.getUserRewards
-);
 
 module.exports = router;

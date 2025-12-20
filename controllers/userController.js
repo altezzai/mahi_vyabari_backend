@@ -26,6 +26,7 @@ const {
   Complaint,
   Otp,
   Area,
+  Rewards,
 } = require("../models");
 const {
   deleteFileWithFolderName,
@@ -1424,6 +1425,43 @@ Please Verify Your account.
       console.error("Error fetching top coupon distributors:", error);
       logger.error("Error fetching top coupon distributors:", error);
       return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  getUserRewards: async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const rewards = await Rewards.findAll({
+        where: { user_id: userId },
+        include: [
+          {
+            model: CouponMilestone,
+            attributes: [
+              "id",
+              "required_coupons",
+              "gift_image",
+              "gift_description",
+            ],
+          },
+          {
+            model: UserCoupon,
+            attributes: ["id", "couponIdFrom", "couponIdTo", "assignedCount"],
+            include: [
+              {
+                model: Shop,
+                attributes: ["id", "shopName"],
+                as: "shop",
+              },
+            ],
+          },
+        ],
+        order: [["id", "DESC"]],
+      });
+
+      return res.status(200).json({ data: rewards });
+    } catch (error) {
+      console.error(error);
+      logger.error("error in getting user rewards", error);
+      return res.status(500).json({ error: "Something went wrong" });
     }
   },
 };
