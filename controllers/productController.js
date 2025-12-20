@@ -108,7 +108,7 @@ module.exports = {
   },
   getProducts: async (req, res) => {
     const search = req.query.search || "";
-    const shop_id = req.query.shop_id || null;
+    const shopId = req.query.shopId || null;
     const download = req.query.download || "";
     let { page = 1, limit = 10 } = req.query;
     if (download === "true") {
@@ -127,8 +127,8 @@ module.exports = {
         [Op.or]: [{ productName: { [Op.like]: `%${search}%` } }],
       };
     }
-    if (shop_id) {
-      whereCondition.shopId = shop_id;
+    if (shopId) {
+      whereCondition.shopId = shopId;
     }
     try {
       const count = await Product.count({
