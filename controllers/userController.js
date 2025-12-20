@@ -27,6 +27,7 @@ const {
   Otp,
   Area,
   Rewards,
+  CouponMilestone,
 } = require("../models");
 const {
   deleteFileWithFolderName,
