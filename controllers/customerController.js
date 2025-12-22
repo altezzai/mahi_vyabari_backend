@@ -214,7 +214,13 @@ EnteMahe - Mahe Businesss Community
           .status(404)
           .json({ success: true, message: "users Not Found" });
       }
-      await users.update({ userName, email, phone, area_id, status });
+      await users.update({
+        userName: userName || users.userName,
+        email: email || users.email,
+        phone: phone || users.phone,
+        area_id: area_id || users.area_id,
+        status: status || users.status,
+      });
       const message = `
       Welcome, ${users.userName} 👋
 Your account has been updated by the Admin.
