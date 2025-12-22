@@ -189,4 +189,56 @@ EnteMahe - Mahe Businesss Community
       res.status(500).json({ success: false, message: error.message });
     }
   },
+  updateCustomer: async (req, res) => {
+    try {
+      const { id } = req.params;
+      let { userName, email, phone, area_id, status } = req.body;
+      if (!phone.startsWith("+91")) {
+        phone = "+91" + phone;
+      }
+      const existingUser = await User.findOne({
+        where: {
+          phone,
+          id: { [Op.ne]: id },
+        },
+      });
+      if (existingUser) {
+        return res
+          .status(400)
+          .json({ success: false, message: "User already exists" });
+      }
+
+      const users = await User.findByPk(id);
+      if (!users) {
+        return res
+          .status(404)
+          .json({ success: true, message: "users Not Found" });
+      }
+      await users.update({ userName, email, phone, area_id, status });
+      const message = `
+      Welcome, ${users.userName} 👋
+Your account has been updated by the Admin.
+
+Login phone: ${users.phone}
+Please log in and check your account details.
+
+Thanks,
+EnteMahe - Mahe Businesss Community
+                  `;
+      try {
+        await sendSMS(users.phone, message);
+      } catch (smsError) {
+        console.error("SMS sending failed:", smsError.message);
+      }
+      res.status(200).json({
+        success: true,
+        message: "users updated successfully",
+        data: users,
+      });
+    } catch (error) {
+      console.log(error);
+      logger.error("error in editCustomer", error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
 };

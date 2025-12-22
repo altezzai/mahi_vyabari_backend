@@ -12,4 +12,6 @@ router.post("/add-customer", customerController.addCustomer);
 router.patch("/delete-customer/:id", customerController.deleteCustomer);
 router.patch("/restore-customer/:id", customerController.restoreCustomer);
 
+router.put("/update-customer/:id", customerController.updateCustomer);
+
 module.exports = router;
