@@ -108,7 +108,15 @@ module.exports = {
         icon: icon || null,
       };
 
-      const newShop = await Shop.create(shopData, { transaction: t });
+      const newShop = await Shop.create(
+        {
+          ...shopData,
+          trash: false,
+          email: email || null,
+          shopName,
+        },
+        { transaction: t }
+      );
       let categoryList = [];
       if (Array.isArray(req.body.categories)) {
         categoryList = req.body.categories.map((c) => parseInt(c));
