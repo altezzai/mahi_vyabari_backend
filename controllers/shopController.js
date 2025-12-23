@@ -35,10 +35,10 @@ module.exports = {
     const t = await sequelize.transaction();
 
     try {
-      if (!shopName || !phone || !email) {
+      if (!shopName || !phone) {
         return res
           .status(400)
-          .json({ error: "shopName, phone, and email are required." });
+          .json({ error: "shopName and phone are required." });
       }
       if (!phone.startsWith("+91")) {
         phone = "+91" + phone;

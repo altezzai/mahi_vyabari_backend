@@ -228,7 +228,8 @@ module.exports = {
           {
             model: Product,
             as: "products",
-            separate: true, // <-- IMPORTANT for ordering inside include
+            separate: true,
+            where: { trash: false },
             order: [["id", "DESC"]], // <-- ORDER PRODUCTS BY ID DESC
             attributes: [
               "id",
