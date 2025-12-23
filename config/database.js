@@ -7,8 +7,14 @@ const sequelize = new Sequelize(
   config.password,
   {
     host: config.host,
-    dialect:config.dialect,
-    logging:false,
+    dialect: config.dialect,
+    logging: true,
+    pool: {
+      max: 20,
+      min: 5,
+      acquire: 60000, // 60s
+      idle: 10000,
+    },
   }
 );
 
