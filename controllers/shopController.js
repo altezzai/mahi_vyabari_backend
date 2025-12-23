@@ -91,7 +91,7 @@ module.exports = {
       const user = await User.create(
         {
           userName: shopName,
-          email,
+          email: email || null,
           phone,
           area_id,
           password: await hashData(password),
