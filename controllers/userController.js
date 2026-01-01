@@ -28,6 +28,7 @@ const {
   Area,
   Rewards,
   CouponMilestone,
+  ShopCoupon,
 } = require("../models");
 const {
   deleteFileWithFolderName,
@@ -1380,7 +1381,7 @@ Please Verify Your account.
   },
   getTopShopUserCoupon: async (req, res) => {
     try {
-      const topShops = await UserCoupon.findAll({
+      const topShops = await ShopCoupon.findAll({
         attributes: [
           "shopId",
           [fn("SUM", col("assignedCount")), "totalCoupons"],
@@ -1416,11 +1417,24 @@ Please Verify Your account.
         raw: true,
         nest: true,
       });
-
+      //i want total usercoupon count(sum of assignedCount) not in limit
+      const totalUserCoupons = await UserCoupon.findAll({
+        attributes: [[fn("SUM", col("assignedCount")), "totalCoupons"]],
+        raw: true,
+      });
+      const activeUsers = await User.count({
+        where: { trash: false, role: "user" },
+      });
+      const activeShops = await Shop.count({
+        where: { trash: false },
+      });
       return res.status(200).json({
         success: true,
         topShops,
         topUsers,
+        totalUserCoupons: totalUserCoupons[0].totalCoupons || 0,
+        activeUsers,
+        activeShops,
       });
     } catch (error) {
       console.error("Error fetching top coupon distributors:", error);
