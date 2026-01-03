@@ -1135,9 +1135,6 @@ Please Verify Your account.
           case "shop":
             count = await Shop.count({
               where: {
-                categories: {
-                  [Op.ne]: null,
-                },
                 trash: false,
               },
             });
