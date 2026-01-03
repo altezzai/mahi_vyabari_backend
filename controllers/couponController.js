@@ -555,7 +555,7 @@ module.exports = {
         offset,
         where: whereCondition,
         attributes: ["id", "userName", "phone"],
-        order: [["createdAt", "DESC"]],
+        order: [["id", "ASC"]],
       });
       const totalPages = Math.ceil(count / limit);
       return res.status(200).json({

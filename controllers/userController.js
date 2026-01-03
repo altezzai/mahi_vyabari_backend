@@ -1381,7 +1381,7 @@ Please Verify Your account.
   },
   getTopShopUserCoupon: async (req, res) => {
     try {
-      const topShops = await ShopCoupon.findAll({
+      const topShops = await UserCoupon.findAll({
         attributes: [
           "shopId",
           [fn("SUM", col("assignedCount")), "totalCoupons"],
