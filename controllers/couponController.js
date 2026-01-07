@@ -573,11 +573,23 @@ module.exports = {
     }
   },
   getRecentUserCoupons: async (req, res) => {
-    const shopId = req.user.shopId;
     try {
-      const couponHistory = await UserCoupon.findAndCountAll({
-        where: { shopId: shopId },
-        limit: 20,
+      const shopId = req.user.shopId;
+      const userId = req.query.userId || null;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+     let whereCondition = {shopId};
+    if (userId) {
+      whereCondition.id = userId;
+      
+    }
+
+      const { count, rows: couponHistory } = await UserCoupon.findAndCountAll({
+        limit,
+        offset,
+
+        where: whereCondition,
         attributes: ["id", "couponIdFrom", "couponIdTo", "createdAt"],
         include: [
           {
@@ -589,8 +601,11 @@ module.exports = {
         order: [["createdAt", "DESC"]],
       });
       res.status(200).json({
-        success: true,
+        totalCount: count,
+        totalPages: Math.ceil(count / limit),
+        currentPage: page,
         couponHistory,
+        success: true,
       });
     } catch (error) {
       console.log(error);
