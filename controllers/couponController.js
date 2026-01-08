@@ -581,10 +581,9 @@ module.exports = {
     const offset = (page - 1) * limit;
      let whereCondition = {shopId};
     if (userId) {
-      whereCondition.id = userId;
+      whereCondition.userId = userId;
       
     }
-
       const { count, rows: couponHistory } = await UserCoupon.findAndCountAll({
         limit,
         offset,
