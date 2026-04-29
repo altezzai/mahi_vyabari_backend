@@ -110,6 +110,14 @@ router.get(
   couponController.luckDraw
 );
 router.get(
+  "/shopBasedLuckyDraw",
+  userAuth,
+  authorizeRoles("admin"),
+  couponController.shopBasedLuckyDraw
+);
+
+
+router.get(
   "/get-user-milestone-status",
   userAuth,
   authorizeRoles("user"),

@@ -487,6 +487,7 @@ module.exports = {
             "category",
             "priority",
             "area_id",
+            "phone",
           ],
           where: whereCondition,
           include: [

@@ -811,6 +811,96 @@ module.exports = {
       return res.status(500).json({ error: "Something went wrong" });
     }
   },
+  shopBasedLuckyDraw: async (req, res) => {
+  try {
+    let { shopId, startDate, endDate } = req.query;
+
+    if (!shopId || !startDate || !endDate) {
+      return res.status(400).json({
+        error: "shopId, startDate, and endDate are required",
+      });
+    }
+
+    shopId = parseInt(shopId);
+
+    /* Step 1: Get all coupon ranges for the shop within date range */
+    const shopCoupons = await UserCoupon.findAll({
+      where: {
+        shopId,
+        createdAt: {
+          [Op.between]: [startDate, endDate],
+        },
+      },
+      attributes: ["id", "couponIdFrom", "couponIdTo"],
+    });
+
+    if (!shopCoupons.length) {
+      return res.status(404).json({
+        message: "No coupons found for this shop in the given date range",
+      });
+    }
+
+    /* Step 2: Find min and max coupon numbers */
+    const minCoupon = Math.min(
+      ...shopCoupons.map((c) => c.couponIdFrom)
+    );
+    const maxCoupon = Math.max(
+      ...shopCoupons.map((c) => c.couponIdTo)
+    );
+
+    /* Step 3: Generate random coupon number */
+    const randomCouponId =
+      Math.floor(Math.random() * (maxCoupon - minCoupon + 1)) +
+      minCoupon;
+
+    /* Step 4: Find the winner */
+    const result = await UserCoupon.findOne({
+      where: {
+        shopId,
+        couponIdFrom: { [Op.lte]: randomCouponId },
+        couponIdTo: { [Op.gte]: randomCouponId },
+        createdAt: {
+          [Op.between]: [startDate, endDate],
+        },
+      },
+      include: [
+        {
+          model: User,
+          attributes: ["id", "userName", "email", "phone", "image"],
+          as: "user",
+        },
+        {
+          model: Shop,
+          attributes: ["id", "shopName", "image"],
+          as: "shop",
+        },
+      ],
+    });
+
+    if (!result) {
+      return res.status(400).json({
+        message: "Invalid coupon number selected. Please try again.",
+        randomCouponId,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Shop-based lucky draw success!",
+      randomCouponId,
+      userDetails: result.user,
+      shopDetails: result.shop,
+      couponId: result.id,
+    });
+  } catch (error) {
+    console.error(error);
+    logger.error("error in shopBasedLuckyDraw", error);
+
+    return res.status(500).json({
+      error: "Something went wrong",
+    });
+  }
+  },
+
   getUserMilestone: async (req, res) => {
     const { id } = req.user;
 
