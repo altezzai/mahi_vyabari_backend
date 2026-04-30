@@ -34,4 +34,10 @@ router.patch("/resolve-complaints/:id", shopController.resolveComplaints);
 router.patch("/reject-complaints/:id", shopController.rejectComplaints);
 router.get("/delete-complaints/:id", shopController.deleteComplaints);
 
+router.get("/get-trashed-shops", shopController.getTrashedShops);
+router.delete(
+  "/permanent-delete-shop/:shopId",
+  shopController.permanentDeleteShop
+);
+
 module.exports = router;

@@ -7,7 +7,8 @@ module.exports = {
       { typeName: 'classified', createdAt: new Date(), updatedAt: new Date() },
       { typeName: 'worker', createdAt: new Date(), updatedAt: new Date() },
       { typeName: 'taxi', createdAt: new Date(), updatedAt: new Date() },
-      { typeName: 'medical', createdAt: new Date(), updatedAt: new Date() }
+      { typeName: 'medical', createdAt: new Date(), updatedAt: new Date() },
+      { typeName: 'service', createdAt: new Date(), updatedAt: new Date() }
     ], {});
   },
 

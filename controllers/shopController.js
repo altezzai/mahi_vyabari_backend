@@ -458,6 +458,112 @@ EnteMahe - Mahe Businesss Community
         .json({ success: false, message: "Internal Server Error" });
     }
   },
+  getTrashedShops: async (req, res) => {
+    const search = req.query.search || "";
+    const area_id = req.query.area_id || null;
+    const download = req.query.download || "";
+    const category_id = req.query.category_id || null;
+    let { page = 1, limit = 10 } = req.query;
+    if (download === "true") {
+      page = null;
+      limit = null;
+    } else {
+      page = parseInt(page) || 1;
+      limit = parseInt(limit) || 10;
+    }
+
+    const offset = page && limit ? (page - 1) * limit : 0;
+
+    let whereCondition = {};
+    if (search) {
+      whereCondition = {
+        [Op.or]: [{ shopName: { [Op.like]: `%${search}%` } }],
+      };
+    }
+    if (area_id) {
+      whereCondition.area_id = area_id;
+    }
+    try {
+      const count = await Shop.count({
+        where: whereCondition,
+        distinct: true,
+      });
+      const shops = await Shop.findAll({
+        limit,
+        offset,
+        distinct: true,
+        where: whereCondition,
+        attributes: [
+          "id",
+          "shopName",
+          "priority",
+          "image",
+          "phone",
+          "address",
+          "description",
+          "openingTime",
+          "closingTime",
+          "workingDays",
+          "whatsapp",
+          "icon",
+          "trash",
+          "createdAt",
+        ],
+        include: [
+          {
+            model: Category,
+            attributes: ["id", "categoryName"],
+            through: { attributes: [] },
+            where: category_id ? { id: category_id } : null,
+          },
+          {
+            model: Area,
+            attributes: ["id", "name"],
+          },
+        ],
+        order: [["createdAt", "DESC"]],
+      });
+      const totalPages = Math.ceil(count / limit);
+      return res.status(200).json({
+        success: true,
+        count,
+        totalPages: download === "true" ? null : totalPages,
+        currentPage: download === "true" ? null : page,
+        data: shops,
+      });
+    } catch (error) {
+      console.error(error);
+      logger.error("Error getting trashed shops:", error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  permanentDeleteShop: async (req, res) => {
+    try {
+      const { shopId } = req.params;
+      const shop = await Shop.findByPk(shopId);
+      if (!shop) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Shop not found" });
+      }
+      if (shop.trash === false) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Shop is not in trash" });
+      }
+      if (shop.couponCount > 0) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Shop has coupons, so shop cannot be deleted" });
+      }
+      await shop.destroy();
+      res.status(200).json({ success: true, shop });
+    } catch (error) {
+      console.error(error);
+      logger.error("Error permanent deleting shop:", error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
   getShopCategories: async (req, res) => {
     try {
       const shopCategories = await Type.findOne({

@@ -39,6 +39,7 @@ const tourismRouter = require("./routes/tourismRoute");
 const bannerRouter = require("./routes/bannerRoute");
 const areaRouter = require("./routes/areaRoute");
 const rewardRouter = require("./routes/rewardRoute");
+const serviceRouter = require("./routes/serviceRoute");
 
 app.set("trust proxy", 1);
 app.use("/public/uploads", express.static("public/uploads"));
@@ -68,6 +69,7 @@ app.use("/api/tourism", tourismRouter);
 app.use("/api/banners", bannerRouter);
 app.use("/api/area", areaRouter);
 app.use("/api/reward", rewardRouter);
+app.use("/api/services", serviceRouter);
 
 app.listen(PORT, () => {
   console.log(`server started on port number ${PORT}`);
