@@ -20,7 +20,7 @@ module.exports = {
 
     const offset = page && limit ? (page - 1) * limit : 0;
 
-    let whereCondition = { role: "user" };
+    let whereCondition = { role: "user", trash: false };
     if (search) {
       whereCondition = {
         ...whereCondition,
@@ -94,6 +94,7 @@ module.exports = {
           [Op.or]: [{ phone }],
         },
       });
+      console.log("existing user", existingUser);
       if (existingUser) {
         return res
           .status(400)
@@ -187,6 +188,90 @@ EnteMahe - Mahe Businesss Community
       console.log(error);
       logger.error("error in restoreCustomer", error);
       res.status(500).json({ success: false, message: error.message });
+    }
+  },
+
+  getTrashedCustomers: async (req, res) => {
+    const search = req.query.search || "";
+    const download = req.query.download || "";
+    let { page = 1, limit = 10 } = req.query;
+    if (download === "true") {
+      page = null;
+      limit = null;
+    } else {
+      page = parseInt(page) || 1;
+      limit = parseInt(limit) || 10;
+    }
+
+    const offset = page && limit ? (page - 1) * limit : 0;
+
+    let whereCondition = { role: "user", trash: true };
+    if (search) {
+      whereCondition = {
+        ...whereCondition,
+        [Op.or]: [
+          { userName: { [Op.like]: `%${search}%` } },
+          { phone: { [Op.like]: `%${search}%` } },
+          { id: { [Op.like]: `%${search}%` } },
+        ],
+      };
+    }
+    try {
+      const { count, rows: users } = await User.findAndCountAll({
+        limit,
+        offset,
+        where: whereCondition,
+        attributes: [
+          "id",
+          "userName",
+          "phone",
+          "couponCount",
+          "trash",
+          "status",
+        ],
+        order: [["createdAt", "DESC"]],
+      });
+      const totalPages = Math.ceil(count / limit);
+      return res.status(200).json({
+        success: true,
+        count,
+        totalPages: download === "true" ? null : totalPages,
+        currentPage: download === "true" ? null : page,
+        data: users,
+      });
+    } catch (error) {
+      console.log(error);
+      logger.error("error in getTrashedCustomers", error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  permanentDeleteCustomer: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const users = await User.findOne({ where: { id, trash: true } });
+      if (!users) {
+        return res
+          .status(404)
+          .json({ success: true, message: "users Not Found" });
+      }
+      if (users.couponCount > 0) {
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message: "User has coupons, so user cannot be deleted",
+          });
+      }
+      await users.destroy();
+      res.status(200).json({
+        success: true,
+        message: "users deleted successfully",
+        data: users,
+      });
+    } catch (error) {
+      console.log(error);
+      logger.error("error in permanentDeleteCustomer", error);
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
   updateCustomer: async (req, res) => {

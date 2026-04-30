@@ -22,21 +22,6 @@ const db = require("./models"); // This loads index.js which loads all models
     console.error("❌ Error synchronizing models:", error);
   }
 })();
-// (async () => {
-//   try {
-//     const rows = await Classified.findAll({
-//       attributes: ["id", "area"],
-//       raw: true,
-//     });
-
-//     const csv = rows.map(row => `${row.id},${row.area}`).join("\n");
-//     fs.writeFileSync("C:/Users/ForTune/OneDrive/Desktop/ente mahe database/classifieds_data.csv", csv);
-
-//     console.log("✅ File exported to Desktop successfully!");
-//   } catch (error) {
-//     console.error("❌ Export failed:", error);
-//   }
-// })();
 
 const shopRouter = require("./routes/shopRoute");
 const productRouter = require("./routes/productRoute");
@@ -55,17 +40,9 @@ const bannerRouter = require("./routes/bannerRoute");
 const areaRouter = require("./routes/areaRoute");
 const rewardRouter = require("./routes/rewardRoute");
 
-// app.use(
-//   session({
-//     resave: false,
-//     saveUninitialized: true,
-//     secret: process.env.SESSION_SECRET,
-//   })
-// );
 app.set("trust proxy", 1);
 app.use("/public/uploads", express.static("public/uploads"));
-// app.use(passport.initialize());
-// app.use(passport.session());
+
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
