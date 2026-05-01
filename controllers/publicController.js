@@ -12,6 +12,7 @@ const {
   Classified,
   ShopCategory,
   WorkerCategory,
+  ServiceCategory,
   Tourism,
   TourismImage,
   Category,
@@ -22,6 +23,7 @@ const {
   HealthcareProvider,
   Banner,
   Place,
+  Service,
 } = require("../models");
 
 module.exports = {
@@ -778,6 +780,105 @@ module.exports = {
       res.status(500).json({ success: false, message: error.message });
     }
   },
+  // get services and byid functions
+  getServices: async (req, res) => {
+    try {
+          const searchQuery = req.query.q || "";
+    const area_id = req.query.area_id || "";
+    const category = req.query.category || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    let whereCondition = { trash: false };
+     if (searchQuery) {
+      whereCondition = {
+        ...whereCondition,
+        serviceName: { [Op.like]: `%${searchQuery}%` },
+      };
+    }
+    if (area_id) {
+      whereCondition = {
+        ...whereCondition,
+        area_id: area_id,
+      };
+    }
+    if (category) {
+      const serviceCategoryEntries = await ServiceCategory.findAll({
+        where: { categoryId: category },
+        attributes: ["serviceId"],
+      });
+      const serviceIds = serviceCategoryEntries.map((entry) => entry.serviceId);
+      if (serviceIds.length === 0) {
+        return res.status(200).json({
+          success: true,
+          totalPages: 0,
+          currentPage: page,
+          data: [],
+        });
+      }
+
+      whereCondition.id = serviceIds;
+    }
+      const count = await Service.count({
+        distinct: true,
+        where: whereCondition,
+      });
+      const services = await Service.findAll({
+        limit,
+        offset,
+        distinct: true,
+        attributes: ["id", "serviceName", "description", "image"],
+        where: whereCondition,
+        include: [
+          {
+            model: Area,
+            attributes: ["id", "name"],
+          },
+           {
+            model: Category,
+            attributes: ["id", "categoryName"],
+            through: { attributes: [] },
+          },
+        ],
+      });
+      const totalPages = Math.ceil(count / limit);
+      res.json({ success: true, totalPages, currentPage: page, data: services });
+    } catch (error) {
+      console.error(error);
+      logger.error("error in getServices", error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  getServiceById: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const service = await Service.findOne({
+        where: { id, trash: false },
+        attributes: ["id", "serviceName", "description", "image","icon","phone","whatsapp","minWage"],
+        include: [
+          {
+            model: Area,
+            attributes: ["id", "name"],
+          },
+           {
+            model: Category,
+            attributes: ["id", "categoryName"],
+            through: { attributes: [] },
+          },
+        ],
+      });
+      if (!service) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Service not found" });
+      }
+      res.status(200).json({ success: true, service });
+    } catch (error) {
+      console.error(error);
+      logger.error("error in getServiceById", error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
   getClassifieds: async (req, res) => {
     const searchQuery = req.query.q || "";
     const area_id = req.query.area_id || "";
@@ -1008,6 +1109,7 @@ module.exports = {
       return res.status(500).json({ success: false, message: error.message });
     }
   },
+  
   getWorkerCategory: async (req, res) => {
     try {
       const workerCategory = await Type.findAll({
@@ -1026,6 +1128,27 @@ module.exports = {
     } catch (error) {
       console.log(error);
       logger.error("error in getWorkerCategory", error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+    getServiceCategories: async (req, res) => {
+    try {
+      const serviceCategories = await Type.findAll({
+        where: { typeName: "service" },
+        attributes: [],
+        include: [
+          {
+            model: Category,
+            where: { trash: false },
+            attributes: ["id", "categoryName", "icon"],
+            as: "category",
+          },
+        ],
+      });
+      return res.status(200).json({ success: true, serviceCategories });
+    } catch (error) {
+      console.log(error);
+      logger.error("error in getServiceCategories", error);
       return res.status(500).json({ success: false, message: error.message });
     }
   },

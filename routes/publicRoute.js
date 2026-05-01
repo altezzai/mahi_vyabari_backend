@@ -17,12 +17,15 @@ router.get("/vehicle-services", publicController.getVehicleServices);
 router.get("/vehicle-service/:id", publicController.getVehicleServiceById);
 router.get("/workers", publicController.getLocalWorkers);
 router.get("/worker/:id", publicController.getLocalWorkersById);
+router.get("/services", publicController.getServices);
+router.get("/service/:id", publicController.getServiceById);
 router.get("/classifieds", publicController.getClassifieds);
 router.get("/classified/:id", publicController.getClassifiedById);
 router.get("/tourism", publicController.getTourism);
 router.get("/tourism/:id", publicController.getTourismById);
 router.get("/shop-categories", publicController.getShopCategories);
 router.get("/worker-categories", publicController.getWorkerCategory);
+router.get("/service-categories", publicController.getServiceCategories);
 router.get("/classified-categories", publicController.getClassifiedCategory);
 router.get(
   "/get-vehicle-service-categories",
