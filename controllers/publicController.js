@@ -618,7 +618,7 @@ module.exports = {
       const vehicleServices = await VehicleService.findAll({
         limit,
         offset,
-        attributes: ["id", "ownerName", "vehicleNumber", "image", "priority"],
+        attributes: ["id", "ownerName", "vehicleNumber", "image", "priority","phone"],
         where: whereCondition,
         include: [
           {
