@@ -86,100 +86,78 @@ module.exports = {
       res.status(500).json({ success: false, message: error.message });
     }
   },
-  getShops: async (req, res) => {
-    try {
+ getShops: async (req, res) => {
       const searchQuery = req.query.q || "";
       const area_id = req.query.area_id || "";
-      const category = req.query.category || "";
+      const category_id = req.query.category || "";
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 3;
       const offset = (page - 1) * limit;
       let whereCondition = { trash: false };
-      if (searchQuery) {
-        whereCondition = {
-          ...whereCondition,
-          shopName: { [Op.like]: `%${searchQuery}%` },
-        };
-      }
-      if (area_id) {
-        whereCondition = {
-          ...whereCondition,
-          area_id: area_id,
-        };
-      }
-      if (category) {
-        const shopCategoryEntries = await ShopCategory.findAll({
-          where: { categoryId: category },
-          attributes: ["shopId"],
-        });
-        const shopIds = shopCategoryEntries.map((entry) => entry.shopId);
-        if (shopIds.length === 0) {
-          return res.status(200).json({
-            success: true,
-            totalPages: 0,
-            currentPage: page,
-            data: [],
-          });
-        }
-
-        whereCondition.id = shopIds;
-      }
-
+    if (searchQuery) {
+      whereCondition = {
+        shopName: { [Op.like]: `%${searchQuery}%` },
+      };
+    }
+    if (area_id) {
+      whereCondition.area_id = area_id;
+    }
+    try {
       const count = await Shop.count({
-        distinct: true,
         where: whereCondition,
+        distinct: true,
       });
-
       const shops = await Shop.findAll({
         limit,
         offset,
         distinct: true,
+        where: whereCondition,
         attributes: [
           "id",
-          "image",
           "shopName",
           "priority",
-          "area_id",
+          "image",
           "phone",
+          "address",
+          "description",
           "openingTime",
           "closingTime",
-          "priority",
-          "rating",
+          "workingDays",
+          "whatsapp",
+          "icon",
+          "trash",
+          "createdAt",
         ],
-        where: whereCondition,
         include: [
           {
             model: Category,
             attributes: ["id", "categoryName"],
             through: { attributes: [] },
+            where: category_id ? { id: category_id } : null,
           },
           {
             model: Area,
             attributes: ["id", "name"],
           },
         ],
-        order: [
-          ["priority", "ASC"],
-          ["rating", "DESC"],
-        ],
+        order: [["createdAt", "DESC"]],
       });
       const totalPages = Math.ceil(count / limit);
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
-        totalCount: count,
+        count,
         totalPages,
         currentPage: page,
         data: shops,
       });
     } catch (error) {
       console.error(error);
-      logger.error("error in getShops", error);
-      res.status(500).json({
-        success: false,
-        message: error.message,
-      });
+      logger.error("Error getting shops:", error);
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
+
+  
   getShopById: async (req, res) => {
     try {
       const { id } = req.params;
