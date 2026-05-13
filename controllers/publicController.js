@@ -140,7 +140,7 @@ module.exports = {
             attributes: ["id", "name"],
           },
         ],
-        order: [["createdAt", "DESC"]],
+        order: [["priority", "ASC"]],
       });
       const totalPages = Math.ceil(count / limit);
       return res.status(200).json({
