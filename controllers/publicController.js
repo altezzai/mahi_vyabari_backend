@@ -154,7 +154,10 @@ module.exports = {
           attributes: ["id", "name"],
         },
       ],
-      order: [["priority", "ASC"]],
+      order: [
+        ["priority", "ASC"],
+        ["id", "ASC"]
+      ],
     });
 
     const totalPages = Math.ceil(count / limit);
