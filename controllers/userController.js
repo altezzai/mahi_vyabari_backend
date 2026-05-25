@@ -547,7 +547,7 @@ module.exports = {
       let shopId;
       if (user.role === "shop") {
         shopId = await Shop.findOne({
-          where: { email: user.email },
+          where: { userId: user.id },
           attributes: ["id"],
         });
       }
