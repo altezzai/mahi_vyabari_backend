@@ -126,7 +126,7 @@ module.exports = {
         const tokenVersion = Date.now();
         const refreshToken = await generateRefreshToken(
           savedUser.id,
-          tokenVersion
+          tokenVersion,
         );
         if (!refreshToken) {
           return res.status(401).json({
@@ -406,7 +406,7 @@ module.exports = {
       // 👉 Update shop table
       await Shop.update(
         { rating: avg.toFixed(1) }, // keep 1 decimal
-        { where: { id: shopId } }
+        { where: { id: shopId } },
       );
 
       return res.status(200).json({
@@ -637,7 +637,7 @@ module.exports = {
       const accessToken = await generateAccessToken(tokenData);
       const newRefreshToken = await generateRefreshToken(
         decoded.id,
-        Date.now()
+        Date.now(),
       );
       res.cookie("refreshToken", newRefreshToken, {
         httpOnly: true,
@@ -1098,13 +1098,13 @@ Please Verify Your account.
           HealthcareProvider,
           { category: "doctor" },
           currentMonthStart,
-          currentMonthEnd
+          currentMonthEnd,
         ),
         countModel(
           HealthcareProvider,
           { category: "doctor" },
           lastMonthStart,
-          lastMonthEnd
+          lastMonthEnd,
         ),
         countTotalModel(HealthcareProvider, { category: "doctor" }),
 
@@ -1112,13 +1112,13 @@ Please Verify Your account.
           HealthcareProvider,
           { category: "hospital" },
           currentMonthStart,
-          currentMonthEnd
+          currentMonthEnd,
         ),
         countModel(
           HealthcareProvider,
           { category: "hospital" },
           lastMonthStart,
-          lastMonthEnd
+          lastMonthEnd,
         ),
         countTotalModel(HealthcareProvider, { category: "hospital" }),
 
@@ -1436,7 +1436,7 @@ Please Verify Your account.
       ];
 
       combinedActivities.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
       );
 
       const recentActivities = combinedActivities.slice(0, limit);
