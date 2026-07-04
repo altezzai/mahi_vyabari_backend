@@ -140,7 +140,8 @@ EnteMahe - Mahe Businesss Community
             `;
 
       try {
-        await sendSMS(phone, message);
+        console.log("Sending SMS to:", phone);
+        // await sendSMS(phone, message);
       } catch (smsError) {
         console.error("SMS sending failed:", smsError.message);
         logger.error("SMS sending failed:", smsError.message, smsError.error);
@@ -215,6 +216,7 @@ EnteMahe - Mahe Businesss Community
           "workingDays",
           "whatsapp",
           "icon",
+          "secondaryPhone",
           "trash",
           "createdAt",
         ],

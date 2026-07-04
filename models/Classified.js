@@ -65,6 +65,9 @@ module.exports = (sequelize, DataTypes) => {
       icon: {
         type: DataTypes.STRING,
       },
+      location: {
+        type: DataTypes.STRING,
+      },
       trash: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,

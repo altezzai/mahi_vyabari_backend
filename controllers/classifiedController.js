@@ -41,6 +41,7 @@ module.exports = {
         priceStatus,
         validityDate,
         fromDate,
+        location,
       } = req.body;
       const classifiedData = {
         userId,
@@ -57,6 +58,7 @@ module.exports = {
         priceStatus,
         validityDate,
         fromDate,
+        location: location || null,
         icon: icon || null,
       };
 
@@ -111,6 +113,7 @@ module.exports = {
         priceStatus,
         validityDate,
         fromDate,
+        location,
       } = req.body;
       let icon = classified.icon;
       if (req.files?.icon) {
@@ -137,6 +140,7 @@ module.exports = {
         validityDate: validityDate || null,
         fromDate: fromDate || null,
         icon: icon || null,
+        location: location || null,
       });
       if (req.files?.images) {
         const imageRecords = [];
@@ -246,6 +250,7 @@ module.exports = {
           "priceStatus",
           "address",
           "price",
+          "location",
           "trash",
         ],
         include: [

@@ -12,6 +12,8 @@ const { hashData } = require("../utils/hashData");
 const { Op, fn, literal, col } = require("sequelize");
 const { sendSMS } = require("../utils/smsService");
 const jwt = require("jsonwebtoken");
+const generatePassword = require("generate-password");
+
 const {
   Shop,
   HealthcareProvider,
@@ -154,6 +156,74 @@ module.exports = {
       });
     }
   },
+  registerWithOutOtp: async (req, res) => {
+      let { userName, phone } = req.body;
+      try {
+        if (!userName || !phone) {
+          return res
+            .status(400)
+            .json({ success: false, message: "All fields are required" });
+        }
+        if (!phone.startsWith("+91")) {
+          phone = "+91" + phone;
+        }
+        const existingUser = await User.findOne({
+          where: {
+            [Op.or]: [{ phone }],
+          },
+        });
+        console.log("existing user", existingUser);
+        if (existingUser) {
+          return res
+            .status(400)
+            .json({ success: false, message: "User already exists" });
+        }
+  
+        const users = await User.findOne({
+          where: { phone },
+        });
+        if (users) {
+          return res
+            .status(400)
+            .json({ success: false, message: "phone already exists" });
+        }
+  
+        const password = await generatePassword.generate({
+          length: 10,
+          numbers: true,
+        });
+        const userData = {
+          userName,
+          phone,
+          role: "user", 
+          password: await hashData(password),
+        };
+        const message = `
+  Welcome, ${userName} 👋
+  Your account has been created successfully
+  
+  Login phone: ${phone}
+  Password: ${password}
+  Please login and change your password immediately for security reasons.
+  
+  Thanks,
+  EnteMahe - Mahe Businesss Community
+              `;
+  
+        const newusers = await User.create(userData);
+        try {
+          await sendSMS(phone, message);
+        } catch (smsError) {
+          console.error("SMS sending failed:", smsError.message);
+        }
+        res.status(200).json({ success: true, newusers });
+      } catch (error) {
+        console.log(error);
+        logger.error("error in addCustomer", error);
+  
+        return res.status(500).json({ success: false, message: error.message });
+      }
+    },
   editUser: async (req, res) => {
     try {
       const id = req.user.id;

@@ -34,6 +34,9 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      secondaryPhone: {
+        type: DataTypes.STRING,
+      },
       whatsapp: {
         type: DataTypes.STRING,
       },
