@@ -138,6 +138,7 @@ module.exports = {
         "closingTime",
         "workingDays",
         "whatsapp",
+        "secondaryPhone",
         "icon",
         "trash",
         "createdAt",
@@ -199,6 +200,7 @@ module.exports = {
           "priority",
           "area_id",
           "email",
+          "secondaryPhone",
           [
             Sequelize.literal(`(
               SELECT AVG(rating)
