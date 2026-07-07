@@ -931,6 +931,7 @@ module.exports = {
           "priority",
           "fromDate",
           "validityDate",
+          "location",
         ],
         where: whereCondition,
         include: [
