@@ -189,9 +189,14 @@ module.exports = {
         }
   
         const password = await generatePassword.generate({
-          length: 10,
+          length: 8,
           numbers: true,
+          uppercase: false,
+          lowercase: false,
+          symbols: false,
+          strict: true,
         });
+        
         const userData = {
           userName,
           phone,
