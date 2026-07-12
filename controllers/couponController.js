@@ -821,47 +821,102 @@ module.exports = {
       });
     }
 
-    shopId = parseInt(shopId);
+    shopId = Number.parseInt(shopId, 10);
 
-    /* Step 1: Get all coupon ranges for the shop within date range */
+    if (Number.isNaN(shopId)) {
+      return res.status(400).json({
+        error: "shopId must be a valid number",
+      });
+    }
+
+    const parsedStartDate = new Date(startDate);
+    const parsedEndDate = new Date(endDate);
+
+    if (
+      Number.isNaN(parsedStartDate.getTime()) ||
+      Number.isNaN(parsedEndDate.getTime())
+    ) {
+      return res.status(400).json({
+        error: "Invalid startDate or endDate",
+      });
+    }
+
+    if (parsedStartDate > parsedEndDate) {
+      return res.status(400).json({
+        error: "startDate cannot be greater than endDate",
+      });
+    }
+
     const shopCoupons = await UserCoupon.findAll({
       where: {
         shopId,
         createdAt: {
-          [Op.between]: [startDate, endDate],
+          [Op.between]: [parsedStartDate, parsedEndDate],
         },
       },
       attributes: ["id", "couponIdFrom", "couponIdTo"],
+      raw: true,
     });
 
-    if (!shopCoupons.length) {
+    if (shopCoupons.length === 0) {
       return res.status(404).json({
         message: "No coupons found for this shop in the given date range",
       });
     }
 
-    /* Step 2: Find min and max coupon numbers */
-    const minCoupon = Math.min(
-      ...shopCoupons.map((c) => c.couponIdFrom)
-    );
-    const maxCoupon = Math.max(
-      ...shopCoupons.map((c) => c.couponIdTo)
+    const validCouponRanges = shopCoupons.filter((coupon) => {
+      const couponIdFrom = Number(coupon.couponIdFrom);
+      const couponIdTo = Number(coupon.couponIdTo);
+
+      return (
+        Number.isInteger(couponIdFrom) &&
+        Number.isInteger(couponIdTo) &&
+        couponIdFrom <= couponIdTo
+      );
+    });
+
+    if (validCouponRanges.length === 0) {
+      return res.status(400).json({
+        message: "No valid coupon ranges found",
+      });
+    }
+
+    const totalCouponCount = validCouponRanges.reduce(
+      (total, coupon) =>
+        total +
+        (Number(coupon.couponIdTo) - Number(coupon.couponIdFrom) + 1),
+      0
     );
 
-    /* Step 3: Generate random coupon number */
-    const randomCouponId =
-      Math.floor(Math.random() * (maxCoupon - minCoupon + 1)) +
-      minCoupon;
+    let randomCouponIndex = Math.floor(Math.random() * totalCouponCount);
 
-    /* Step 4: Find the winner */
+    let winningCouponRange = null;
+    let randomCouponId = null;
+
+    for (const coupon of validCouponRanges) {
+      const couponIdFrom = Number(coupon.couponIdFrom);
+      const couponIdTo = Number(coupon.couponIdTo);
+      const couponCount = couponIdTo - couponIdFrom + 1;
+
+      if (randomCouponIndex < couponCount) {
+        winningCouponRange = coupon;
+        randomCouponId = couponIdFrom + randomCouponIndex;
+        break;
+      }
+
+      randomCouponIndex -= couponCount;
+    }
+
+    if (!winningCouponRange || randomCouponId === null) {
+      return res.status(500).json({
+        error: "Unable to select a winning coupon",
+      });
+    }
+
     const result = await UserCoupon.findOne({
       where: {
+        id: winningCouponRange.id,
         shopId,
-        couponIdFrom: { [Op.lte]: randomCouponId },
-        couponIdTo: { [Op.gte]: randomCouponId },
-        createdAt: {
-          [Op.between]: [startDate, endDate],
-        },
       },
       include: [
         {
@@ -878,28 +933,30 @@ module.exports = {
     });
 
     if (!result) {
-      return res.status(400).json({
-        message: "Invalid coupon number selected. Please try again.",
-        randomCouponId,
+      return res.status(404).json({
+        message: "Winning coupon record not found",
       });
     }
 
     return res.status(200).json({
       message: "Shop-based lucky draw success!",
       randomCouponId,
+      couponId: result.id,
       userDetails: result.user,
       shopDetails: result.shop,
-      couponId: result.id,
     });
   } catch (error) {
     console.error(error);
-    logger.error("error in shopBasedLuckyDraw", error);
+    logger.error("Error in shopBasedLuckyDraw", {
+      message: error.message,
+      stack: error.stack,
+    });
 
     return res.status(500).json({
       error: "Something went wrong",
     });
   }
-  },
+},
 
   getUserMilestone: async (req, res) => {
     const { id } = req.user;
