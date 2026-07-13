@@ -207,9 +207,9 @@ module.exports = {
   Welcome, ${userName} 👋
   Your account has been created successfully
   
-  Login phone: ${phone}
+  Login phone: ${phone.replace(/^\+91/, "")}
   Password: ${password}
-  Please login and change your password immediately for security reasons.
+  Please log in and change your password at your convenience.
   
   Thanks,
   EnteMahe - Mahe Businesss Community
