@@ -1,4 +1,4 @@
-require("../config/database");
+const sequelize = require("../config/database");
 const bcrypt = require("bcrypt");
 const logger = require("../utils/logger");
 const { startOfMonth, endOfMonth, subMonths } = require("date-fns");
@@ -158,8 +158,10 @@ module.exports = {
   },
   registerWithOutOtp: async (req, res) => {
       let { userName, phone } = req.body;
+      const t = await sequelize.transaction();
       try {
         if (!userName || !phone) {
+          await t.rollback();
           return res
             .status(400)
             .json({ success: false, message: "All fields are required" });
@@ -171,9 +173,11 @@ module.exports = {
           where: {
             [Op.or]: [{ phone }],
           },
+          transaction: t,
         });
         console.log("existing user", existingUser);
         if (existingUser) {
+          await t.rollback();
           return res
             .status(400)
             .json({ success: false, message: "User already exists" });
@@ -181,8 +185,10 @@ module.exports = {
   
         const users = await User.findOne({
           where: { phone },
+          transaction: t,
         });
         if (users) {
+          await t.rollback();
           return res
             .status(400)
             .json({ success: false, message: "phone already exists" });
@@ -215,14 +221,18 @@ module.exports = {
   EnteMahe - Mahe Businesss Community
               `;
   
-        const newusers = await User.create(userData);
+        const newusers = await User.create(userData, { transaction: t });
         try {
           await sendSMS(phone, message);
+          await t.commit();
         } catch (smsError) {
           console.error("SMS sending failed:", smsError.message);
+          await t.rollback();
+          return res.status(500).json({ success: false, message: "Failed to send SMS. User not created." });
         }
         res.status(200).json({ success: true, newusers });
       } catch (error) {
+        if (!t.finished) await t.rollback();
         console.log(error);
         logger.error("error in addCustomer", error);
   
