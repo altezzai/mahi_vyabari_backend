@@ -1,6 +1,6 @@
 const { Op } = require("sequelize");
 const generatePassword = require("generate-password");
-const { User } = require("../models");
+const { User, sequelize } = require("../models");
 const { hashData } = require("../utils/hashData");
 const { sendSMS } = require("../utils/smsService");
 const logger = require("../utils/logger");
@@ -116,7 +116,7 @@ module.exports = {
       });
       const userData = {
         userName,
-        email,
+        email: email || null,
         phone,
         role: "user",
         area_id,
@@ -134,13 +134,16 @@ Thanks,
 EnteMahe - Mahe Businesss Community
             `;
 
-      const newusers = await User.create(userData);
+      const transaction = await sequelize.transaction();
       try {
+        const newusers = await User.create(userData, { transaction });
         await sendSMS(phone, message);
-      } catch (smsError) {
-        console.error("SMS sending failed:", smsError.message);
+        await transaction.commit();
+        res.status(200).json({ success: true, newusers });
+      } catch (innerError) {
+        await transaction.rollback();
+        throw innerError;
       }
-      res.status(200).json({ success: true, newusers });
     } catch (error) {
       console.log(error);
       logger.error("error in addCustomer", error);
